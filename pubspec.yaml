@@ -1,0 +1,67 @@
+name: jurnee
+description: "A new Flutter project."
+
+publish_to: 'none'
+
+version: 0.0.1+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  flutter_svg: ^2.1.0
+  cached_network_image: ^3.4.1
+  get: ^4.7.2
+  image_cropper: ^9.1.0
+  image_picker: ^1.1.2
+  shared_preferences: ^2.5.3
+  http: ^1.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/fonts/
+    - assets/icons/
+    - assets/language/
+  
+  fonts:
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/Lato-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Lato-ThinItalic.ttf
+          weight: 100
+          style: italic
+        - asset: assets/fonts/Lato-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Lato-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/Lato-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Lato-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Lato-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Lato-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/Lato-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Lato-BlackItalic.ttf
+          weight: 900
+          style: italic
