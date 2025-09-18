@@ -10,12 +10,54 @@ class AppTexts {
     fontWeight: FontWeight.w400,
     color: AppColors.gray.shade900,
   );
+  static TextStyle d2xlm = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 72,
+    height: 88 / 72,
+    fontWeight: FontWeight.w500,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle d2xls = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 72,
+    height: 88 / 72,
+    fontWeight: FontWeight.w600,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle d2xlb = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 72,
+    height: 88 / 72,
+    fontWeight: FontWeight.w700,
+    color: AppColors.gray.shade900,
+  );
 
   static TextStyle dxlr = TextStyle(
     fontFamily: "Lato",
     fontSize: 60,
     height: 72 / 60,
     fontWeight: FontWeight.w400,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle dxlm = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 60,
+    height: 72 / 60,
+    fontWeight: FontWeight.w500,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle dxls = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 60,
+    height: 72 / 60,
+    fontWeight: FontWeight.w600,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle dxlb = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 60,
+    height: 72 / 60,
+    fontWeight: FontWeight.w700,
     color: AppColors.gray.shade900,
   );
 
@@ -26,12 +68,54 @@ class AppTexts {
     fontWeight: FontWeight.w400,
     color: AppColors.gray.shade900,
   );
+  static TextStyle dlgm = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 48,
+    height: 60 / 48,
+    fontWeight: FontWeight.w500,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle dlgs = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 48,
+    height: 60 / 48,
+    fontWeight: FontWeight.w600,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle dlgb = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 48,
+    height: 60 / 48,
+    fontWeight: FontWeight.w700,
+    color: AppColors.gray.shade900,
+  );
 
   static TextStyle dmdr = TextStyle(
     fontFamily: "Lato",
     fontSize: 36,
     height: 44 / 36,
     fontWeight: FontWeight.w400,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle dmdm = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 36,
+    height: 44 / 36,
+    fontWeight: FontWeight.w500,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle dmds = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 36,
+    height: 44 / 36,
+    fontWeight: FontWeight.w600,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle dmdb = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 36,
+    height: 44 / 36,
+    fontWeight: FontWeight.w700,
     color: AppColors.gray.shade900,
   );
 
@@ -71,12 +155,25 @@ class AppTexts {
     fontWeight: FontWeight.w400,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle dxsm = TextStyle(
     fontFamily: "Lato",
     fontSize: 24,
     height: 32 / 24,
     fontWeight: FontWeight.w500,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle dxss = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 24,
+    height: 32 / 24,
+    fontWeight: FontWeight.w600,
+    color: AppColors.gray.shade900,
+  );
+  static TextStyle dxsb = TextStyle(
+    fontFamily: "Lato",
+    fontSize: 24,
+    height: 32 / 24,
+    fontWeight: FontWeight.w700,
     color: AppColors.gray.shade900,
   );
 
@@ -87,7 +184,6 @@ class AppTexts {
     fontWeight: FontWeight.w400,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle txlm = TextStyle(
     fontFamily: "Lato",
     fontSize: 20,
@@ -95,7 +191,6 @@ class AppTexts {
     fontWeight: FontWeight.w500,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle txls = TextStyle(
     fontFamily: "Lato",
     fontSize: 20,
@@ -103,7 +198,6 @@ class AppTexts {
     fontWeight: FontWeight.w600,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle txlb = TextStyle(
     fontFamily: "Lato",
     fontSize: 20,
@@ -119,7 +213,6 @@ class AppTexts {
     fontWeight: FontWeight.w400,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle tlgm = TextStyle(
     fontFamily: "Lato",
     fontSize: 18,
@@ -127,7 +220,6 @@ class AppTexts {
     fontWeight: FontWeight.w500,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle tlgs = TextStyle(
     fontFamily: "Lato",
     fontSize: 18,
@@ -135,7 +227,6 @@ class AppTexts {
     fontWeight: FontWeight.w600,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle tlgb = TextStyle(
     fontFamily: "Lato",
     fontSize: 18,
@@ -151,7 +242,6 @@ class AppTexts {
     fontWeight: FontWeight.w400,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle tmdm = TextStyle(
     fontFamily: "Lato",
     fontSize: 16,
@@ -159,7 +249,6 @@ class AppTexts {
     fontWeight: FontWeight.w500,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle tmds = TextStyle(
     fontFamily: "Lato",
     fontSize: 16,
@@ -167,7 +256,6 @@ class AppTexts {
     fontWeight: FontWeight.w600,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle tmdb = TextStyle(
     fontFamily: "Lato",
     fontSize: 16,
@@ -183,7 +271,6 @@ class AppTexts {
     fontWeight: FontWeight.w400,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle tsmm = TextStyle(
     fontFamily: "Lato",
     fontSize: 14,
@@ -191,7 +278,6 @@ class AppTexts {
     fontWeight: FontWeight.w500,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle tsms = TextStyle(
     fontFamily: "Lato",
     fontSize: 14,
@@ -199,7 +285,6 @@ class AppTexts {
     fontWeight: FontWeight.w600,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle tsmb = TextStyle(
     fontFamily: "Lato",
     fontSize: 14,
@@ -215,7 +300,6 @@ class AppTexts {
     fontWeight: FontWeight.w400,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle txsm = TextStyle(
     fontFamily: "Lato",
     fontSize: 12,
@@ -223,7 +307,6 @@ class AppTexts {
     fontWeight: FontWeight.w500,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle txss = TextStyle(
     fontFamily: "Lato",
     fontSize: 12,
@@ -231,7 +314,6 @@ class AppTexts {
     fontWeight: FontWeight.w600,
     color: AppColors.gray.shade900,
   );
-
   static TextStyle txsb = TextStyle(
     fontFamily: "Lato",
     fontSize: 12,
