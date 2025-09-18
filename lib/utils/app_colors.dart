@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Base
   static const Color white = Color(0xFFFFFFFF);
+  static const Color scaffoldBG = Color(0xFFf3f4f6);
   static const Color black = Color(0xFF000000);
 
   // Green
@@ -14,7 +15,7 @@ class AppColors {
     300: Color(0xFF6ACD70),
     400: Color(0xFF4DD55D),
     500: Color(0xFF17C23A),
-    600: Color(0xFF158B26),
+    600: Color(0xFF15B826),
     700: Color(0xFF108F1F),
     800: Color(0xFF0D6F17),
     900: Color(0xFF0A5512),

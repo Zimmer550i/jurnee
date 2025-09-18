@@ -24,13 +24,13 @@ class CustomButton extends StatefulWidget {
     this.leading,
     this.trailing,
     this.padding = 40,
-    this.radius = 99,
+    this.radius = 12,
     this.isSecondary = false,
     this.isLoading = false,
     this.isDisabled = false,
-    this.fontSize = 16,
+    this.fontSize = 14,
     this.iconSize = 24,
-    this.height = 50,
+    this.height = 48,
     this.width = double.infinity,
   });
 
@@ -51,13 +51,11 @@ class _CustomButtonState extends State<CustomButton> {
         padding: EdgeInsets.symmetric(horizontal: widget.padding),
         decoration: BoxDecoration(
           color: widget.isSecondary
-              ? AppColors.green[50]
-              : widget.isDisabled
-              ? AppColors.green.shade300
-              : AppColors.green.shade500,
+              ? AppColors.white
+              : AppColors.green.shade600,
           borderRadius: BorderRadius.circular(widget.radius),
           border: widget.isSecondary
-              ? Border.all(color: AppColors.green)
+              ? Border.all(color: AppColors.green.shade600, width: 1.5)
               : null,
         ),
         child: widget.isLoading
@@ -67,8 +65,8 @@ class _CustomButtonState extends State<CustomButton> {
                   padding: const EdgeInsets.all(8.0),
                   child: CircularProgressIndicator(
                     color: widget.isSecondary
-                        ? AppColors.green
-                        : AppColors.green[50],
+                        ? AppColors.green.shade600
+                        : AppColors.white,
                     strokeWidth: 4,
                   ),
                 ),
@@ -85,18 +83,18 @@ class _CustomButtonState extends State<CustomButton> {
                       width: widget.iconSize,
                       colorFilter: ColorFilter.mode(
                         widget.isSecondary
-                            ? AppColors.green
-                            : AppColors.green[25]!,
+                            ? AppColors.green.shade600
+                            : AppColors.white,
                         BlendMode.srcIn,
                       ),
                     ),
                   Text(
                     widget.text,
-                    style: AppTexts.tsmb.copyWith(
+                    style: AppTexts.tsms.copyWith(
                       fontSize: widget.fontSize,
                       color: widget.isSecondary
-                          ? AppColors.green
-                          : AppColors.green.shade900,
+                          ? AppColors.green.shade600
+                          : AppColors.white,
                     ),
                   ),
                   if (widget.trailing != null)
@@ -106,8 +104,8 @@ class _CustomButtonState extends State<CustomButton> {
                       width: widget.iconSize,
                       colorFilter: ColorFilter.mode(
                         widget.isSecondary
-                            ? AppColors.green
-                            : AppColors.green.shade900,
+                            ? AppColors.green.shade600
+                            : AppColors.white,
                         BlendMode.srcIn,
                       ),
                     ),

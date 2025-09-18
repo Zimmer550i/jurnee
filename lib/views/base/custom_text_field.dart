@@ -15,6 +15,7 @@ class CustomTextField extends StatefulWidget {
   final double radius;
   final double? height;
   final double? width;
+  final Color focusColor;
   final TextEditingController? controller;
   final bool isPassword;
   final int lines;
@@ -29,11 +30,12 @@ class CustomTextField extends StatefulWidget {
     this.isDisabled = false,
     this.radius = 12,
     this.lines = 1,
+    this.focusColor = AppColors.green,
     this.textInputType,
     this.controller,
     this.onTap,
     this.errorText,
-    this.height = 50,
+    this.height = 48,
     this.width,
   });
 
@@ -93,21 +95,23 @@ class _CustomTextFieldState extends State<CustomTextField> {
             decoration: BoxDecoration(
               color: AppColors.white,
               borderRadius: BorderRadius.circular(widget.radius),
-              border: isFocused
-                  ? Border.all(color: AppColors.green, width: 1.5)
+              border: widget.errorText != null
+                  ? Border.all(color: AppColors.red.shade400, width: 1.5)
+                  : isFocused
+                  ? Border.all(color: widget.focusColor, width: 1.5)
                   : Border.all(color: AppColors.gray.shade200),
             ),
             child: Row(
-              spacing: 12,
+              spacing: 16,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (widget.leading != null)
                   SvgPicture.asset(
                     widget.leading!,
-                    height: 20,
-                    width: 20,
+                    height: 24,
+                    width: 24,
                     colorFilter: ColorFilter.mode(
-                      isFocused ? AppColors.green : AppColors.green.shade100,
+                      isFocused ? widget.focusColor : AppColors.gray.shade900,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -141,10 +145,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 if (widget.trailing != null)
                   SvgPicture.asset(
                     widget.trailing!,
-                    height: 20,
-                    width: 20,
+                    height: 24,
+                    width: 24,
                     colorFilter: ColorFilter.mode(
-                      isFocused ? AppColors.green : AppColors.green.shade100,
+                      isFocused ? widget.focusColor : AppColors.green.shade100,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -158,9 +162,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     behavior: HitTestBehavior.translucent,
                     child: SvgPicture.asset(
                       isObscured ? AppIcons.eyeOff : AppIcons.eye,
-                      width: 20,
+                      width: 24,
                       colorFilter: ColorFilter.mode(
-                        isFocused ? AppColors.green : AppColors.gray.shade100,
+                        isFocused ? widget.focusColor : AppColors.gray.shade100,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -171,14 +175,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
         ),
         if (widget.errorText != null)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.only(top: 8.0),
             child: Text(
               widget.errorText!,
-              style: TextStyle(
-                fontVariations: [FontVariation("wght", 400)],
-                fontSize: 12,
-                color: AppColors.red,
-              ),
+              style: AppTexts.txsr.copyWith(color: AppColors.red.shade400),
             ),
           ),
       ],

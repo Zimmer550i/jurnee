@@ -8,7 +8,13 @@ import 'package:jurnee/utils/custom_svg.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool hasLeading;
-  const CustomAppBar({super.key, required this.title, this.hasLeading = true});
+  final String? trailing;
+  const CustomAppBar({
+    super.key,
+    required this.title,
+    this.hasLeading = true,
+    this.trailing,
+  });
 
   @override
   Size get preferredSize => Size(double.infinity, kToolbarHeight);
@@ -16,17 +22,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.green[600],
+      backgroundColor: AppColors.scaffoldBG,
       automaticallyImplyLeading: false,
       titleSpacing: 0,
       title: SizedBox(
-        height: 44,
+        height: 50,
         child: Row(
           children: [
             SizedBox(width: 12),
             InkWell(
               onTap: () => hasLeading ? Get.back() : null,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(4),
               child: SizedBox(
                 height: 32,
                 width: 32,
@@ -35,20 +41,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     : const SizedBox(),
               ),
             ),
-            const SizedBox(width: 18),
-            Text(
-              title,
-              style: AppTexts.tsmr.copyWith(color: AppColors.green[50]),
+            Expanded(
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: AppTexts.tmdb.copyWith(color: AppColors.gray.shade700),
+              ),
             ),
+            SizedBox(width: 32),
+            SizedBox(width: 12),
           ],
-        ),
-      ),
-      bottom: PreferredSize(
-        preferredSize: Size.fromHeight(0.5),
-        child: Container(
-          height: 0.5,
-          width: double.infinity,
-          color: AppColors.green.shade300,
         ),
       ),
     );

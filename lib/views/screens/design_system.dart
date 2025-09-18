@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
@@ -20,13 +21,23 @@ class DesignSystem extends StatelessWidget {
               image: "https://picsum.photos/500/500",
               isEditable: true,
             ),
-            CustomTextField(title: "Email", hintText: "Enter your email"),
+            CustomTextField(
+              hintText: "Search",
+              leading: "assets/icons/search.svg",
+              focusColor: AppColors.gray.shade900,
+            ),
+            CustomTextField(
+              title: "Email",
+              hintText: "Enter your email",
+              errorText: "Email didn't match",
+            ),
             CustomTextField(
               title: "Password",
               hintText: "Enter your password",
               isPassword: true,
             ),
             CustomButton(text: "Button"),
+            CustomButton(text: "Button", isSecondary: true),
           ],
         ),
       ),
