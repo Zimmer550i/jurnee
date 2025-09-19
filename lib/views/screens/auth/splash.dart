@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jurnee/views/screens/auth/login.dart';
+import 'package:jurnee/views/screens/home/home.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -18,7 +18,7 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     super.initState();
     // verifyToken();
     Future.delayed(time, () {
-      Get.to(() => Login());
+      Get.to(() => Home());
     });
   }
 
