@@ -5,13 +5,13 @@ import 'package:jurnee/utils/custom_svg.dart';
 
 class CustomBottomNavbar extends StatelessWidget {
   final int index;
-  final Function(int)? onChanged;
+  final Function(int) onChanged;
   final void Function() onShowOverlay;
   final bool showOverlay;
   const CustomBottomNavbar({
     super.key,
     required this.index,
-    this.onChanged,
+    required this.onChanged,
     required this.onShowOverlay,
     required this.showOverlay,
   });
@@ -71,12 +71,15 @@ class CustomBottomNavbar extends StatelessWidget {
   }
 
   Widget item(String name, String icon, int pos) {
-    bool isSelected = pos == index;
+    bool isSelected = (pos == index) && !showOverlay;
 
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          if (onChanged != null) onChanged!(pos);
+          onChanged(pos);
+          if (showOverlay) {
+            onShowOverlay();
+          }
         },
         behavior: HitTestBehavior.translucent,
         child: Column(

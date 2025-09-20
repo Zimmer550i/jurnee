@@ -1,6 +1,6 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
@@ -30,23 +30,33 @@ class _HomeState extends State<Home> {
         children: [
           Column(
             children: [
-              AppBar(
-                automaticallyImplyLeading: false,
-                backgroundColor: AppColors.scaffoldBG,
-                surfaceTintColor: Colors.transparent,
-                titleSpacing: 0,
-                title: Row(
-                  children: [
-                    const SizedBox(width: 24),
-                    CustomSvg(asset: "assets/icons/logo.svg"),
-                    Spacer(),
-                    const SizedBox(width: 24),
-                  ],
+              if (index != 0)
+                AppBar(
+                  automaticallyImplyLeading: false,
+                  backgroundColor: AppColors.scaffoldBG,
+                  surfaceTintColor: Colors.transparent,
+                  titleSpacing: 0,
+                  title: Row(
+                    children: [
+                      const SizedBox(width: 24),
+                      CustomSvg(asset: "assets/icons/logo.svg"),
+                      Spacer(),
+                      const SizedBox(width: 24),
+                    ],
+                  ),
                 ),
-              ),
-              pages[index],
+              Expanded(child: pages[index]),
             ],
           ),
+          if (showOverlay)
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  showOverlay = false;
+                });
+              },
+              child: Container(color: AppColors.black.withValues(alpha: 0.37)),
+            ),
           Positioned(
             bottom: 20,
             left: 24,
@@ -78,6 +88,7 @@ class _HomeState extends State<Home> {
                           ),
                           const SizedBox(height: 16),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
                                 child: Container(
@@ -140,6 +151,7 @@ class _HomeState extends State<Home> {
                           ),
                           const SizedBox(height: 16),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
                                 child: Container(
@@ -213,16 +225,24 @@ class _HomeState extends State<Home> {
         ],
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
-      floatingActionButton: showOverlay
+      floatingActionButton: showOverlay || index != 0
           ? null
-          : Container(
-              height: 60,
-              width: 60,
-              decoration: BoxDecoration(
-                color: AppColors.green.shade600,
-                shape: BoxShape.circle,
+          : GestureDetector(
+              onTap: () {
+                Get.to(
+                  () => Homepage(showMap: true),
+                  transition: Transition.noTransition,
+                );
+              },
+              child: Container(
+                height: 60,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: AppColors.green.shade600,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(child: CustomSvg(asset: "assets/icons/map.svg")),
               ),
-              child: Center(child: CustomSvg(asset: "assets/icons/map.svg")),
             ),
       bottomNavigationBar: CustomBottomNavbar(
         index: index,
