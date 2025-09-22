@@ -48,7 +48,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 style: AppTexts.tmdb.copyWith(color: AppColors.gray.shade700),
               ),
             ),
-            SizedBox(width: 32),
+            trailing != null
+                ? CustomSvg(asset: trailing!)
+                : SizedBox(width: 32),
             SizedBox(width: 12),
           ],
         ),
