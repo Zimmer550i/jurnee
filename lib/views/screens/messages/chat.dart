@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
-import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 
 class Chat extends StatefulWidget {

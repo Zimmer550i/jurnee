@@ -41,7 +41,6 @@ class _LocationMapState extends State<LocationMap> {
   }
 
   void loadMarkers() async {
-    markers.clear();
     markers.addAll([
       Marker(
         markerId: MarkerId("1"),
@@ -78,6 +77,10 @@ class _LocationMapState extends State<LocationMap> {
         },
       ),
     ]);
+    while (markers.length > 2) {
+      markers.remove(markers.elementAt(0));
+    }
+
     if (cardPosition != null) {
       markers.add(
         Marker(
@@ -90,6 +93,7 @@ class _LocationMapState extends State<LocationMap> {
               ).toBitmapDescriptor(
                 logicalSize: Size(400, 400),
                 imageSize: Size(600, 600),
+                waitToRender: Duration.zero,
               ),
           onTap: () {
             Get.to(() => PostDetails());

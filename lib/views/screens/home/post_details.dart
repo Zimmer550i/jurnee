@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
+import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
+import 'package:jurnee/views/screens/home/attending.dart';
 
 class PostDetails extends StatelessWidget {
   const PostDetails({super.key});
@@ -45,15 +48,71 @@ class PostDetails extends StatelessWidget {
                         ),
                         PopupMenuButton(
                           onSelected: (value) {
-                            
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: AppColors.scaffoldBG,
+                              builder: (context) {
+                                return SafeArea(
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 60),
+                                          Text(
+                                            "Why you are reporting this post?",
+                                            style: AppTexts.txsb,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          CustomTextField(
+                                            lines: 5,
+                                            hintText: "Start writing...",
+                                          ),
+                                          const SizedBox(height: 24),
+                                          CustomButton(
+                                            onTap: () {
+                                              Get.back();
+                                            },
+                                            text: "Submit",
+                                          ),
+                                          const SizedBox(height: 24),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
                           },
                           menuPadding: EdgeInsets.zero,
-                          color: AppColors.green,
+                          color: AppColors.white,
                           itemBuilder: (_) => [
-                            PopupMenuItem(value: "1", child: Container(
-                              color: AppColors.scaffoldBG,
-                              
-                            )),
+                            PopupMenuItem(
+                              value: "1",
+                              child: Row(
+                                spacing: 8,
+                                children: [
+                                  Transform.translate(
+                                    offset: Offset(0, 2),
+                                    child: CustomSvg(
+                                      asset: "assets/icons/report.svg",
+                                    ),
+                                  ),
+                                  Text(
+                                    "Report",
+                                    style: AppTexts.tsms.copyWith(
+                                      color: AppColors.green.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -150,49 +209,58 @@ class PostDetails extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Text(
-                          "Attending",
-                          style: AppTexts.tlgm.copyWith(color: AppColors.gray),
-                        ),
-                        Spacer(),
-                        SizedBox(
-                          width: 79,
-                          height: 26,
-                          child: Stack(
-                            children: [
-                              for (int i = 0; i < 5; i++)
-                                Positioned(
-                                  left: 12.0 * i,
-                                  child: Container(
-                                    padding: EdgeInsets.all(1),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.white,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: ProfilePicture(
-                                      image:
-                                          "https://thispersondoesnotexist.com",
-                                      size: 24,
+                    InkWell(
+                      onTap: () {
+                        Get.to(() => Attending());
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            "Attending",
+                            style: AppTexts.tlgm.copyWith(
+                              color: AppColors.gray,
+                            ),
+                          ),
+                          Spacer(),
+                          SizedBox(
+                            width: 79,
+                            height: 26,
+                            child: Stack(
+                              children: [
+                                for (int i = 0; i < 5; i++)
+                                  Positioned(
+                                    left: 12.0 * i,
+                                    child: Container(
+                                      padding: EdgeInsets.all(1),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: ProfilePicture(
+                                        image:
+                                            "https://thispersondoesnotexist.com",
+                                        size: 24,
+                                      ),
                                     ),
                                   ),
-                                ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        Text(
-                          "+42",
-                          style: AppTexts.txsr.copyWith(color: AppColors.gray),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "See all",
-                          style: AppTexts.txss.copyWith(
-                            color: AppColors.green.shade600,
+                          Text(
+                            "+42",
+                            style: AppTexts.txsr.copyWith(
+                              color: AppColors.gray,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Text(
+                            "See all",
+                            style: AppTexts.txss.copyWith(
+                              color: AppColors.green.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Text(
@@ -215,11 +283,65 @@ class PostDetails extends StatelessWidget {
                           CustomNetworkedImage(radius: 12),
                       ],
                     ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        Text(
+                          "Missing Person’s Information",
+                          style: AppTexts.tlgm.copyWith(
+                            color: AppColors.gray.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Name: John Doe",
+                          style: AppTexts.tmdr.copyWith(color: AppColors.gray),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Age: 21",
+                          style: AppTexts.tmdr.copyWith(color: AppColors.gray),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Clothing Info: wearing red shirt & black pant",
+                          style: AppTexts.tmdr.copyWith(color: AppColors.gray),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Contact Info: name@example.com",
+                          style: AppTexts.tmdr.copyWith(color: AppColors.gray),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 20),
                     Text(
                       "#hashtag" * 9,
                       style: AppTexts.tsmr.copyWith(
                         color: AppColors.green.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Text(
+                          "Start From",
+                          style: AppTexts.tmdr.copyWith(color: AppColors.gray),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "\$200",
+                          style: AppTexts.dxss.copyWith(
+                            color: AppColors.gray.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      "Expires in 7 days",
+                      style: AppTexts.tmdm.copyWith(
+                        color: AppColors.gray.shade400,
                       ),
                     ),
                     const SizedBox(height: 32),
