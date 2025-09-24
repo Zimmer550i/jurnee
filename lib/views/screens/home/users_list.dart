@@ -4,13 +4,14 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 
-class Attending extends StatelessWidget {
-  const Attending({super.key});
+class UsersList extends StatelessWidget {
+  final String title;
+  const UsersList({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Attending"),
+      appBar: CustomAppBar(title: title),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 24),
@@ -23,7 +24,10 @@ class Attending extends StatelessWidget {
                   Row(
                     spacing: 16,
                     children: [
-                      ProfilePicture(size: 52),
+                      ProfilePicture(
+                        image: "https://thispersondoesnotexist.com",
+                        size: 52,
+                      ),
                       Text(
                         "Sample Name",
                         style: AppTexts.tlgm.copyWith(

@@ -21,33 +21,19 @@ class _HomeState extends State<Home> {
   int index = 0;
   bool showOverlay = false;
 
-  List<Widget> pages = [Homepage(), Messages(), Notifications(), Profile()];
+  List<Widget> pages = [
+    Homepage(),
+    Messages(),
+    Notifications(),
+    Profile(isUser: true),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          Column(
-            children: [
-              if (index != 0)
-                AppBar(
-                  automaticallyImplyLeading: false,
-                  backgroundColor: AppColors.scaffoldBG,
-                  surfaceTintColor: Colors.transparent,
-                  titleSpacing: 0,
-                  title: Row(
-                    children: [
-                      const SizedBox(width: 24),
-                      CustomSvg(asset: "assets/icons/logo.svg"),
-                      Spacer(),
-                      const SizedBox(width: 24),
-                    ],
-                  ),
-                ),
-              Expanded(child: pages[index]),
-            ],
-          ),
+          pages[index],
           if (showOverlay)
             GestureDetector(
               onTap: () {

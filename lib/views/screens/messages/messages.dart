@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/messages/chat.dart';
 
@@ -10,16 +11,32 @@ class Messages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          spacing: 8,
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: AppColors.scaffoldBG,
+        surfaceTintColor: Colors.transparent,
+        titleSpacing: 0,
+        title: Row(
           children: [
-            const SizedBox(height: 12),
-            for (int i = 0; i < 16; i++) messageWidget(),
-            const SizedBox(height: 12),
+            const SizedBox(width: 24),
+            CustomSvg(asset: "assets/icons/logo.svg"),
+            Spacer(),
+            const SizedBox(width: 24),
           ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            spacing: 8,
+            children: [
+              const SizedBox(height: 12),
+              for (int i = 0; i < 16; i++) messageWidget(),
+              const SizedBox(height: 12),
+            ],
+          ),
         ),
       ),
     );

@@ -8,13 +8,29 @@ class Notifications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          for (int i = 0; i < 16; i++) notificationWidget(i > 2),
-          const SizedBox(height: 20),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: AppColors.scaffoldBG,
+        surfaceTintColor: Colors.transparent,
+        titleSpacing: 0,
+        title: Row(
+          children: [
+            const SizedBox(width: 24),
+            CustomSvg(asset: "assets/icons/logo.svg"),
+            Spacer(),
+            const SizedBox(width: 24),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            for (int i = 0; i < 16; i++) notificationWidget(i > 2),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

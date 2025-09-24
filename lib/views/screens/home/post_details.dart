@@ -8,7 +8,8 @@ import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
-import 'package:jurnee/views/screens/home/attending.dart';
+import 'package:jurnee/views/screens/home/users_list.dart';
+import 'package:jurnee/views/screens/profile/boost_post.dart';
 
 class PostDetails extends StatelessWidget {
   const PostDetails({super.key});
@@ -209,58 +210,115 @@ class PostDetails extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    InkWell(
-                      onTap: () {
-                        Get.to(() => Attending());
-                      },
-                      child: Row(
-                        children: [
-                          Text(
-                            "Attending",
-                            style: AppTexts.tlgm.copyWith(
-                              color: AppColors.gray,
+                    Column(
+                      spacing: 24,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Total Earnings",
+                              style: AppTexts.tlgm.copyWith(
+                                color: AppColors.gray,
+                              ),
                             ),
-                          ),
-                          Spacer(),
-                          SizedBox(
-                            width: 79,
-                            height: 26,
-                            child: Stack(
-                              children: [
-                                for (int i = 0; i < 5; i++)
-                                  Positioned(
-                                    left: 12.0 * i,
-                                    child: Container(
-                                      padding: EdgeInsets.all(1),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.white,
-                                        shape: BoxShape.circle,
+                            Text(
+                              "\$500",
+                              style: AppTexts.txlb.copyWith(
+                                color: AppColors.gray.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Units Sold",
+                              style: AppTexts.tlgm.copyWith(
+                                color: AppColors.gray,
+                              ),
+                            ),
+                            Text(
+                              "10/40",
+                              style: AppTexts.txlb.copyWith(
+                                color: AppColors.gray.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Unit Price",
+                              style: AppTexts.tlgm.copyWith(
+                                color: AppColors.gray,
+                              ),
+                            ),
+                            Text(
+                              "\$50",
+                              style: AppTexts.txlb.copyWith(
+                                color: AppColors.gray.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        InkWell(
+                          onTap: () {
+                            Get.to(() => UsersList(title: "Attending"));
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                "Attending",
+                                style: AppTexts.tlgm.copyWith(
+                                  color: AppColors.gray,
+                                ),
+                              ),
+                              Spacer(),
+                              SizedBox(
+                                width: 79,
+                                height: 26,
+                                child: Stack(
+                                  children: [
+                                    for (int i = 0; i < 5; i++)
+                                      Positioned(
+                                        left: 12.0 * i,
+                                        child: Container(
+                                          padding: EdgeInsets.all(1),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.white,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: ProfilePicture(
+                                            image:
+                                                "https://thispersondoesnotexist.com",
+                                            size: 24,
+                                          ),
+                                        ),
                                       ),
-                                      child: ProfilePicture(
-                                        image:
-                                            "https://thispersondoesnotexist.com",
-                                        size: 24,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                "+42",
+                                style: AppTexts.txsr.copyWith(
+                                  color: AppColors.gray,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "See all",
+                                style: AppTexts.txss.copyWith(
+                                  color: AppColors.green.shade600,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            "+42",
-                            style: AppTexts.txsr.copyWith(
-                              color: AppColors.gray,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            "See all",
-                            style: AppTexts.txss.copyWith(
-                              color: AppColors.green.shade600,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 20),
                     Text(
@@ -345,7 +403,12 @@ class PostDetails extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 32),
-                    CustomButton(text: "Attending"),
+                    CustomButton(
+                      onTap: () {
+                        Get.to(() => BoostPost());
+                      },
+                      text: "Boost Post",
+                    ),
                     const SizedBox(height: 20),
                   ],
                 ),
