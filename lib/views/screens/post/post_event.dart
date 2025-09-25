@@ -42,14 +42,13 @@ class _PostEventState extends State<PostEvent> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      onTap: () {
-                        setState(() async {
-                          date = await showDatePicker(
-                            context: context,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2050),
-                          );
-                        });
+                      onTap: () async {
+                        date = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2050),
+                        );
+                        setState(() {});
                       },
                       title: "Date",
                       hintText: "Pick date",
@@ -58,13 +57,12 @@ class _PostEventState extends State<PostEvent> {
                   ),
                   Expanded(
                     child: CustomTextField(
-                      onTap: () {
-                        setState(() async {
-                          time = await showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay.now(),
-                          );
-                        });
+                      onTap: () async {
+                        time = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        setState(() {});
                       },
                       title: "Time",
                       hintText: "Pick time",

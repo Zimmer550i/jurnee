@@ -3,7 +3,8 @@ import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 
 class LocationPicker extends StatefulWidget {
-  const LocationPicker({super.key});
+  final String title;
+  const LocationPicker({super.key, this.title = "Location"});
 
   @override
   State<LocationPicker> createState() => _LocationPickerState();
@@ -29,7 +30,7 @@ class _LocationPickerState extends State<LocationPicker> {
               }
             });
           },
-          title: "Location",
+          title: widget.title,
           hintText: "Select location",
           trailing: "assets/icons/location.svg",
         ),

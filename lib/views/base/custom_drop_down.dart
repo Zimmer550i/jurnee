@@ -31,7 +31,7 @@ class CustomDropDown extends StatefulWidget {
 class _CustomDropDownState extends State<CustomDropDown> {
   String? currentVal;
   bool isExpanded = false;
-  Duration defaultDuration = const Duration(milliseconds: 300);
+  Duration defaultDuration = const Duration(milliseconds: 100);
 
   @override
   void initState() {

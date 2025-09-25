@@ -43,14 +43,13 @@ class _PostDealState extends State<PostDeal> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      onTap: () {
-                        setState(() async {
-                          start = await showDatePicker(
-                            context: context,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2050),
-                          );
-                        });
+                      onTap: () async {
+                        start = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2050),
+                        );
+                        setState(() {});
                       },
                       title: "Start",
                       hintText: "Start date",
@@ -59,14 +58,13 @@ class _PostDealState extends State<PostDeal> {
                   ),
                   Expanded(
                     child: CustomTextField(
-                      onTap: () {
-                        setState(() async {
-                          end = await showDatePicker(
-                            context: context,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2050),
-                          );
-                        });
+                      onTap: () async {
+                        end = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2050),
+                        );
+                        setState(() {});
                       },
                       title: "End",
                       hintText: "End Date",
