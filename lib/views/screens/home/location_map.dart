@@ -59,7 +59,7 @@ class _LocationMapState extends State<LocationMap> {
       ),
       Marker(
         markerId: MarkerId("2"),
-        position: LatLng(37.42796133580664, -122.085749655962),
+        position: LatLng(37.42858833580664, -122.085749655962),
         icon: await Icon(Icons.location_pin, color: AppColors.green.shade600)
             .toBitmapDescriptor(
               logicalSize: Size(300, 300),
@@ -67,10 +67,10 @@ class _LocationMapState extends State<LocationMap> {
             ),
         onTap: () async {
           setState(() {
-            if (cardPosition == LatLng(37.42796133580664, -122.085749655962)) {
+            if (cardPosition == LatLng(37.42858833580664, -122.085749655962)) {
               cardPosition = null;
             } else {
-              cardPosition = LatLng(37.42796133580664, -122.085749655962);
+              cardPosition = LatLng(37.42858833580664, -122.085749655962);
             }
           });
           loadMarkers();
@@ -91,8 +91,8 @@ class _LocationMapState extends State<LocationMap> {
                 padding: EdgeInsetsGeometry.only(bottom: 60),
                 child: PostCardSmall(),
               ).toBitmapDescriptor(
-                logicalSize: Size(400, 400),
-                imageSize: Size(600, 600),
+                logicalSize: Size(400, 500),
+                imageSize: Size(400, 500),
                 waitToRender: Duration.zero,
               ),
           onTap: () {
@@ -102,6 +102,7 @@ class _LocationMapState extends State<LocationMap> {
       );
     }
 
-    setState(() {});
+    setState(() {
+    });
   }
 }

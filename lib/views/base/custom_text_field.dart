@@ -20,6 +20,7 @@ class CustomTextField extends StatefulWidget {
   final bool isPassword;
   final int lines;
   final void Function()? onTap;
+  final void Function(String)? onChanged;
   const CustomTextField({
     super.key,
     this.title,
@@ -37,6 +38,7 @@ class CustomTextField extends StatefulWidget {
     this.errorText,
     this.height = 48,
     this.width,
+    this.onChanged,
   });
 
   @override
@@ -130,6 +132,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                         focusNode.unfocus();
                       });
                     },
+                    onChanged: widget.onChanged,
                     style: AppTexts.tsmr,
                     decoration: InputDecoration(
                       border: InputBorder.none,
@@ -145,10 +148,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 if (widget.trailing != null)
                   SvgPicture.asset(
                     widget.trailing!,
-                    height: 24,
-                    width: 24,
+                    height: 16,
+                    width: 16,
                     colorFilter: ColorFilter.mode(
-                      isFocused ? widget.focusColor : AppColors.green.shade100,
+                      AppColors.green.shade700,
                       BlendMode.srcIn,
                     ),
                   ),

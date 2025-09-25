@@ -1,5 +1,4 @@
 import 'package:jurnee/utils/app_colors.dart';
-import 'package:jurnee/utils/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -20,8 +19,8 @@ class CustomDropDown extends StatefulWidget {
     this.hintText,
     required this.options,
     this.onChanged,
-    this.radius = 24,
-    this.height,
+    this.radius = 12,
+    this.height = 48,
     this.width,
   });
 
@@ -32,7 +31,7 @@ class CustomDropDown extends StatefulWidget {
 class _CustomDropDownState extends State<CustomDropDown> {
   String? currentVal;
   bool isExpanded = false;
-  Duration defaultDuration = const Duration(milliseconds: 100);
+  Duration defaultDuration = const Duration(milliseconds: 300);
 
   @override
   void initState() {
@@ -46,16 +45,11 @@ class _CustomDropDownState extends State<CustomDropDown> {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8,
       children: [
         if (widget.title != null)
-          Text(
-            widget.title!,
-            style: TextStyle(
-              fontVariations: [FontVariation("wght", 600)],
-              fontSize: 16,
-              color: AppColors.green[600],
-            ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(widget.title!, style: AppTexts.txsb),
           ),
 
         GestureDetector(
@@ -67,8 +61,11 @@ class _CustomDropDownState extends State<CustomDropDown> {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
-              color: AppColors.green[400],
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(widget.radius),
+              border: isExpanded
+                  ? Border.all(color: AppColors.green.shade600, width: 1)
+                  : Border.all(color: AppColors.gray.shade200),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -81,24 +78,25 @@ class _CustomDropDownState extends State<CustomDropDown> {
                           ? Text(
                               widget.hintText ?? "Select One",
                               style: AppTexts.tsmr.copyWith(
-                                color: AppColors.green.shade200,
+                                color: AppColors.gray.shade400,
                               ),
                             )
-                          : Text(
-                              currentVal!,
-                              style: AppTexts.tsmr.copyWith(
-                                color: AppColors.green.shade50,
-                              ),
-                            ),
+                          : Text(currentVal!, style: AppTexts.tsmr),
                       const Spacer(),
                       AnimatedRotation(
                         duration: defaultDuration,
                         turns: isExpanded ? 0.5 : 1,
-                        child: SvgPicture.asset(AppIcons.arrowDown),
+                        child: SvgPicture.asset("assets/icons/dropdown.svg"),
                       ),
                     ],
                   ),
                 ),
+                if (isExpanded)
+                  Container(
+                    width: widget.width,
+                    height: 0.5,
+                    color: AppColors.gray.shade200,
+                  ),
                 AnimatedSize(
                   duration: defaultDuration,
                   child: isExpanded
@@ -107,6 +105,7 @@ class _CustomDropDownState extends State<CustomDropDown> {
                           children: [
                             ...widget.options.map((e) {
                               return GestureDetector(
+                                behavior: HitTestBehavior.translucent,
                                 onTap: () {
                                   setState(() {
                                     isExpanded = false;
@@ -116,22 +115,14 @@ class _CustomDropDownState extends State<CustomDropDown> {
                                     }
                                   });
                                 },
-                                child: Container(
+                                child: SizedBox(
                                   height: widget.height,
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      top: BorderSide(
-                                        color: AppColors.green[400]!,
-                                        width: 0.5,
-                                      ),
-                                    ),
-                                  ),
                                   child: Align(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
                                       e,
                                       style: TextStyle(
-                                        color: AppColors.green[50],
+                                        color: AppColors.gray,
                                         fontSize: 14,
                                       ),
                                     ),

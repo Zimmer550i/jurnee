@@ -8,6 +8,9 @@ import 'package:jurnee/views/base/custom_bottom_navbar.dart';
 import 'package:jurnee/views/screens/home/homepage.dart';
 import 'package:jurnee/views/screens/messages/messages.dart';
 import 'package:jurnee/views/screens/notifications/notifications.dart';
+import 'package:jurnee/views/screens/post/post_alert.dart';
+import 'package:jurnee/views/screens/post/post_deal.dart';
+import 'package:jurnee/views/screens/post/post_event.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
 class Home extends StatefulWidget {
@@ -77,59 +80,71 @@ class _HomeState extends State<Home> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.green[50],
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      CustomSvg(
-                                        asset: "assets/icons/event.svg",
-                                      ),
-                                      Text(
-                                        "Event",
-                                        style: AppTexts.tmdb.copyWith(
-                                          color: AppColors.gray.shade600,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Get.to(() => PostEvent());
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.green[50],
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        CustomSvg(
+                                          asset: "assets/icons/event.svg",
                                         ),
-                                      ),
-                                      Text(
-                                        "Share upcoming activities, concerts, meetups",
-                                        textAlign: TextAlign.center,
-                                        style: AppTexts.txsr.copyWith(
-                                          color: AppColors.gray.shade500,
+                                        Text(
+                                          "Event",
+                                          style: AppTexts.tmdb.copyWith(
+                                            color: AppColors.gray.shade600,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          "Share upcoming activities, concerts, meetups",
+                                          textAlign: TextAlign.center,
+                                          style: AppTexts.txsr.copyWith(
+                                            color: AppColors.gray.shade500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 16),
                               Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.green[50],
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      CustomSvg(asset: "assets/icons/deal.svg"),
-                                      Text(
-                                        "Deal",
-                                        style: AppTexts.tmdb.copyWith(
-                                          color: AppColors.gray.shade600,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Get.to(() => PostDeal());
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.green[50],
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        CustomSvg(
+                                          asset: "assets/icons/deal.svg",
                                         ),
-                                      ),
-                                      Text(
-                                        "Promote discounts, specials, flash offers",
-                                        textAlign: TextAlign.center,
-                                        style: AppTexts.txsr.copyWith(
-                                          color: AppColors.gray.shade500,
+                                        Text(
+                                          "Deal",
+                                          style: AppTexts.tmdb.copyWith(
+                                            color: AppColors.gray.shade600,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          "Promote discounts, specials, flash offers",
+                                          textAlign: TextAlign.center,
+                                          style: AppTexts.txsr.copyWith(
+                                            color: AppColors.gray.shade500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -170,31 +185,36 @@ class _HomeState extends State<Home> {
                               ),
                               const SizedBox(width: 16),
                               Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.green[50],
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      CustomSvg(
-                                        asset: "assets/icons/alerts.svg",
-                                      ),
-                                      Text(
-                                        "Alerts",
-                                        style: AppTexts.tmdb.copyWith(
-                                          color: AppColors.gray.shade600,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Get.to(() => PostAlert());
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.green[50],
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        CustomSvg(
+                                          asset: "assets/icons/alerts.svg",
                                         ),
-                                      ),
-                                      Text(
-                                        "Quick community updates (road closures, lost pet)",
-                                        textAlign: TextAlign.center,
-                                        style: AppTexts.txsr.copyWith(
-                                          color: AppColors.gray.shade500,
+                                        Text(
+                                          "Alerts",
+                                          style: AppTexts.tmdb.copyWith(
+                                            color: AppColors.gray.shade600,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          "Quick community updates (road closures, lost pet)",
+                                          textAlign: TextAlign.center,
+                                          style: AppTexts.txsr.copyWith(
+                                            color: AppColors.gray.shade500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
