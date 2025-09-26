@@ -11,6 +11,7 @@ import 'package:jurnee/views/screens/notifications/notifications.dart';
 import 'package:jurnee/views/screens/post/post_alert.dart';
 import 'package:jurnee/views/screens/post/post_deal.dart';
 import 'package:jurnee/views/screens/post/post_event.dart';
+import 'package:jurnee/views/screens/post/post_service.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
 class Home extends StatefulWidget {
@@ -155,31 +156,36 @@ class _HomeState extends State<Home> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.green[50],
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      CustomSvg(
-                                        asset: "assets/icons/service.svg",
-                                      ),
-                                      Text(
-                                        "Service",
-                                        style: AppTexts.tmdb.copyWith(
-                                          color: AppColors.gray.shade600,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Get.to(() => PostService());
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.green[50],
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        CustomSvg(
+                                          asset: "assets/icons/service.svg",
                                         ),
-                                      ),
-                                      Text(
-                                        "Add professional services with availability & pricing",
-                                        textAlign: TextAlign.center,
-                                        style: AppTexts.txsr.copyWith(
-                                          color: AppColors.gray.shade500,
+                                        Text(
+                                          "Service",
+                                          style: AppTexts.tmdb.copyWith(
+                                            color: AppColors.gray.shade600,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          "Add professional services with availability & pricing",
+                                          textAlign: TextAlign.center,
+                                          style: AppTexts.txsr.copyWith(
+                                            color: AppColors.gray.shade500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
