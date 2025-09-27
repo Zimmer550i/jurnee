@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jurnee/utils/custom_image_picker.dart';
 import 'package:jurnee/utils/custom_svg.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProfilePicture extends StatelessWidget {
   final double size;
@@ -66,15 +67,14 @@ class ProfilePicture extends StatelessWidget {
                   ? CachedNetworkImage(
                       imageUrl: image!,
                       progressIndicatorBuilder: (context, url, progress) {
-                        return SizedBox(
-                          width: size,
-                          height: size,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              value: progress.progress,
-                              strokeWidth: 2,
-                              color: AppColors.green[400],
-                            ),
+                        return Shimmer.fromColors(
+                          baseColor: AppColors.green.shade300,
+                          highlightColor: AppColors.green[25]!,
+                          period: Duration(milliseconds: 800),
+                          child: Container(
+                            height: size,
+                            width: size,
+                            color: Colors.white,
                           ),
                         );
                       },

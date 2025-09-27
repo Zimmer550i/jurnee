@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:jurnee/utils/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CustomNetworkedImage extends StatelessWidget {
@@ -43,18 +44,21 @@ class CustomNetworkedImage extends StatelessWidget {
                   height: height,
                   width: width,
                   color: Colors.grey,
-                  child: Center(child: Column(
-                    children: [
-                      Icon(Icons.error, color: Colors.red),
-                      Text(error.toString())
-                    ],
-                  )),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error, color: Colors.red),
+                        Text(error.toString()),
+                      ],
+                    ),
+                  ),
                 );
               },
               placeholder: (context, url) {
                 return Shimmer.fromColors(
-                  baseColor: Color.fromARGB(255, 133, 191, 254),
-                  highlightColor: Color.fromARGB(255, 197, 222, 248),
+                  baseColor: AppColors.green.shade300,
+                  highlightColor: AppColors.green[25]!,
                   period: Duration(milliseconds: 800),
                   child: Container(
                     height: height ?? width,

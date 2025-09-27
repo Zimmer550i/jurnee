@@ -9,6 +9,7 @@ import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
+import 'package:jurnee/views/screens/home/reviews.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/profile/boost_post.dart';
 
@@ -32,9 +33,9 @@ class PostDetails extends StatelessWidget {
                     () => MediaPlayer(
                       mediaList: [
                         "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4",
-                        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_30MB.mp4",
-                        "https://picsum.photos/id/1025/600/400",
-                        "https://picsum.photos/id/1039/600/400",
+                        "https://test-videos.co.uk/vids/jellyfish/mp4/h264/720/Jellyfish_720_10s_10MB.mp4",
+                        "https://test-videos.co.uk/vids/sintel/mp4/h264/720/Sintel_720_10s_30MB.mp4",
+                        "https://picsum.photos/500/800",
                       ],
                     ),
                   );
@@ -134,6 +135,20 @@ class PostDetails extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: AppColors.green.shade200,
+                      ),
+                      child: Text(
+                        "Food & Beverage",
+                        style: AppTexts.tsms.copyWith(
+                          color: AppColors.green.shade900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     Text(
                       "0.8 mi • Tonight 6:00 PM",
                       style: AppTexts.tmdm.copyWith(
@@ -156,20 +171,30 @@ class PostDetails extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Row(
-                      spacing: 4,
-                      children: [
-                        for (int i = 0; i < 5; i++)
-                          CustomSvg(asset: "assets/icons/star.svg", size: 24),
-                        Expanded(
-                          child: Text(
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(() => Reviews(count: 25));
+                      },
+                      child: Row(
+                        children: [
+                          for (int i = 0; i < 5; i++)
+                            CustomSvg(asset: "assets/icons/star.svg", size: 24),
+                          const SizedBox(width: 4),
+                          Text(
                             "4.7",
                             style: AppTexts.tlgm.copyWith(
                               color: AppColors.gray.shade400,
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 12),
+                          Text(
+                            "See All",
+                            style: AppTexts.tsmr.copyWith(
+                              color: AppColors.green.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Row(

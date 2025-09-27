@@ -1,14 +1,17 @@
 import 'package:jurnee/utils/app_colors.dart';
+import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_flick_portrait_controls.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoWidget extends StatefulWidget {
-  final String url;
-  const VideoWidget(this.url, {super.key});
+  final String? url;
+  final VideoPlayerController? controller;
+  const VideoWidget(this.url, {super.key, this.controller});
 
   @override
   State<VideoWidget> createState() => _VideoWidgetState();
@@ -18,20 +21,22 @@ class _VideoWidgetState extends State<VideoWidget> {
   late FlickManager flickManager;
   late VideoPlayerController _controller;
 
-  /*
-  Bug: When the video pauses when load buffers there is no loading animation.
-  */
-
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    _controller =
+        widget.controller ??
+              VideoPlayerController.networkUrl(Uri.parse(widget.url!))
+          ..setLooping(true)
+          ..setVolume(1);
     flickManager = FlickManager(videoPlayerController: _controller);
   }
 
   @override
   void dispose() {
     super.dispose();
+    flickManager.dispose();
+    _controller.dispose();
   }
 
   @override
@@ -39,6 +44,7 @@ class _VideoWidgetState extends State<VideoWidget> {
     return FlickVideoPlayer(
       flickManager: flickManager,
       flickVideoWithControls: FlickVideoWithControls(
+        videoFit: BoxFit.cover,
         playerLoadingFallback: Stack(
           children: [
             Center(
@@ -64,6 +70,102 @@ class _VideoWidgetState extends State<VideoWidget> {
                     ),
                     child: Center(
                       child: CustomSvg(asset: "assets/icons/back.svg"),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: FlickAutoHideChild(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      // color: Color(0xff1b1b1b).withAlpha(128),
+                      gradient: LinearGradient(
+                        begin: AlignmentGeometry.bottomCenter,
+                        end: AlignmentGeometry.topCenter,
+                        colors: [Colors.black, Colors.transparent],
+                      ),
+                    ),
+                    padding: EdgeInsets.only(left: 20, right: 20, top: 20),
+                    child: SafeArea(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "Post from event",
+                            style: AppTexts.tmdr.copyWith(
+                              color: AppColors.gray[25],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "Event Name",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTexts.dxsm.copyWith(
+                              color: AppColors.gray[25],
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
+                                "0.8 mi",
+                                style: AppTexts.tmdm.copyWith(
+                                  color: AppColors.gray[25],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              for (int i = 0; i < 4; i++)
+                                CustomSvg(asset: "assets/icons/star.svg"),
+                              for (int i = 0; i < 1; i++)
+                                CustomSvg(
+                                  asset: "assets/icons/star.svg",
+                                  color: Colors.white,
+                                ),
+                              const SizedBox(width: 4),
+                              Text(
+                                "4.7",
+                                style: AppTexts.tmdm.copyWith(
+                                  color: AppColors.gray[25],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              ProfilePicture(
+                                image: "https://thispersondoesnotexist.com",
+                                size: 52,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Sample Name",
+                                style: AppTexts.txlm.copyWith(
+                                  color: AppColors.gray[25],
+                                ),
+                              ),
+                            ],
+                          ),
+                          FlickVideoProgressBar(
+                            flickProgressBarSettings: FlickProgressBarSettings(
+                              playedColor: AppColors.green,
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              FlickCurrentPosition(fontSize: 14),
+                              Spacer(),
+                              FlickTotalDuration(fontSize: 14),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
