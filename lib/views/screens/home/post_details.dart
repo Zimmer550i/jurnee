@@ -7,6 +7,7 @@ import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
+import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/profile/boost_post.dart';
@@ -25,10 +26,24 @@ class PostDetails extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              CustomNetworkedImage(
-                height: MediaQuery.of(context).size.width / 2,
-                width: MediaQuery.of(context).size.width,
-                radius: 0,
+              GestureDetector(
+                onTap: () {
+                  Get.to(
+                    () => MediaPlayer(
+                      mediaList: [
+                        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4",
+                        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_30MB.mp4",
+                        "https://picsum.photos/id/1025/600/400",
+                        "https://picsum.photos/id/1039/600/400",
+                      ],
+                    ),
+                  );
+                },
+                child: CustomNetworkedImage(
+                  height: MediaQuery.of(context).size.width / 2,
+                  width: MediaQuery.of(context).size.width,
+                  radius: 0,
+                ),
               ),
 
               Padding(
