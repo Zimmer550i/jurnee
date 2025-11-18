@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/auth_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/screens/auth/reset_password.dart';
+import 'package:jurnee/views/screens/home/home.dart';
 import 'package:pinput/pinput.dart';
 
 class Verification extends StatefulWidget {
@@ -20,16 +23,44 @@ class Verification extends StatefulWidget {
 }
 
 class _VerificationState extends State<Verification> {
+  final auth = Get.find<AuthController>();
   final otpCtrl = TextEditingController();
   FocusNode focusNode = FocusNode();
+  bool resendingOtp = false;
 
   void onSubmit() async {
-    if (widget.isResettingPassword) {
-      Get.to(() => ResetPassword());
+    final message = await auth.verifyOtp(widget.email, otpCtrl.text.trim());
+
+    if (message == "success") {
+      customSnackBar("Email verification successful!", isError: false);
+
+      if (widget.isResettingPassword) {
+        Get.to(() => ResetPassword());
+      } else {
+        Get.offAll(() => Home());
+      }
+    } else {
+      customSnackBar(message);
     }
   }
 
-  void resendOtp() async {}
+  void resendOtp() async {
+    setState(() {
+      resendingOtp = true;
+    });
+
+    final message = await auth.resendOtp(widget.email);
+
+    if (message == "success") {
+      customSnackBar("Resent OTP successful", isError: false);
+      otpCtrl.clear();
+    } else {
+      customSnackBar(message);
+    }
+    setState(() {
+      resendingOtp = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +81,7 @@ class _VerificationState extends State<Verification> {
               const SizedBox(height: 48),
               Pinput(
                 focusNode: focusNode,
+                controller: otpCtrl,
                 defaultPinTheme: PinTheme(
                   height: 48,
                   width: 48,
@@ -93,11 +125,18 @@ class _VerificationState extends State<Verification> {
               CustomButton(
                 onTap: resendOtp,
                 text: "Resend Code",
+                isLoading: resendingOtp,
                 isSecondary: true,
                 width: MediaQuery.of(context).size.width / 2,
               ),
               Spacer(),
-              CustomButton(onTap: onSubmit, text: "Continue"),
+              Obx(
+                () => CustomButton(
+                  onTap: onSubmit,
+                  isLoading: auth.isLoading.value,
+                  text: "Continue",
+                ),
+              ),
               const SizedBox(height: 24),
             ],
           ),

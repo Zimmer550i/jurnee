@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:jurnee/controllers/auth_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_checkbox.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/auth/verification.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -15,6 +19,7 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  final auth = Get.find<AuthController>();
   final nameCtrl = TextEditingController();
   final locationCtrl = TextEditingController();
   final emailCtrl = TextEditingController();
@@ -23,8 +28,61 @@ class _RegisterState extends State<Register> {
 
   bool agreedTerms = false;
 
+  Future<LatLng> getLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      customSnackBar("Location services are disabled.");
+      return LatLng(0, 0);
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        customSnackBar("Location permissions are denied.");
+        return LatLng(0, 0);
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      customSnackBar("Location permissions are permanently denied.");
+      return LatLng(0, 0);
+    }
+
+    final position = await Geolocator.getCurrentPosition();
+
+    return LatLng(position.latitude, position.longitude);
+  }
+
   void onSubmit() async {
-    Get.to(() => Verification(email: emailCtrl.text));
+    if (!agreedTerms) {
+      customSnackBar(
+        "You must accept the Terms and Conditions and Privacy Policy to proceed",
+      );
+      return;
+    }
+
+    final userLocation = await getLocation();
+    final message = await auth.register(
+      emailCtrl.text,
+      passCtrl.text,
+      nameCtrl.text,
+      locationCtrl.text,
+      userLocation,
+    );
+
+    if (message == "success") {
+      customSnackBar(
+        "An OTP has been send to ${emailCtrl.text}",
+        isError: false,
+      );
+      Get.to(() => Verification(email: emailCtrl.text));
+    } else {
+      customSnackBar(message);
+    }
   }
 
   @override
@@ -120,7 +178,13 @@ class _RegisterState extends State<Register> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                CustomButton(onTap: onSubmit, text: "Register"),
+                Obx(
+                  () => CustomButton(
+                    onTap: onSubmit,
+                    isLoading: auth.isLoading.value,
+                    text: "Register",
+                  ),
+                ),
               ],
             ),
           ),

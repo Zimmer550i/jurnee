@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:jurnee/controllers/auth_controller.dart';
 import 'package:jurnee/services/shared_prefs_service.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 
 class ApiService {
-  final String devUrl = "http://192.168.10.18:8001";
+  final String devUrl = "http://10.10.12.54:3001/api/v1";
   final String prodUrl = "";
   static final String imgUrl = "";
   final bool inDevelopment = true;
@@ -190,7 +193,8 @@ class ApiService {
 
   void _checkTokenExpiry(bool authReq, http.Response response) {
     if (response.statusCode == 401 && authReq) {
-      // Get.find<AuthController>().logout();
+      customSnackBar("Session expired! Please login again...");
+      Get.find<AuthController>().logout();
     }
   }
 }

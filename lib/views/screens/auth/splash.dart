@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/auth_controller.dart';
+import 'package:jurnee/views/screens/auth/login.dart';
 import 'package:jurnee/views/screens/home/home.dart';
 
 class Splash extends StatefulWidget {
@@ -11,15 +13,15 @@ class Splash extends StatefulWidget {
 
 class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
   bool isVerified = false;
-  Duration time = Duration(milliseconds: 4500);
+  Duration animationDuration = Duration(milliseconds: 4500);
 
   @override
   void initState() {
     super.initState();
-    // verifyToken();
-    Future.delayed(time, () {
-      Get.to(() => Home());
-    });
+    verifyToken();
+    // Future.delayed(time, () {
+    //   Get.to(() => Home());
+    // });
   }
 
   @override
@@ -36,19 +38,19 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     );
   }
 
-  // void verifyToken() async {
-  //   final time = Stopwatch();
-  //   time.start();
-  //   isVerified = await Get.find<AuthController>().previouslyLoggedIn();
+  void verifyToken() async {
+    final time = Stopwatch();
+    time.start();
+    isVerified = await Get.find<AuthController>().previouslyLoggedIn();
 
-  //   if (time.elapsed < Duration(seconds: 2)) {
-  //     await Future.delayed(Duration(seconds: 2) - time.elapsed);
-  //   }
+    if (time.elapsed < animationDuration) {
+      await Future.delayed(animationDuration - time.elapsed);
+    }
 
-  //   if (isVerified) {
-  //     Get.offAll(() => App());
-  //   } else {
-  //     Get.offAll(() => Onboard());
-  //   }
-  // }
+    if (isVerified) {
+      Get.offAll(() => Home());
+    } else {
+      Get.offAll(() => Login());
+    }
+  }
 }

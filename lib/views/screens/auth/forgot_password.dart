@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/auth_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/auth/verification.dart';
@@ -15,6 +17,7 @@ class ForgotPassword extends StatefulWidget {
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
+  final auth = Get.find<AuthController>();
   final emailCtrl = TextEditingController();
 
   @override
@@ -24,9 +27,19 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   }
 
   void onSubmit() async {
-    Get.to(
-      () => Verification(email: emailCtrl.text, isResettingPassword: true),
-    );
+    final message = await auth.forgetPassword(emailCtrl.text);
+
+    if (message == "success") {
+      customSnackBar(
+        "An OTP has been send to ${emailCtrl.text}",
+        isError: false,
+      );
+      Get.to(
+        () => Verification(email: emailCtrl.text, isResettingPassword: true),
+      );
+    } else {
+      customSnackBar(message);
+    }
   }
 
   @override
@@ -53,7 +66,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 controller: emailCtrl,
               ),
               Spacer(),
-              CustomButton(onTap: onSubmit, text: "Send OTP"),
+              Obx(
+                () => CustomButton(
+                  onTap: onSubmit,
+                  isLoading: auth.isLoading.value,
+                  text: "Send OTP",
+                ),
+              ),
               const SizedBox(height: 24),
             ],
           ),
