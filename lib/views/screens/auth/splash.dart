@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/views/screens/auth/login.dart';
 import 'package:jurnee/views/screens/home/home.dart';
 
@@ -19,16 +20,11 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     verifyToken();
-    // Future.delayed(time, () {
-    //   Get.to(() => Home());
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // extendBodyBehindAppBar: true,
-      // appBar: AppBar(backgroundColor: Colors.transparent),
       body: Align(
         alignment: Alignment.centerLeft,
         child: SizedBox.expand(
@@ -42,6 +38,7 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     final time = Stopwatch();
     time.start();
     isVerified = await Get.find<AuthController>().previouslyLoggedIn();
+    if (isVerified) Get.find<UserController>().getUserData();
 
     if (time.elapsed < animationDuration) {
       await Future.delayed(animationDuration - time.elapsed);

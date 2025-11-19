@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_list_handler.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_button.dart';
@@ -12,6 +14,7 @@ import 'package:jurnee/views/screens/auth/login.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/profile/app_info.dart';
 import 'package:jurnee/views/screens/profile/edit_profile.dart';
+import 'package:jurnee/views/screens/profile/support.dart';
 
 class Profile extends StatefulWidget {
   final bool isUser;
@@ -22,7 +25,9 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  final user = Get.find<UserController>();
   final GlobalKey<ScaffoldState> _key = GlobalKey();
+
   int index = 0;
 
   @override
@@ -30,7 +35,6 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
       key: _key,
       endDrawerEnableOpenDragGesture: false,
-
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: AppColors.scaffoldBG,
@@ -41,248 +45,263 @@ class _ProfileState extends State<Profile> {
             const SizedBox(width: 24),
             CustomSvg(asset: "assets/icons/logo.svg"),
             Spacer(),
-            // if (widget.isUser)
-            //   GestureDetector(
-            //     onTap: () {
-            //       _key.currentState?.openDrawer();
-            //     },
-            //     child: CustomSvg(
-            //       asset: "assets/icons/hamburger_menu.svg",
-            //       color: AppColors.black,
-            //     ),
-            //   ),
             const SizedBox(width: 24),
           ],
         ),
       ),
       endDrawer: drawer(context),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            ProfilePicture(
-              image: "https://thispersondoesnotexist.com",
-              size: 144,
-              borderWidth: 2,
-              borderColor: AppColors.green,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Sample Name",
-              style: AppTexts.dxsb.copyWith(color: AppColors.gray.shade700),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              spacing: 4,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CustomSvg(
-                  asset: "assets/icons/location.svg",
-                  color: AppColors.gray,
-                ),
-                Text(
-                  "Sample Name",
-                  style: AppTexts.tsmr.copyWith(color: AppColors.gray),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Exploring local events, deals, and hidden gems—honest reviews only",
-              textAlign: TextAlign.center,
-              style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade600),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      Get.to(() => UsersList(title: "Posts (12)"));
-                    },
-                    child: Column(
-                      children: [
-                        Text(
-                          "12",
-                          style: AppTexts.dxsm.copyWith(
-                            color: AppColors.gray.shade700,
+      body: CustomListHandler(
+        onRefresh: () => user.getUserData(),
+        child: Obx(
+          () => Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+              ProfilePicture(
+                image: user.userImage,
+                size: 144,
+                borderWidth: 2,
+                borderColor: AppColors.green,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                user.userData?.name ?? "Loading...",
+                style: AppTexts.dxsb.copyWith(color: AppColors.gray.shade700),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                spacing: 4,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomSvg(
+                    asset: "assets/icons/location.svg",
+                    color: AppColors.gray,
+                  ),
+                  Text(
+                    user.userData?.address ?? "Loading...",
+                    style: AppTexts.tsmr.copyWith(color: AppColors.gray),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                user.userData?.bio ?? "Loading...",
+                textAlign: TextAlign.center,
+                style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade600),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  // Spacer(),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.to(
+                          () => UsersList(
+                            title: "Posts (${user.userData?.post.toString()})",
                           ),
-                        ),
-                        Text(
-                          "Posts",
-                          style: AppTexts.tsmr.copyWith(color: AppColors.gray),
-                        ),
-                      ],
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Text(
+                            user.userData?.post.toString() ?? "",
+                            style: AppTexts.dxsm.copyWith(
+                              color: AppColors.gray.shade700,
+                            ),
+                          ),
+                          Text(
+                            "Posts",
+                            style: AppTexts.tsmr.copyWith(
+                              color: AppColors.gray,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      Get.to(() => UsersList(title: "Followers (102)"));
-                    },
-                    child: Column(
-                      children: [
-                        Text(
-                          "102",
-                          style: AppTexts.dxsm.copyWith(
-                            color: AppColors.gray.shade700,
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.to(
+                          () => UsersList(
+                            title:
+                                "Followers (${user.userData?.followers.toString()})",
                           ),
-                        ),
-                        Text(
-                          "Followers",
-                          style: AppTexts.tsmr.copyWith(color: AppColors.gray),
-                        ),
-                      ],
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Text(
+                            user.userData?.followers.toString() ?? "",
+                            style: AppTexts.dxsm.copyWith(
+                              color: AppColors.gray.shade700,
+                            ),
+                          ),
+                          Text(
+                            "Followers",
+                            style: AppTexts.tsmr.copyWith(
+                              color: AppColors.gray,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      Get.to(() => UsersList(title: "Following (510)"));
-                    },
-                    child: Column(
-                      children: [
-                        Text(
-                          "510",
-                          style: AppTexts.dxsm.copyWith(
-                            color: AppColors.gray.shade700,
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.to(
+                          () => UsersList(
+                            title:
+                                "Following (${user.userData?.following.toString()})",
                           ),
-                        ),
-                        Text(
-                          "Following",
-                          style: AppTexts.tsmr.copyWith(color: AppColors.gray),
-                        ),
-                      ],
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Text(
+                            user.userData?.following.toString() ?? "",
+                            style: AppTexts.dxsm.copyWith(
+                              color: AppColors.gray.shade700,
+                            ),
+                          ),
+                          Text(
+                            "Following",
+                            style: AppTexts.tsmr.copyWith(
+                              color: AppColors.gray,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                  // Spacer(),
+                ],
+              ),
+              if (!widget.isUser)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: CustomButton(
+                          leading: "assets/icons/follow.svg",
+                          text: "Follow",
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: CustomButton(
+                          leading: "assets/icons/message.svg",
+                          text: "Message",
+                          isSecondary: true,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Row(
+              const SizedBox(height: 16),
+              Row(
                 children: [
                   Expanded(
-                    child: CustomButton(
-                      leading: "assets/icons/follow.svg",
-                      text: "Follow",
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          index = 0;
+                        });
+                      },
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: index == 0
+                                ? BorderSide(color: AppColors.green.shade600)
+                                : BorderSide.none,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Posts",
+                            style: AppTexts.tmds.copyWith(
+                              color: index == 0
+                                  ? AppColors.green.shade600
+                                  : AppColors.gray.shade400,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 16),
                   Expanded(
-                    child: CustomButton(
-                      leading: "assets/icons/message.svg",
-                      text: "Message",
-                      isSecondary: true,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          index = 1;
+                        });
+                      },
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: index == 1
+                                ? BorderSide(color: AppColors.green.shade600)
+                                : BorderSide.none,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Attending",
+                            style: AppTexts.tmds.copyWith(
+                              color: index == 1
+                                  ? AppColors.green.shade600
+                                  : AppColors.gray.shade400,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // if(!widget.isUser)
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          index = 2;
+                        });
+                      },
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: index == 2
+                                ? BorderSide(color: AppColors.green.shade600)
+                                : BorderSide.none,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Saved",
+                            style: AppTexts.tmds.copyWith(
+                              color: index == 2
+                                  ? AppColors.green.shade600
+                                  : AppColors.gray.shade400,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        index = 0;
-                      });
-                    },
-                    child: Container(
-                      height: 48,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: index == 0
-                              ? BorderSide(color: AppColors.green.shade600)
-                              : BorderSide.none,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Posts",
-                          style: AppTexts.tmds.copyWith(
-                            color: index == 0
-                                ? AppColors.green.shade600
-                                : AppColors.gray.shade400,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+              const SizedBox(height: 24),
+              for (int i = 0; i < 10; i++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: PostCard(),
                 ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        index = 1;
-                      });
-                    },
-                    child: Container(
-                      height: 48,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: index == 1
-                              ? BorderSide(color: AppColors.green.shade600)
-                              : BorderSide.none,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Attending",
-                          style: AppTexts.tmds.copyWith(
-                            color: index == 1
-                                ? AppColors.green.shade600
-                                : AppColors.gray.shade400,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                // if(!widget.isUser)
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        index = 2;
-                      });
-                    },
-                    child: Container(
-                      height: 48,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: index == 2
-                              ? BorderSide(color: AppColors.green.shade600)
-                              : BorderSide.none,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Saved",
-                          style: AppTexts.tmds.copyWith(
-                            color: index == 2
-                                ? AppColors.green.shade600
-                                : AppColors.gray.shade400,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            for (int i = 0; i < 10; i++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: PostCard(),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -292,167 +311,78 @@ class _ProfileState extends State<Profile> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.7,
       decoration: BoxDecoration(color: Colors.white),
-      child: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
+      child: SingleChildScrollView(
+        child: SafeArea(
+          child: Column(
+            children: [
+              drawerButton("Edit Profile", "edit", () {
+                Get.back();
                 Get.to(() => EditProfile());
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.7,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: AppColors.green.shade300),
-                  ),
-                ),
-                child: Row(
-                  spacing: 8,
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CustomSvg(asset: "assets/icons/edit.svg"),
-                    Text(
-                      "Edit Profile",
-                      style: AppTexts.tmdm.copyWith(color: AppColors.gray),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
+              }),
+              drawerButton("My Bookings", "calendar", () {
+                Get.back();
+                // Get.to(() => EditProfile());
+              }),
+              drawerButton("Client Bookings", "client", () {
+                Get.back();
+                // Get.to(() => EditProfile());
+              }),
+              drawerButton("Community Guidelines", "guidelines", () {
+                Get.back();
                 Get.to(() => AppInfo(title: "Community Guidelines"));
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.7,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: AppColors.green.shade300),
-                  ),
-                ),
-                child: Row(
-                  spacing: 8,
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CustomSvg(asset: "assets/icons/guidelines.svg"),
-                    Text(
-                      "Community Guidelines",
-                      style: AppTexts.tmdm.copyWith(color: AppColors.gray),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
+              }),
+              drawerButton("Terms of Services", "terms", () {
+                Get.back();
                 Get.to(() => AppInfo(title: "Terms of Services"));
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.7,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: AppColors.green.shade300),
-                  ),
-                ),
-                child: Row(
-                  spacing: 8,
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CustomSvg(asset: "assets/icons/terms.svg"),
-                    Text(
-                      "Terms of Services",
-                      style: AppTexts.tmdm.copyWith(color: AppColors.gray),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
+              }),
+              drawerButton("Privacy Policy", "privacy", () {
+                Get.back();
                 Get.to(() => AppInfo(title: "Privacy Policy"));
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.7,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: AppColors.green.shade300),
-                  ),
-                ),
-                child: Row(
-                  spacing: 8,
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CustomSvg(asset: "assets/icons/privacy.svg"),
-                    Text(
-                      "Privacy Policy",
-                      style: AppTexts.tmdm.copyWith(color: AppColors.gray),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
+              }),
+              drawerButton("About Us", "about", () {
+                Get.back();
                 Get.to(() => AppInfo(title: "About Us"));
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.7,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: AppColors.green.shade300),
-                  ),
-                ),
-                child: Row(
-                  spacing: 8,
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CustomSvg(asset: "assets/icons/about.svg"),
-                    Text(
-                      "About Us",
-                      style: AppTexts.tmdm.copyWith(color: AppColors.gray),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
+              }),
+              drawerButton("Support", "support", () {
+                Get.back();
+                Get.to(() => Support());
+              }),
+              drawerButton("Logout", "log-out", () {
                 Get.back();
                 logoutSheet(context);
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.7,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: AppColors.green.shade300),
-                  ),
-                ),
-                child: Row(
-                  spacing: 8,
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CustomSvg(asset: "assets/icons/log-out.svg"),
-                    Text(
-                      "Logout",
-                      style: AppTexts.tmdm.copyWith(color: AppColors.gray),
-                    ),
-                  ],
-                ),
-              ),
+              }),
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  GestureDetector drawerButton(
+    String name,
+    String iconName,
+    void Function() onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.7,
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: AppColors.green.shade300)),
+        ),
+        child: Row(
+          spacing: 8,
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CustomSvg(
+              asset: "assets/icons/$iconName.svg",
+              size: 24,
+              color: AppColors.green,
             ),
+            Text(name, style: AppTexts.tmdm.copyWith(color: AppColors.gray)),
           ],
         ),
       ),

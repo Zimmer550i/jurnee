@@ -1,13 +1,11 @@
 import 'dart:convert';
-
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:jurnee/models/user.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends GetxController {
-  Rxn<User> user = Rxn();
   RxBool isLoading = RxBool(false);
 
   final api = ApiService();
@@ -31,7 +29,7 @@ class AuthController extends GetxController {
       if (response.statusCode == 200) {
         final data = body['data'];
 
-        user.value = User.fromJson(data['user']);
+        Get.find<UserController>().userData = data['user'];
         api.setToken(data['accessToken']);
 
         return "success";
@@ -105,7 +103,7 @@ class AuthController extends GetxController {
       if (response.statusCode == 200) {
         final data = body['data'];
 
-        user.value = User.fromJson(data['user']);
+        Get.find<UserController>().userData = data['user'];
         api.setToken(data['accessToken']);
 
         return "success";
@@ -165,9 +163,8 @@ class AuthController extends GetxController {
   }
 
   Future<bool> previouslyLoggedIn() async {
-    final accessToken = prefs.getString("accessToken");
-    final refreshToken = prefs.getString("refreshToken");
-    if (accessToken != null && refreshToken != null) {
+    final token = prefs.getString("token");
+    if (token != null) {
       return true;
     }
 
