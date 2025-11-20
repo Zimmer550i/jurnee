@@ -17,7 +17,6 @@ class NotificationController extends GetxController {
 
   RxBool isFirstLoad = true.obs;
   RxBool isMoreLoading = false.obs;
-
   RxBool isLoading = RxBool(false);
 
   @override

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
+import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/notification_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +25,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.put(NotificationController());
   Get.put(AuthController());
   Get.put(UserController());
+  Get.put(ChatController());
 
   //Retrieving localized data
   Map<String, Map<String, String>> _languages = Map();

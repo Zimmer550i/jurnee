@@ -6,7 +6,8 @@ import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 
 class Chat extends StatefulWidget {
-  const Chat({super.key});
+  final String inboxId;
+  const Chat({super.key, required this.inboxId});
 
   @override
   State<Chat> createState() => _ChatState();
