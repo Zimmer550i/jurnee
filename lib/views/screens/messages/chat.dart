@@ -1,25 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/chat_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
+import 'package:jurnee/models/chat_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_list_handler.dart';
 import 'package:jurnee/utils/custom_svg.dart';
+import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 
 class Chat extends StatefulWidget {
   final String inboxId;
-  const Chat({super.key, required this.inboxId});
+  final Member chatMember;
+  const Chat({super.key, required this.inboxId, required this.chatMember});
 
   @override
   State<Chat> createState() => _ChatState();
 }
 
 class _ChatState extends State<Chat> {
-  List<Widget> messages = [];
+  final chat = Get.find<ChatController>();
+  final textCtrl = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    getMessages();
+    chat.connectAndListen(widget.inboxId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      chat.fetchMessages(widget.inboxId);
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    chat.disconnect();
+    textCtrl.dispose();
+  }
+
+  void onSend() async {
+    chat.sendMessage(
+      chatId: widget.inboxId,
+      senderId: Get.find<UserController>().userData!.id,
+      message: textCtrl.text,
+    );
+    textCtrl.clear();
   }
 
   @override
@@ -41,12 +67,9 @@ class _ChatState extends State<Chat> {
         title: Row(
           spacing: 12,
           children: [
-            ProfilePicture(
-              image: "https://thispersondoesnotexist.com",
-              size: 40,
-            ),
+            ProfilePicture(image: widget.chatMember.image, size: 40),
             Text(
-              "Sample Name",
+              widget.chatMember.name,
               style: AppTexts.tlgb.copyWith(color: AppColors.gray),
             ),
           ],
@@ -54,15 +77,18 @@ class _ChatState extends State<Chat> {
       ),
       body: Stack(
         children: [
-          SingleChildScrollView(
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
+          Positioned.fill(
+            child: CustomListHandler(
+              reverse: true,
+              onLoadMore: () =>
+                  chat.fetchMessages(widget.inboxId, loadMore: true),
+              child: Obx(
+                () => Column(
                   children: [
-                    ...messages,
-                    ...messages,
-                    ...messages,
+                    if (chat.isLoading.value) CustomLoading(),
+                    if (chat.messages.isNotEmpty)
+                      for (int i = chat.messages.length - 1; i >= 0; i--)
+                        getMessage(i),
                     const SizedBox(height: 70),
                   ],
                 ),
@@ -84,6 +110,8 @@ class _ChatState extends State<Chat> {
                   children: [
                     Expanded(
                       child: TextField(
+                        controller: textCtrl,
+                        onSubmitted: (value) => onSend(),
                         decoration: InputDecoration(
                           isDense: true,
                           isCollapsed: true,
@@ -95,15 +123,18 @@ class _ChatState extends State<Chat> {
                         ),
                       ),
                     ),
-                    Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.green.shade700,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: CustomSvg(asset: "assets/icons/send.svg"),
+                    GestureDetector(
+                      onTap: () => onSend(),
+                      child: Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.green.shade700,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: CustomSvg(asset: "assets/icons/send.svg"),
+                        ),
                       ),
                     ),
                   ],
@@ -116,19 +147,35 @@ class _ChatState extends State<Chat> {
     );
   }
 
-  void getMessages() {
-    messages.clear();
-    messages.addAll([
-      recieveMessage("Hey, do you know what time is it where you are?"),
-      sendMessage("t’s morning in Tokyo 😎"),
-      recieveMessage("What does it look like in Japan?", hasNext: true),
-      recieveMessage("Do you like it?", hasPrev: true),
-      sendMessage("Absolutely loving it!", hasNext: true),
-    ]);
+  Widget getMessage(int index) {
+    String message = chat.messages[index].message ?? "____";
+    bool isReciever = widget.chatMember.id == chat.messages[index].sender?.id;
+
+    if (isReciever) {
+      return recieveMessage(
+        message,
+        hasPrev:
+            index != chat.messages.length - 1 &&
+            widget.chatMember.id == chat.messages[index + 1].sender?.id,
+        hasNext:
+            index != 0 &&
+            widget.chatMember.id == chat.messages[index - 1].sender?.id,
+      );
+    } else {
+      return sendMessage(
+        message,
+        hasPrev:
+            index != chat.messages.length - 1 &&
+            widget.chatMember.id != chat.messages[index + 1].sender?.id,
+        hasNext:
+            index != 0 &&
+            widget.chatMember.id != chat.messages[index - 1].sender?.id,
+      );
+    }
   }
 
   Widget recieveMessage(
-    String? messgae, {
+    String? message, {
     bool hasPrev = false,
     bool hasNext = false,
   }) {
@@ -160,7 +207,7 @@ class _ChatState extends State<Chat> {
                         bottomLeft: Radius.circular(hasNext ? 4 : 18),
                       ),
                     ),
-                    child: Text(messgae ?? "", style: TextStyle(fontSize: 15)),
+                    child: Text(message ?? "", style: TextStyle(fontSize: 15)),
                   ),
                 ),
               ],

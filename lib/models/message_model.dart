@@ -49,13 +49,15 @@ class MessageModel {
 }
 
 class SenderModel {
+  final String? id;
   final String? name;
   final String? image;
 
-  SenderModel({this.name, this.image});
+  SenderModel({this.id, this.name, this.image});
 
   factory SenderModel.fromJson(Map<String, dynamic> json) {
     return SenderModel(
+      id: json['_id'] as String?,
       name: json['name'] as String?,
       image: json['image'] as String?,
     );
@@ -63,6 +65,7 @@ class SenderModel {
 
   Map<String, dynamic> toJson() {
     return {
+      "_id": id,
       "name": name,
       "image": image,
     };

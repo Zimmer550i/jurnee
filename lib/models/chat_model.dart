@@ -50,17 +50,26 @@ class ChatModel {
 
 // Member model
 class Member {
+  final String? id;
   final String name;
   final String image;
 
-  Member({required this.name, required this.image});
+  Member({this.id, required this.name, required this.image});
 
   factory Member.fromJson(Map<String, dynamic> json) {
-    return Member(name: json["name"] ?? "", image: json["image"] ?? "");
+    return Member(
+      id: json["_id"] as String?,
+      name: json["name"] ?? "",
+      image: json["image"] ?? "",
+    );
   }
 
   Map<String, dynamic> toJson() {
-    return {"name": name, "image": image};
+    return {
+      "_id": id,
+      "name": name,
+      "image": image,
+    };
   }
 }
 

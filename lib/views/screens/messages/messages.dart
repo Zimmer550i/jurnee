@@ -7,6 +7,7 @@ import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_list_handler.dart';
 import 'package:jurnee/utils/custom_svg.dart';
+import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/messages/chat.dart';
 
@@ -44,11 +45,14 @@ class _MessagesState extends State<Messages> {
         ),
       ),
       body: CustomListHandler(
+        onRefresh: () => chat.fetchChats(),
+        onLoadMore: () => chat.fetchChats(loadMore: true),
         child: Obx(
           () => Column(
             spacing: 8,
             children: [
               const SizedBox(height: 12),
+              if (chat.isLoading.value) CustomLoading(),
               for (var i in chat.chats) messageWidget(i),
               const SizedBox(height: 12),
             ],
@@ -61,7 +65,7 @@ class _MessagesState extends State<Messages> {
   Widget messageWidget(ChatModel chat) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => Chat(inboxId: chat.id));
+        Get.to(() => Chat(inboxId: chat.id, chatMember: chat.members.last));
       },
       child: Container(
         padding: EdgeInsets.all(12),
