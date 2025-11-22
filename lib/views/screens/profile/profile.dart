@@ -14,6 +14,7 @@ import 'package:jurnee/views/screens/auth/login.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/profile/app_info.dart';
 import 'package:jurnee/views/screens/profile/edit_profile.dart';
+import 'package:jurnee/views/screens/profile/bookings.dart';
 import 'package:jurnee/views/screens/profile/support.dart';
 
 class Profile extends StatefulWidget {
@@ -321,10 +322,11 @@ class _ProfileState extends State<Profile> {
               }),
               drawerButton("My Bookings", "calendar", () {
                 Get.back();
-                // Get.to(() => EditProfile());
+                Get.to(() => Bookings());
               }),
               drawerButton("Client Bookings", "client", () {
                 Get.back();
+                Get.to(() => Bookings());
                 // Get.to(() => EditProfile());
               }),
               drawerButton("Community Guidelines", "guidelines", () {
