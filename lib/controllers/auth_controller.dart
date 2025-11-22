@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jurnee/controllers/user_controller.dart';
+import 'package:jurnee/models/user.dart';
 import 'package:jurnee/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,7 +30,7 @@ class AuthController extends GetxController {
       if (response.statusCode == 200) {
         final data = body['data'];
 
-        Get.find<UserController>().userData = data['user'];
+        Get.find<UserController>().userData = User.fromJson(data['user']);
         api.setToken(data['accessToken']);
 
         return "success";
@@ -103,7 +104,7 @@ class AuthController extends GetxController {
       if (response.statusCode == 200) {
         final data = body['data'];
 
-        Get.find<UserController>().userData = data['user'];
+        Get.find<UserController>().userData = User.fromJson(data['user']);
         api.setToken(data['accessToken']);
 
         return "success";
