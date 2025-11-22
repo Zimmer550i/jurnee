@@ -1,10 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_bottom_navbar.dart';
+import 'package:jurnee/views/screens/auth/user_interests.dart';
 import 'package:jurnee/views/screens/home/homepage.dart';
 import 'package:jurnee/views/screens/messages/messages.dart';
 import 'package:jurnee/views/screens/notifications/notifications.dart';
@@ -24,6 +26,16 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int index = 0;
   bool showOverlay = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.find<UserController>().userData!.interested.isEmpty) {
+        Get.to(() => UserInterests());
+      }
+    });
+  }
 
   List<Widget> pages = [
     Homepage(),

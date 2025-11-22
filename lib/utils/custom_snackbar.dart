@@ -4,10 +4,8 @@ import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 
 void customSnackBar(String message, {bool isError = true, String? title}) {
-  debugPrint("${isError ? "Error " : ""}Snackbar==> $message");
   title ??= isError ? "Error Occured" : "Succeed";
 
-  // SAFELY close an open snackbar without crashing GetX
   if (Get.isSnackbarOpen) {
     Future.microtask(() {
       if (Get.isSnackbarOpen) {
