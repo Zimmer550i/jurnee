@@ -1,12 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:jurnee/models/post_model.dart';
+import 'package:jurnee/services/shared_prefs_service.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
+import 'package:jurnee/utils/get_location.dart';
+import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/screens/home/post_details.dart';
 
-class PostCard extends StatelessWidget {
-  const PostCard({super.key});
+class PostCard extends StatefulWidget {
+  final PostModel post;
+  const PostCard(this.post, {super.key});
+
+  @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  LatLng? userPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    setPosition();
+  }
+
+  setPosition() async {
+    var latitude = double.tryParse(await SharedPrefsService.get("latitude") ?? "");
+    var longitude = double.tryParse(await SharedPrefsService.get("longitude") ?? "");
+
+    if (latitude != null && longitude != null) {
+      setState(() {
+        userPosition = LatLng(latitude, longitude);
+      });
+    } else {
+      final pos = await getLocation();
+
+      if (pos != null) {
+        setState(() {
+          userPosition = LatLng(pos.latitude, pos.longitude);
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +60,12 @@ class PostCard extends StatelessWidget {
           decoration: BoxDecoration(color: AppColors.white),
           child: Column(
             children: [
-              SizedBox(
+              CustomNetworkedImage(
                 height: 184,
-                width: double.infinity,
-                child: Image.asset(
-                  "assets/images/sample_image.jpg",
-                  fit: BoxFit.cover,
-                ),
+                // width: double.infinity,
+                url: widget.post.image,
+                fit: BoxFit.cover,
+                radius: 0,
               ),
               SizedBox(
                 height: 124,
@@ -41,7 +79,7 @@ class PostCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Cozy Coffee Spot",
+                        widget.post.title.toString(),
                         style: AppTexts.dxss.copyWith(
                           color: AppColors.gray.shade600,
                         ),
@@ -52,7 +90,12 @@ class PostCard extends StatelessWidget {
                         children: [
                           CustomSvg(asset: "assets/icons/location.svg"),
                           Text(
-                            "2.3 miles",
+                            userPosition == null
+                                ? "fetching..."
+                                : getDistance(
+                                    userPosition!.latitude,
+                                    userPosition!.longitude,
+                                  ),
                             style: AppTexts.tsmm.copyWith(
                               color: AppColors.gray.shade600,
                             ),
@@ -60,7 +103,9 @@ class PostCard extends StatelessWidget {
                           Container(),
                           CustomSvg(asset: "assets/icons/star.svg"),
                           Text(
-                            "4.9",
+                            widget.post.averageRating == null
+                                ? "N/A"
+                                : widget.post.averageRating!.toString(),
                             style: AppTexts.tsmm.copyWith(
                               color: AppColors.gray.shade600,
                             ),
@@ -69,7 +114,7 @@ class PostCard extends StatelessWidget {
                       ),
 
                       Text(
-                        "Shop our summer collection of dresses, now 50% off. Free delivery within 10 miles and 24/7 customer service...",
+                        widget.post.description.toString(),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: AppTexts.tsmr.copyWith(
@@ -85,5 +130,20 @@ class PostCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String getDistance(double targetLat, double targetLong) {
+    // Calculate distance in meters
+    double distanceInMeters = Geolocator.distanceBetween(
+      userPosition!.latitude ,
+      userPosition!.longitude ,
+      targetLat,
+      targetLong,
+    );
+
+    // Convert meters to miles (1 meter = 0.000621371 miles)
+    double distanceInMiles = distanceInMeters * 0.000621371;
+
+    return "${distanceInMiles.toStringAsFixed(1)} miles";
   }
 }

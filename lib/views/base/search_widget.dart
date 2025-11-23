@@ -6,7 +6,8 @@ import 'package:jurnee/views/base/custom_button.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class SearchWidget extends StatefulWidget {
-  const SearchWidget({super.key});
+  final TextEditingController controller;
+  const SearchWidget(this.controller, {super.key});
 
   @override
   State<SearchWidget> createState() => _SearchWidgetState();

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_list_handler.dart';
 import 'package:jurnee/utils/custom_svg.dart';
+import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/post_card.dart';
 import 'package:jurnee/views/base/search_widget.dart';
 import 'package:jurnee/views/screens/home/location_map.dart';
@@ -15,8 +19,24 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  final post = Get.find<PostController>();
+  final search = TextEditingController();
   int tab = 0;
   bool searchEnabled = false;
+
+  final List<String?> categoryList = [
+    null,
+    'event',
+    'deal',
+    'service',
+    'alert',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    post.fetchPosts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,29 +92,40 @@ class _HomepageState extends State<Homepage> {
               widget.showMap
                   ? LocationMap()
                   : Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                              ),
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    const SizedBox(height: 12),
-                                    for (int i = 0; i < 10; i++)
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 20,
-                                        ),
-                                        child: PostCard(),
-                                      ),
-                                  ],
+                      child: CustomListHandler(
+                        onRefresh: () =>
+                            post.fetchPosts(category: categoryList[tab]),
+                        onLoadMore: () => post.fetchPosts(
+                          loadMore: true,
+                          category: categoryList[tab],
+                        ),
+                        child: Obx(
+                          () => Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              if (post.isLoading.value) CustomLoading(),
+                              if (!post.isLoading.value)
+                                for (var i
+                                    in post.postMap[PostType.defaultPosts]!)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 20),
+                                    child: PostCard(i),
+                                  ),
+                              if (!post.isLoading.value &&
+                                  post.isMoreLoading.value)
+                                CustomLoading(),
+                              if (!post.isLoading.value &&
+                                  post.totalPages.value ==
+                                      post.currentPage.value)
+                                Text(
+                                  "End of list",
+                                  style: AppTexts.tsmr.copyWith(
+                                    color: AppColors.gray.shade300,
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                              const SizedBox(height: 24),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -104,7 +135,7 @@ class _HomepageState extends State<Homepage> {
           if (searchEnabled)
             Column(
               children: [
-                if (searchEnabled) SearchWidget(),
+                if (searchEnabled) SearchWidget(search),
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
@@ -130,6 +161,7 @@ class _HomepageState extends State<Homepage> {
       onTap: () {
         setState(() {
           tab = index;
+          post.fetchPosts(category: categoryList[tab]);
         });
       },
       child: AnimatedContainer(
@@ -148,10 +180,20 @@ class _HomepageState extends State<Homepage> {
         child: Row(
           spacing: 4,
           children: [
-            if (icon != null) CustomSvg(asset: icon),
+            if (icon != null)
+              CustomSvg(
+                asset: icon,
+                color: isSelected
+                    ? AppColors.gray.shade900
+                    : AppColors.gray.shade500,
+              ),
             Text(
               title,
-              style: AppTexts.txsm.copyWith(color: AppColors.gray.shade500),
+              style: AppTexts.txsm.copyWith(
+                color: isSelected
+                    ? AppColors.gray.shade900
+                    : AppColors.gray.shade500,
+              ),
             ),
           ],
         ),

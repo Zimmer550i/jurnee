@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
@@ -77,6 +78,8 @@ class _SupportState extends State<Support> {
           );
         },
       );
+    } else {
+      customSnackBar(message);
     }
   }
 

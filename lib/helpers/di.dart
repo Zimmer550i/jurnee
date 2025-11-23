@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/notification_controller.dart';
+import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../controllers/localization_controller.dart';
@@ -26,6 +27,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.put(AuthController());
   Get.put(UserController());
   Get.put(ChatController());
+  Get.put(PostController());
 
   //Retrieving localized data
   Map<String, Map<String, String>> _languages = Map();

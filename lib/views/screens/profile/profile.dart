@@ -8,7 +8,6 @@ import 'package:jurnee/utils/custom_list_handler.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_button.dart';
-import 'package:jurnee/views/base/post_card.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/auth/login.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
@@ -299,7 +298,7 @@ class _ProfileState extends State<Profile> {
               for (int i = 0; i < 10; i++)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 20),
-                  child: PostCard(),
+                  // child: PostCard(),
                 ),
             ],
           ),

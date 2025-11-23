@@ -8,12 +8,14 @@ class CustomListHandler extends StatelessWidget {
   final double horizontalPadding;
   final Widget child;
   final bool reverse;
+  final bool topPadding;
   const CustomListHandler({
     super.key,
     required this.child,
     this.onRefresh,
     this.onLoadMore,
     this.reverse = false,
+    this.topPadding = false,
     this.scrollThreshold = 200,
     this.horizontalPadding = 24,
   });
@@ -48,11 +50,10 @@ class CustomListHandler extends StatelessWidget {
               color: AppColors.green,
               backgroundColor: AppColors.green[25],
               child: SingleChildScrollView(
-                clipBehavior: Clip.none,
                 reverse: reverse,
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: SafeArea(child: child),
+                child: SafeArea(top: topPadding, child: child),
               ),
             ),
     );
