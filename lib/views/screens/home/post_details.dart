@@ -1,8 +1,16 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:jurnee/controllers/user_controller.dart';
+import 'package:jurnee/models/post_model.dart';
+import 'package:jurnee/services/shared_prefs_service.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
+import 'package:jurnee/utils/get_location.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
@@ -13,14 +21,51 @@ import 'package:jurnee/views/screens/home/reviews.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/profile/boost_post.dart';
 
-class PostDetails extends StatelessWidget {
-  const PostDetails({super.key});
+class PostDetails extends StatefulWidget {
+  final PostModel post;
+  const PostDetails(this.post, {super.key});
+
+  @override
+  State<PostDetails> createState() => _PostDetailsState();
+}
+
+class _PostDetailsState extends State<PostDetails> {
+  LatLng? userPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    setPosition();
+  }
+
+  setPosition() async {
+    var latitude = double.tryParse(
+      await SharedPrefsService.get("latitude") ?? "",
+    );
+    var longitude = double.tryParse(
+      await SharedPrefsService.get("longitude") ?? "",
+    );
+
+    if (latitude != null && longitude != null) {
+      setState(() {
+        userPosition = LatLng(latitude, longitude);
+      });
+    } else {
+      final pos = await getLocation();
+
+      if (pos != null) {
+        setState(() {
+          userPosition = LatLng(pos.latitude, pos.longitude);
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Event-Details",
+        title: "Event Details",
         trailing: "assets/icons/share.svg",
       ),
       body: SingleChildScrollView(
@@ -31,16 +76,13 @@ class PostDetails extends StatelessWidget {
                 onTap: () {
                   Get.to(
                     () => MediaPlayer(
-                      mediaList: [
-                        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4",
-                        "https://test-videos.co.uk/vids/jellyfish/mp4/h264/720/Jellyfish_720_10s_10MB.mp4",
-                        "https://test-videos.co.uk/vids/sintel/mp4/h264/720/Sintel_720_10s_30MB.mp4",
-                        "https://picsum.photos/500/800",
-                      ],
+                      mediaList: [widget.post.image, ...?widget.post.media],
                     ),
                   );
                 },
                 child: CustomNetworkedImage(
+                  url:
+                      widget.post.image ?? "https://thispersondoesnotexist.com",
                   height: MediaQuery.of(context).size.width / 2,
                   width: MediaQuery.of(context).size.width,
                   radius: 0,
@@ -57,7 +99,7 @@ class PostDetails extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            "Night at Casa Verde",
+                            widget.post.title.toString(),
                             style: AppTexts.dxss.copyWith(
                               color: AppColors.gray.shade700,
                             ),
@@ -67,40 +109,39 @@ class PostDetails extends StatelessWidget {
                           onSelected: (value) {
                             showModalBottomSheet(
                               context: context,
+                              useSafeArea: true,
                               backgroundColor: AppColors.scaffoldBG,
                               builder: (context) {
-                                return SafeArea(
-                                  child: SizedBox(
-                                    width: double.infinity,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 24,
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const SizedBox(height: 60),
-                                          Text(
-                                            "Why you are reporting this post?",
-                                            style: AppTexts.txsb,
-                                          ),
-                                          const SizedBox(height: 8),
-                                          CustomTextField(
-                                            lines: 5,
-                                            hintText: "Start writing...",
-                                          ),
-                                          const SizedBox(height: 24),
-                                          CustomButton(
-                                            onTap: () {
-                                              Get.back();
-                                            },
-                                            text: "Submit",
-                                          ),
-                                          const SizedBox(height: 24),
-                                        ],
-                                      ),
+                                return SizedBox(
+                                  width: double.infinity,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 60),
+                                        Text(
+                                          "Why you are reporting this post?",
+                                          style: AppTexts.txsb,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        CustomTextField(
+                                          lines: 5,
+                                          hintText: "Start writing...",
+                                        ),
+                                        const SizedBox(height: 24),
+                                        CustomButton(
+                                          onTap: () {
+                                            Get.back();
+                                          },
+                                          text: "Submit",
+                                        ),
+                                        const SizedBox(height: 24),
+                                      ],
                                     ),
                                   ),
                                 );
@@ -142,7 +183,7 @@ class PostDetails extends StatelessWidget {
                         color: AppColors.green.shade200,
                       ),
                       child: Text(
-                        "Food & Beverage",
+                        widget.post.subcategory ?? "post.subcategory",
                         style: AppTexts.tsms.copyWith(
                           color: AppColors.green.shade900,
                         ),
@@ -150,7 +191,7 @@ class PostDetails extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "0.8 mi • Tonight 6:00 PM",
+                      "${getDistance(widget.post.locationCoordinates?[0] ?? 0, widget.post.locationCoordinates?[1] ?? 0)} • ${DateFormat("dd MMM, hh:mm a").format(widget.post.startDate ?? DateTime.now())}",
                       style: AppTexts.tmdm.copyWith(
                         color: AppColors.gray.shade400,
                       ),
@@ -162,7 +203,7 @@ class PostDetails extends StatelessWidget {
                         CustomSvg(asset: "assets/icons/location.svg", size: 24),
                         Expanded(
                           child: Text(
-                            "2118 Thornridge Cir",
+                            widget.post.address.toString(),
                             style: AppTexts.tmdm.copyWith(
                               color: AppColors.gray.shade400,
                             ),
@@ -181,7 +222,7 @@ class PostDetails extends StatelessWidget {
                             CustomSvg(asset: "assets/icons/star.svg", size: 24),
                           const SizedBox(width: 4),
                           Text(
-                            "4.7",
+                            widget.post.averageRating.toString(),
                             style: AppTexts.tlgm.copyWith(
                               color: AppColors.gray.shade400,
                             ),
@@ -206,13 +247,10 @@ class PostDetails extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        ProfilePicture(
-                          image: "https://thispersondoesnotexist.com",
-                          size: 32,
-                        ),
+                        ProfilePicture(image: widget.post.author, size: 32),
                         const SizedBox(width: 8),
                         Text(
-                          "Jacob Jones",
+                          widget.post.author,
                           style: AppTexts.tlgm.copyWith(
                             color: AppColors.gray.shade700,
                           ),
@@ -221,7 +259,7 @@ class PostDetails extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      "Street-style music, live music, patio seating",
+                      widget.post.description.toString(),
                       style: AppTexts.tlgr.copyWith(
                         color: AppColors.gray.shade600,
                       ),
@@ -232,19 +270,19 @@ class PostDetails extends StatelessWidget {
                       children: [
                         CustomSvg(asset: "assets/icons/eye.svg", size: 24),
                         Text(
-                          "100+",
+                          widget.post.views.toString(),
                           style: AppTexts.tsmr.copyWith(color: AppColors.gray),
                         ),
                         const SizedBox(width: 4),
                         CustomSvg(asset: "assets/icons/save.svg", size: 24),
                         Text(
-                          "50+",
+                          widget.post.totalSaved.toString(),
                           style: AppTexts.tsmr.copyWith(color: AppColors.gray),
                         ),
                         const SizedBox(width: 4),
                         CustomSvg(asset: "assets/icons/love.svg", size: 24),
                         Text(
-                          "23",
+                          widget.post.likes.toString(),
                           style: AppTexts.tsmr.copyWith(color: AppColors.gray),
                         ),
                       ],
@@ -307,7 +345,15 @@ class PostDetails extends StatelessWidget {
 
                         InkWell(
                           onTap: () {
-                            Get.to(() => UsersList(title: "Attending"));
+                            Get.to(
+                              () => UsersList(
+                                title: "Attending",
+                                getListMethod: (loadMore) {
+                                  return Get.find<UserController>()
+                                      .getFollowers();
+                                },
+                              ),
+                            );
                           },
                           child: Row(
                             children: [
@@ -323,7 +369,15 @@ class PostDetails extends StatelessWidget {
                                 height: 26,
                                 child: Stack(
                                   children: [
-                                    for (int i = 0; i < 5; i++)
+                                    for (
+                                      int i = 0;
+                                      i <
+                                          min(
+                                            5,
+                                            widget.post.attenders?.length ?? 0,
+                                          );
+                                      i++
+                                    )
                                       Positioned(
                                         left: 12.0 * i,
                                         child: Container(
@@ -333,8 +387,8 @@ class PostDetails extends StatelessWidget {
                                             shape: BoxShape.circle,
                                           ),
                                           child: ProfilePicture(
-                                            image:
-                                                "https://thispersondoesnotexist.com",
+                                            image: widget.post.attenders!
+                                                .elementAt(i),
                                             size: 24,
                                           ),
                                         ),
@@ -342,12 +396,13 @@ class PostDetails extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              Text(
-                                "+42",
-                                style: AppTexts.txsr.copyWith(
-                                  color: AppColors.gray,
+                              if (widget.post.attenders!.length > 5)
+                                Text(
+                                  "+${max(0, widget.post.attenders!.length - 5)}",
+                                  style: AppTexts.txsr.copyWith(
+                                    color: AppColors.gray,
+                                  ),
                                 ),
-                              ),
                               const SizedBox(width: 8),
                               Text(
                                 "See all",
@@ -377,8 +432,15 @@ class PostDetails extends StatelessWidget {
                       ),
                       physics: NeverScrollableScrollPhysics(),
                       children: [
-                        for (int i = 0; i < 5; i++)
-                          CustomNetworkedImage(radius: 12),
+                        for (
+                          int i = 0;
+                          i < (widget.post.media?.length ?? 0);
+                          i++
+                        )
+                          CustomNetworkedImage(
+                            url: widget.post.media?[i],
+                            radius: 12,
+                          ),
                       ],
                     ),
                     Column(
@@ -415,7 +477,7 @@ class PostDetails extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      "#hashtag" * 9,
+                      widget.post.hasTag!.map((val) => "#$val ").join(),
                       style: AppTexts.tsmr.copyWith(
                         color: AppColors.green.shade700,
                       ),
@@ -429,7 +491,7 @@ class PostDetails extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          "\$200",
+                          "\$${widget.post.price}",
                           style: AppTexts.dxss.copyWith(
                             color: AppColors.gray.shade700,
                           ),
@@ -458,5 +520,20 @@ class PostDetails extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String getDistance(double targetLat, double targetLong) {
+    // Calculate distance in meters
+    double distanceInMeters = Geolocator.distanceBetween(
+      userPosition!.latitude,
+      userPosition!.longitude,
+      targetLat,
+      targetLong,
+    );
+
+    // Convert meters to miles (1 meter = 0.000621371 miles)
+    double distanceInMiles = distanceInMeters * 0.000621371;
+
+    return "${distanceInMiles.toStringAsFixed(1)} miles";
   }
 }

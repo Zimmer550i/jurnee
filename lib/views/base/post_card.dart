@@ -29,8 +29,12 @@ class _PostCardState extends State<PostCard> {
   }
 
   setPosition() async {
-    var latitude = double.tryParse(await SharedPrefsService.get("latitude") ?? "");
-    var longitude = double.tryParse(await SharedPrefsService.get("longitude") ?? "");
+    var latitude = double.tryParse(
+      await SharedPrefsService.get("latitude") ?? "",
+    );
+    var longitude = double.tryParse(
+      await SharedPrefsService.get("longitude") ?? "",
+    );
 
     if (latitude != null && longitude != null) {
       setState(() {
@@ -51,7 +55,7 @@ class _PostCardState extends State<PostCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => PostDetails());
+        Get.to(() => PostDetails(widget.post));
       },
       child: ClipRRect(
         borderRadius: BorderRadiusGeometry.circular(16),
@@ -135,8 +139,8 @@ class _PostCardState extends State<PostCard> {
   String getDistance(double targetLat, double targetLong) {
     // Calculate distance in meters
     double distanceInMeters = Geolocator.distanceBetween(
-      userPosition!.latitude ,
-      userPosition!.longitude ,
+      userPosition!.latitude,
+      userPosition!.longitude,
       targetLat,
       targetLong,
     );

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/views/base/post_card_small.dart';
-import 'package:jurnee/views/screens/home/post_details.dart';
 import 'package:widget_to_marker/widget_to_marker.dart';
 
 class LocationMap extends StatefulWidget {
@@ -96,7 +94,7 @@ class _LocationMapState extends State<LocationMap> {
                 waitToRender: Duration.zero,
               ),
           onTap: () {
-            Get.to(() => PostDetails());
+            // Get.to(() => PostDetails());
           },
         ),
       );

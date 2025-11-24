@@ -33,8 +33,10 @@ class _MediaPlayerState extends State<MediaPlayer> {
         backgroundColor: AppColors.black,
         body: SafeArea(
           bottom: false,
+          top: false,
           child: PageView.builder(
             scrollDirection: Axis.vertical,
+            itemCount: widget.mediaList.length,
             itemBuilder: (context, index) {
               return Stack(
                 children: [
@@ -49,6 +51,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
                         Positioned.fill(
                           child: CustomNetworkedImage(
                             url: widget.mediaList.elementAt(index)!,
+                            radius: 0,
                             fit: BoxFit.contain,
                           ),
                         ),

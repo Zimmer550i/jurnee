@@ -59,7 +59,7 @@ class PostModel {
   final List<String>? media;
   final String? title;
   final String? description;
-  final String? startDate;
+  final DateTime? startDate;
   final String? startTime;
   final String? address;
 
@@ -69,7 +69,7 @@ class PostModel {
   final int views;
   final int likes;
 
-  final String? endDate;
+  final DateTime? endDate;
 
   // service
   final num? price;
@@ -83,7 +83,7 @@ class PostModel {
   final num? missingAge;
   final String? clothingDescription;
   final List<double>? lastSeenCoordinates;
-  final String? lastSeenDate;
+  final DateTime? lastSeenDate;
   final String? contactInfo;
   final num? expireLimit;
 
@@ -144,7 +144,7 @@ class PostModel {
         media: json['media'] == null ? null : List<String>.from(json['media']),
         title: json['title'],
         description: json['description'],
-        startDate: json['startDate'],
+        startDate: json['startDate'] == null ? null : DateTime.parse(json['startDate']),
         startTime: json['startTime'],
         address: json['address'],
 
@@ -156,7 +156,7 @@ class PostModel {
         hasTag: json['hasTag'] == null ? null : List<String>.from(json['hasTag']),
         views: json['views'] ?? 0,
         likes: json['likes'] ?? 0,
-        endDate: json['endDate'],
+        endDate: json['endDate'] == null ? null : DateTime.parse(json['endDate']),
         price: json['price'],
         schedule: json['schedule'] == null
             ? null
@@ -178,7 +178,7 @@ class PostModel {
                         .map((e) => e.toDouble()),
                   ),
 
-        lastSeenDate: json['lastSeenDate'],
+        lastSeenDate: json['lastSeenDate'] == null ? null : DateTime.parse(json['lastSeenDate']),
         contactInfo: json['contactInfo'],
         expireLimit: json['expireLimit'],
         capacity: json['capacity'],
@@ -203,7 +203,7 @@ class PostModel {
         'media': media,
         'title': title,
         'description': description,
-        'startDate': startDate,
+        'startDate': startDate?.toIso8601String(),
         'startTime': startTime,
         'address': address,
         'location': {
@@ -213,7 +213,7 @@ class PostModel {
         'hasTag': hasTag,
         'views': views,
         'likes': likes,
-        'endDate': endDate,
+        'endDate': endDate?.toIso8601String(),
         'price': price,
         'schedule': schedule?.map((x) => x.toJson()).toList(),
         'category': category,
@@ -226,7 +226,7 @@ class PostModel {
           'type': 'Point',
           'coordinates': lastSeenCoordinates,
         },
-        'lastSeenDate': lastSeenDate,
+        'lastSeenDate': lastSeenDate?.toIso8601String(),
         'contactInfo': contactInfo,
         'expireLimit': expireLimit,
         'capacity': capacity,
@@ -248,14 +248,14 @@ class PostModel {
     List<String>? media,
     String? title,
     String? description,
-    String? startDate,
+    DateTime? startDate,
     String? startTime,
     String? address,
     List<double>? locationCoordinates,
     List<String>? hasTag,
     int? views,
     int? likes,
-    String? endDate,
+    DateTime? endDate,
     num? price,
     List<Schedule>? schedule,
     String? category,
@@ -265,7 +265,7 @@ class PostModel {
     num? missingAge,
     String? clothingDescription,
     List<double>? lastSeenCoordinates,
-    String? lastSeenDate,
+    DateTime? lastSeenDate,
     String? contactInfo,
     num? expireLimit,
     num? capacity,

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jurnee/utils/app_colors.dart';
+import 'package:jurnee/utils/app_texts.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CustomNetworkedImage extends StatelessWidget {
@@ -32,10 +33,16 @@ class CustomNetworkedImage extends StatelessWidget {
       borderRadius: BorderRadiusGeometry.circular(radius),
       child: file != null
           ? Image.file(file!, height: height, width: width, fit: fit)
+          : url == null
+          ? Container(
+              height: height,
+              width: width,
+              decoration: BoxDecoration(color: AppColors.gray.shade200),
+              child: Center(child: Icon(Icons.error_outline_rounded)),
+            )
           : CachedNetworkImage(
-              imageUrl:
-                  url ??
-                  "https://picsum.photos/${randomSeed == null ? "" : "seed/$randomSeed/"}${(width ?? 400).toInt()}/${(height ?? 400).toInt()}",
+              imageUrl: url!,
+              // "https://picsum.photos/${randomSeed == null ? "" : "seed/$randomSeed/"}${(width ?? 400).toInt()}/${(height ?? 400).toInt()}",
               height: height,
               width: width,
               fit: fit,
@@ -43,13 +50,19 @@ class CustomNetworkedImage extends StatelessWidget {
                 return Container(
                   height: height,
                   width: width,
-                  color: Colors.grey,
+                  color: AppColors.gray.shade200,
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error, color: Colors.red),
-                        Text(error.toString()),
+                        Icon(Icons.error, color: AppColors.gray.shade200),
+                        Text(
+                          error.toString(),
+                          textAlign: TextAlign.center,
+                          style: AppTexts.tsmr.copyWith(
+                            color: AppColors.gray.shade400,
+                          ),
+                        ),
                       ],
                     ),
                   ),

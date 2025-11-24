@@ -10,7 +10,6 @@ import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/auth/login.dart';
-import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/profile/app_info.dart';
 import 'package:jurnee/views/screens/profile/edit_profile.dart';
 import 'package:jurnee/views/screens/profile/bookings.dart';
@@ -96,11 +95,11 @@ class _ProfileState extends State<Profile> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        Get.to(
-                          () => UsersList(
-                            title: "Posts (${user.userData?.post.toString()})",
-                          ),
-                        );
+                        // Get.to(
+                        //   () => UsersList(
+                        //     title: "Posts (${user.userData?.post.toString()})",
+                        //   ),
+                        // );
                       },
                       child: Column(
                         children: [
@@ -123,12 +122,12 @@ class _ProfileState extends State<Profile> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        Get.to(
-                          () => UsersList(
-                            title:
-                                "Followers (${user.userData?.followers.toString()})",
-                          ),
-                        );
+                        // Get.to(
+                        //   () => UsersList(
+                        //     title:
+                        //         "Followers (${user.userData?.followers.toString()})",
+                        //   ),
+                        // );
                       },
                       child: Column(
                         children: [
@@ -151,12 +150,12 @@ class _ProfileState extends State<Profile> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        Get.to(
-                          () => UsersList(
-                            title:
-                                "Following (${user.userData?.following.toString()})",
-                          ),
-                        );
+                        // Get.to(
+                        //   () => UsersList(
+                        //     title:
+                        //         "Following (${user.userData?.following.toString()})",
+                        //   ),
+                        // );
                       },
                       child: Column(
                         children: [

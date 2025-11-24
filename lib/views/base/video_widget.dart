@@ -57,19 +57,21 @@ class _VideoWidgetState extends State<VideoWidget> {
               top: 12,
               left: 20,
               child: FlickAutoHideChild(
-                child: GestureDetector(
-                  onTap: () {
-                    Get.back();
-                  },
-                  child: Container(
-                    height: 32,
-                    width: 32,
-                    decoration: BoxDecoration(
-                      color: Color(0xff1b1b1b).withAlpha(128),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: CustomSvg(asset: "assets/icons/back.svg"),
+                child: SafeArea(
+                  child: GestureDetector(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Container(
+                      height: 32,
+                      width: 32,
+                      decoration: BoxDecoration(
+                        color: Color(0xff1b1b1b).withAlpha(128),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: CustomSvg(asset: "assets/icons/back.svg"),
+                      ),
                     ),
                   ),
                 ),
