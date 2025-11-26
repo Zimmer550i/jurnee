@@ -37,7 +37,7 @@ class _VerificationState extends State<Verification> {
       if (widget.isResettingPassword) {
         Get.to(() => ResetPassword());
       } else {
-        Get.offAll(() => Home());
+        Get.offAll(() => Home(), routeName: "/app");
       }
     } else {
       customSnackBar(message);

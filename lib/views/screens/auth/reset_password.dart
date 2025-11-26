@@ -26,7 +26,7 @@ class _ResetPasswordState extends State<ResetPassword> {
     if (message == "success") {
       customSnackBar("Your password has been changed", isError: false);
       if (await auth.previouslyLoggedIn()) {
-        Get.offAll(() => Home());
+        Get.offAll(() => Home(), routeName: "/app");
       } else {
         Get.offAll(Login());
       }

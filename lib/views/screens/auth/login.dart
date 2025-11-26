@@ -49,7 +49,7 @@ class _LoginState extends State<Login> {
     final message = await auth.login(emailCtrl.text, passCtrl.text);
 
     if (message == "success") {
-      Get.offAll(() => Home());
+      Get.offAll(() => Home(), routeName: "/app");
     } else {
       customSnackBar(message);
     }

@@ -47,7 +47,7 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
 
     Get.find<PostController>().fetchLocation();
     if (isVerified) {
-      Get.offAll(() => Home());
+      Get.offAll(() => Home(), routeName: "/app");
     } else {
       Get.offAll(() => Login());
     }

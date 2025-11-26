@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:jurnee/services/shared_prefs_service.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 
+//TODO: Fix saved location
 /// 1. getLocation with caching logic and override parameter
 Future<Position?> getLocation({
   bool forceRefresh = false,

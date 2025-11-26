@@ -17,8 +17,8 @@ class SharedPrefsService {
 
   static Future<double?> getDouble(String key, {String Function()? onNull}) async {
     final prefs = await SharedPreferences.getInstance();
-    final value = prefs.getDouble(key);
-    return value;
+    final value = prefs.get(key);
+    return double.tryParse(value.toString());
   }
 
   static Future<void> remove(String key) async {
