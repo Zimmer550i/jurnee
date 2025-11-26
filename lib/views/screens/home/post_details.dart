@@ -37,7 +37,9 @@ class PostDetails extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   Get.to(
-                    () => MediaPlayer(mediaList: [post.image, ...post.media]),
+                    () => MediaPlayer(
+                      mediaList: [post.image, ...post.media ?? []],
+                    ),
                   );
                 },
                 child: CustomNetworkedImage(
@@ -153,7 +155,7 @@ class PostDetails extends StatelessWidget {
                         ),
                       ),
                     Text(
-                      "${Get.find<PostController>().getDistance(post.location.coordinates[0], post.location.coordinates[1])} • ${DateFormat("dd MMM, hh:mm a").format(post.startDate)}",
+                      "${Get.find<PostController>().getDistance(post.location.coordinates[0], post.location.coordinates[1])} • ${post.startDate != null ? DateFormat("dd MMM, hh:mm a").format(post.startDate!) : ""}",
                       style: AppTexts.tmdm.copyWith(
                         color: AppColors.gray.shade400,
                       ),
@@ -380,27 +382,36 @@ class PostDetails extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      "Photos / Videos",
-                      style: AppTexts.tlgm.copyWith(
-                        color: AppColors.gray.shade600,
+                    if (post.media != null)
+                      Column(
+                        spacing: 8,
+                        children: [
+                          const SizedBox(height: 12),
+                          Text(
+                            "Photos / Videos",
+                            style: AppTexts.tlgm.copyWith(
+                              color: AppColors.gray.shade600,
+                            ),
+                          ),
+                          GridView(
+                            shrinkWrap: true,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                ),
+                            physics: NeverScrollableScrollPhysics(),
+                            children: [
+                              for (int i = 0; i < (post.media!.length); i++)
+                                CustomNetworkedImage(
+                                  url: post.media![i],
+                                  radius: 12,
+                                ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    GridView(
-                      shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                      ),
-                      physics: NeverScrollableScrollPhysics(),
-                      children: [
-                        for (int i = 0; i < (post.media.length); i++)
-                          CustomNetworkedImage(url: post.media[i], radius: 12),
-                      ],
-                    ),
                     if (post.subcategory != null &&
                         post.subcategory == "Missing Person")
                       Column(

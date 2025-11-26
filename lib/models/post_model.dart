@@ -10,12 +10,12 @@ String postModelToJson(PostModel data) => json.encode(data.toJson());
 
 class PostModel {
     final String id;
-    final String image;
-    final List<String> media;
+    final String? image;
+    final List<String>? media;
     final Author author;
     final String title;
     final String description;
-    final DateTime startDate;
+    final DateTime? startDate;
     final String? startTime;
     final String address;
     final Location location;
@@ -52,12 +52,12 @@ class PostModel {
 
     PostModel({
         required this.id,
-        required this.image,
-        required this.media,
+        this.image,
+        this.media,
         required this.author,
         required this.title,
         required this.description,
-        required this.startDate,
+        this.startDate,
         this.startTime,
         required this.address,
         required this.location,
@@ -181,11 +181,11 @@ class PostModel {
     factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
         id: json["_id"],
         image: json["image"],
-        media: List<String>.from(json["media"].map((x) => x)),
+        media: json["media"] == null ? null : List<String>.from(json["media"].map((x) => x)),
         author: Author.fromJson(json["author"]),
         title: json["title"],
         description: json["description"],
-        startDate: DateTime.parse(json["startDate"]),
+        startDate: json["startDate"] == null ? null : DateTime.parse(json["startDate"]),
         startTime: json["startTime"],
         address: json["address"],
         location: Location.fromJson(json["location"]),
@@ -224,11 +224,11 @@ class PostModel {
     Map<String, dynamic> toJson() => {
         "_id": id,
         "image": image,
-        "media": List<dynamic>.from(media.map((x) => x)),
+        "media": media == null ? null : List<dynamic>.from(media!.map((x) => x)),
         "author": author.toJson(),
         "title": title,
         "description": description,
-        "startDate": startDate.toIso8601String(),
+        "startDate": startDate?.toIso8601String(),
         "startTime": startTime,
         "address": address,
         "location": location.toJson(),
