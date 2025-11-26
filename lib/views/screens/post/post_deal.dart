@@ -38,7 +38,7 @@ class _PostDealState extends State<PostDeal> {
       "data": {
         "title": _baseKey.currentState?.titleCtrl.text.trim(),
         "description": _baseKey.currentState?.descriptionCtrl.text.trim(),
-        "category": "Event",
+        "category": "Deal",
         "address": _baseKey.currentState?.locationCtrl.text.trim(),
         "location": {
           "type": "Point",

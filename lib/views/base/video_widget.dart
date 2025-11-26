@@ -36,7 +36,6 @@ class _VideoWidgetState extends State<VideoWidget> {
   void dispose() {
     super.dispose();
     flickManager.dispose();
-    _controller.dispose();
   }
 
   @override

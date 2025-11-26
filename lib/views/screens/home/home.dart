@@ -37,12 +37,7 @@ class _HomeState extends State<Home> {
     });
   }
 
-  List<Widget> pages = [
-    Homepage(),
-    Messages(),
-    Notifications(),
-    Profile(),
-  ];
+  List<Widget> pages = [Homepage(), Messages(), Notifications(), Profile()];
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +90,9 @@ class _HomeState extends State<Home> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
+                                    setState(() {
+                                      showOverlay = false;
+                                    });
                                     Get.to(() => PostEvent());
                                   },
                                   child: Container(
@@ -130,6 +128,9 @@ class _HomeState extends State<Home> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
+                                    setState(() {
+                                      showOverlay = false;
+                                    });
                                     Get.to(() => PostDeal());
                                   },
                                   child: Container(
@@ -170,6 +171,9 @@ class _HomeState extends State<Home> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
+                                    setState(() {
+                                      showOverlay = false;
+                                    });
                                     Get.to(() => PostService());
                                   },
                                   child: Container(
@@ -205,6 +209,9 @@ class _HomeState extends State<Home> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
+                                    setState(() {
+                                      showOverlay = false;
+                                    });
                                     Get.to(() => PostAlert());
                                   },
                                   child: Container(
