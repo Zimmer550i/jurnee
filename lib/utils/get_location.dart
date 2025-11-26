@@ -35,29 +35,6 @@ Future<Position?> getLocation({
   return pos;
 }
 
-/// 2. Calculate distance in miles
-Future<String> getDistance(double targetLat, double targetLong) async {
-  // Get current location (will use cache if available < 1 hour)
-  Position? currentPos = await getLocation();
-
-  if (currentPos == null) {
-    return "Unknown distance";
-  }
-
-  // Calculate distance in meters
-  double distanceInMeters = Geolocator.distanceBetween(
-    currentPos.latitude,
-    currentPos.longitude,
-    targetLat,
-    targetLong,
-  );
-
-  // Convert meters to miles (1 meter = 0.000621371 miles)
-  double distanceInMiles = distanceInMeters * 0.000621371;
-
-  return "${distanceInMiles.toStringAsFixed(1)} miles";
-}
-
 Future<bool> _handlePermission() async {
   LocationPermission permission = await Geolocator.checkPermission();
 

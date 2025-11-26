@@ -1,15 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/post_model.dart';
-import 'package:jurnee/services/shared_prefs_service.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
-import 'package:jurnee/utils/get_location.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
@@ -21,45 +19,9 @@ import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/profile/boost_post.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
-class PostDetails extends StatefulWidget {
+class PostDetails extends StatelessWidget {
   final PostModel post;
   const PostDetails(this.post, {super.key});
-
-  @override
-  State<PostDetails> createState() => _PostDetailsState();
-}
-
-class _PostDetailsState extends State<PostDetails> {
-  LatLng? userPosition;
-
-  @override
-  void initState() {
-    super.initState();
-    setPosition();
-  }
-
-  setPosition() async {
-    var latitude = double.tryParse(
-      await SharedPrefsService.get("latitude") ?? "",
-    );
-    var longitude = double.tryParse(
-      await SharedPrefsService.get("longitude") ?? "",
-    );
-
-    if (latitude != null && longitude != null) {
-      setState(() {
-        userPosition = LatLng(latitude, longitude);
-      });
-    } else {
-      final pos = await getLocation();
-
-      if (pos != null) {
-        setState(() {
-          userPosition = LatLng(pos.latitude, pos.longitude);
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,13 +37,11 @@ class _PostDetailsState extends State<PostDetails> {
               GestureDetector(
                 onTap: () {
                   Get.to(
-                    () => MediaPlayer(
-                      mediaList: [widget.post.image, ...widget.post.media],
-                    ),
+                    () => MediaPlayer(mediaList: [post.image, ...post.media]),
                   );
                 },
                 child: CustomNetworkedImage(
-                  url: widget.post.image,
+                  url: post.image,
                   height: MediaQuery.of(context).size.width / 2,
                   width: MediaQuery.of(context).size.width,
                   radius: 0,
@@ -98,7 +58,7 @@ class _PostDetailsState extends State<PostDetails> {
                       children: [
                         Expanded(
                           child: Text(
-                            widget.post.title.toString(),
+                            post.title.toString(),
                             style: AppTexts.dxss.copyWith(
                               color: AppColors.gray.shade700,
                             ),
@@ -174,7 +134,7 @@ class _PostDetailsState extends State<PostDetails> {
                         ),
                       ],
                     ),
-                    if (widget.post.subcategory != null)
+                    if (post.subcategory != null)
                       Container(
                         margin: EdgeInsets.only(bottom: 8, top: 8),
                         padding: EdgeInsets.symmetric(
@@ -186,19 +146,18 @@ class _PostDetailsState extends State<PostDetails> {
                           color: AppColors.green.shade200,
                         ),
                         child: Text(
-                          widget.post.subcategory ?? "sfa",
+                          post.subcategory ?? "sfa",
                           style: AppTexts.tsms.copyWith(
                             color: AppColors.green.shade900,
                           ),
                         ),
                       ),
-                    // TODO: Fix this
-                    // Text(
-                    //   "${getDistance(widget.post.locationCoordinates?[0] ?? 0, widget.post.locationCoordinates?[1] ?? 0)} • ${DateFormat("dd MMM, hh:mm a").format(widget.post.startDate ?? DateTime.now())}",
-                    //   style: AppTexts.tmdm.copyWith(
-                    //     color: AppColors.gray.shade400,
-                    //   ),
-                    // ),
+                    Text(
+                      "${Get.find<PostController>().getDistance(post.location.coordinates[0], post.location.coordinates[1])} • ${DateFormat("dd MMM, hh:mm a").format(post.startDate)}",
+                      style: AppTexts.tmdm.copyWith(
+                        color: AppColors.gray.shade400,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Row(
                       spacing: 4,
@@ -206,7 +165,7 @@ class _PostDetailsState extends State<PostDetails> {
                         CustomSvg(asset: "assets/icons/location.svg", size: 24),
                         Expanded(
                           child: Text(
-                            widget.post.address.toString(),
+                            post.address.toString(),
                             style: AppTexts.tmdm.copyWith(
                               color: AppColors.gray.shade400,
                             ),
@@ -225,7 +184,7 @@ class _PostDetailsState extends State<PostDetails> {
                             CustomSvg(asset: "assets/icons/star.svg", size: 24),
                           const SizedBox(width: 4),
                           Text(
-                            widget.post.averageRating.toString(),
+                            post.averageRating.toString(),
                             style: AppTexts.tlgm.copyWith(
                               color: AppColors.gray.shade400,
                             ),
@@ -243,7 +202,7 @@ class _PostDetailsState extends State<PostDetails> {
                     const SizedBox(height: 20),
                     GestureDetector(
                       onTap: () {
-                        Get.to(() => Profile(userId: widget.post.author.id));
+                        Get.to(() => Profile(userId: post.author.id));
                       },
                       child: Row(
                         children: [
@@ -254,13 +213,10 @@ class _PostDetailsState extends State<PostDetails> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          ProfilePicture(
-                            image: widget.post.author.image,
-                            size: 32,
-                          ),
+                          ProfilePicture(image: post.author.image, size: 32),
                           const SizedBox(width: 8),
                           Text(
-                            widget.post.author.name,
+                            post.author.name,
                             style: AppTexts.tlgm.copyWith(
                               color: AppColors.gray.shade700,
                             ),
@@ -270,7 +226,7 @@ class _PostDetailsState extends State<PostDetails> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      widget.post.description.toString(),
+                      post.description.toString(),
                       style: AppTexts.tlgr.copyWith(
                         color: AppColors.gray.shade600,
                       ),
@@ -281,25 +237,25 @@ class _PostDetailsState extends State<PostDetails> {
                       children: [
                         CustomSvg(asset: "assets/icons/eye.svg", size: 24),
                         Text(
-                          widget.post.views.toString(),
+                          post.views.toString(),
                           style: AppTexts.tsmr.copyWith(color: AppColors.gray),
                         ),
                         const SizedBox(width: 4),
                         CustomSvg(asset: "assets/icons/save.svg", size: 24),
                         Text(
-                          widget.post.totalSaved.toString(),
+                          post.totalSaved.toString(),
                           style: AppTexts.tsmr.copyWith(color: AppColors.gray),
                         ),
                         const SizedBox(width: 4),
                         CustomSvg(asset: "assets/icons/love.svg", size: 24),
                         Text(
-                          widget.post.likes.toString(),
+                          post.likes.toString(),
                           style: AppTexts.tsmr.copyWith(color: AppColors.gray),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    if (widget.post.author.id !=
+                    if (post.author.id !=
                         Get.find<UserController>().userData!.id)
                       Column(
                         spacing: 24,
@@ -385,7 +341,7 @@ class _PostDetailsState extends State<PostDetails> {
                               children: [
                                 for (
                                   int i = 0;
-                                  i < min(5, widget.post.attenders.length);
+                                  i < min(5, post.attenders.length);
                                   i++
                                 )
                                   Positioned(
@@ -397,7 +353,7 @@ class _PostDetailsState extends State<PostDetails> {
                                         shape: BoxShape.circle,
                                       ),
                                       child: ProfilePicture(
-                                        image: widget.post.attenders
+                                        image: post.attenders
                                             .elementAt(i)
                                             .image,
                                         size: 24,
@@ -407,9 +363,9 @@ class _PostDetailsState extends State<PostDetails> {
                               ],
                             ),
                           ),
-                          if (widget.post.attenders.length > 5)
+                          if (post.attenders.length > 5)
                             Text(
-                              "+${max(0, widget.post.attenders.length - 5)}",
+                              "+${max(0, post.attenders.length - 5)}",
                               style: AppTexts.txsr.copyWith(
                                 color: AppColors.gray,
                               ),
@@ -441,15 +397,12 @@ class _PostDetailsState extends State<PostDetails> {
                       ),
                       physics: NeverScrollableScrollPhysics(),
                       children: [
-                        for (int i = 0; i < (widget.post.media.length); i++)
-                          CustomNetworkedImage(
-                            url: widget.post.media[i],
-                            radius: 12,
-                          ),
+                        for (int i = 0; i < (post.media.length); i++)
+                          CustomNetworkedImage(url: post.media[i], radius: 12),
                       ],
                     ),
-                    if (widget.post.subcategory != null &&
-                        widget.post.subcategory == "Missing Person")
+                    if (post.subcategory != null &&
+                        post.subcategory == "Missing Person")
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -492,7 +445,7 @@ class _PostDetailsState extends State<PostDetails> {
                       ),
                     const SizedBox(height: 20),
                     Text(
-                      widget.post.hasTag
+                      post.hasTag
                               ?.map(
                                 (val) => val.contains("#") ? "$val " : "#$val ",
                               )
@@ -503,7 +456,7 @@ class _PostDetailsState extends State<PostDetails> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    if (widget.post.price != null)
+                    if (post.price != null)
                       Row(
                         children: [
                           Text(
@@ -514,14 +467,14 @@ class _PostDetailsState extends State<PostDetails> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            "\$${widget.post.price}",
+                            "\$${post.price}",
                             style: AppTexts.dxss.copyWith(
                               color: AppColors.gray.shade700,
                             ),
                           ),
                         ],
                       ),
-                    if (widget.post.expireLimit != null)
+                    if (post.expireLimit != null)
                       Text(
                         "Expires in 7 days",
                         style: AppTexts.tmdm.copyWith(
@@ -544,20 +497,5 @@ class _PostDetailsState extends State<PostDetails> {
         ),
       ),
     );
-  }
-
-  String getDistance(double targetLat, double targetLong) {
-    // Calculate distance in meters
-    double distanceInMeters = Geolocator.distanceBetween(
-      userPosition!.latitude,
-      userPosition!.longitude,
-      targetLat,
-      targetLong,
-    );
-
-    // Convert meters to miles (1 meter = 0.000621371 miles)
-    double distanceInMiles = distanceInMeters * 0.000621371;
-
-    return "${distanceInMiles.toStringAsFixed(1)} miles";
   }
 }

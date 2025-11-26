@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
+import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/views/screens/auth/login.dart';
 import 'package:jurnee/views/screens/home/home.dart';
@@ -44,6 +45,7 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
       await Future.delayed(animationDuration - time.elapsed);
     }
 
+    Get.find<PostController>().fetchLocation();
     if (isVerified) {
       Get.offAll(() => Home());
     } else {
