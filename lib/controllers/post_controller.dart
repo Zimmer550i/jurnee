@@ -19,7 +19,11 @@ class PostController extends GetxController {
   RxBool isFirstLoad = true.obs;
   RxBool isMoreLoading = false.obs;
 
-  Future<String> fetchPosts({bool loadMore = false, String? category, String? search}) async {
+  Future<String> fetchPosts({
+    bool loadMore = false,
+    String? category,
+    String? search,
+  }) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 
     isLoading(true);
@@ -39,7 +43,7 @@ class PostController extends GetxController {
           "page": currentPage.value.toString(),
           "limit": limit.toString(),
           "category": category,
-          "search": search
+          "search": search,
         },
         authReq: true,
       );
@@ -67,6 +71,29 @@ class PostController extends GetxController {
     } finally {
       isFirstLoad(false);
       isMoreLoading(false);
+      isLoading(false);
+    }
+  }
+
+  Future<String> createPost(String type, Map<String, dynamic> data) async {
+    isLoading(true);
+    try {
+      final res = await api.post(
+        "/post/$type",
+        data,
+        isMultiPart: true,
+        authReq: true,
+      );
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
       isLoading(false);
     }
   }

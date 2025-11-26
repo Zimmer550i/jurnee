@@ -41,7 +41,7 @@ class _HomeState extends State<Home> {
     Homepage(),
     Messages(),
     Notifications(),
-    Profile(isUser: true),
+    Profile(),
   ];
 
   @override

@@ -4,14 +4,18 @@ import 'package:jurnee/views/base/custom_text_field.dart';
 
 class LocationPicker extends StatefulWidget {
   final String title;
-  const LocationPicker({super.key, this.title = "Location"});
+  final TextEditingController controller;
+  const LocationPicker({
+    super.key,
+    this.title = "Location",
+    required this.controller,
+  });
 
   @override
   State<LocationPicker> createState() => _LocationPickerState();
 }
 
 class _LocationPickerState extends State<LocationPicker> {
-  final ctrl = TextEditingController();
   bool showSuggestions = false;
 
   @override
@@ -20,7 +24,7 @@ class _LocationPickerState extends State<LocationPicker> {
       spacing: 8,
       children: [
         CustomTextField(
-          controller: ctrl,
+          controller: widget.controller,
           onChanged: (val) {
             setState(() {
               if (val == "") {

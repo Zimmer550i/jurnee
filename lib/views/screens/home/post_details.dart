@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/services/shared_prefs_service.dart';
@@ -20,6 +19,7 @@ import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/home/reviews.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/profile/boost_post.dart';
+import 'package:jurnee/views/screens/profile/profile.dart';
 
 class PostDetails extends StatefulWidget {
   final PostModel post;
@@ -76,13 +76,12 @@ class _PostDetailsState extends State<PostDetails> {
                 onTap: () {
                   Get.to(
                     () => MediaPlayer(
-                      mediaList: [widget.post.image, ...?widget.post.media],
+                      mediaList: [widget.post.image, ...widget.post.media],
                     ),
                   );
                 },
                 child: CustomNetworkedImage(
-                  url:
-                      widget.post.image ?? "https://thispersondoesnotexist.com",
+                  url: widget.post.image,
                   height: MediaQuery.of(context).size.width / 2,
                   width: MediaQuery.of(context).size.width,
                   radius: 0,
@@ -175,27 +174,31 @@ class _PostDetailsState extends State<PostDetails> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        color: AppColors.green.shade200,
-                      ),
-                      child: Text(
-                        widget.post.subcategory ?? "post.subcategory",
-                        style: AppTexts.tsms.copyWith(
-                          color: AppColors.green.shade900,
+                    if (widget.post.subcategory != null)
+                      Container(
+                        margin: EdgeInsets.only(bottom: 8, top: 8),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: AppColors.green.shade200,
+                        ),
+                        child: Text(
+                          widget.post.subcategory ?? "sfa",
+                          style: AppTexts.tsms.copyWith(
+                            color: AppColors.green.shade900,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "${getDistance(widget.post.locationCoordinates?[0] ?? 0, widget.post.locationCoordinates?[1] ?? 0)} • ${DateFormat("dd MMM, hh:mm a").format(widget.post.startDate ?? DateTime.now())}",
-                      style: AppTexts.tmdm.copyWith(
-                        color: AppColors.gray.shade400,
-                      ),
-                    ),
+                    // TODO: Fix this
+                    // Text(
+                    //   "${getDistance(widget.post.locationCoordinates?[0] ?? 0, widget.post.locationCoordinates?[1] ?? 0)} • ${DateFormat("dd MMM, hh:mm a").format(widget.post.startDate ?? DateTime.now())}",
+                    //   style: AppTexts.tmdm.copyWith(
+                    //     color: AppColors.gray.shade400,
+                    //   ),
+                    // ),
                     const SizedBox(height: 8),
                     Row(
                       spacing: 4,
@@ -238,24 +241,32 @@ class _PostDetailsState extends State<PostDetails> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Text(
-                          "Post by:",
-                          style: AppTexts.tlgr.copyWith(
-                            color: AppColors.gray.shade600,
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(() => Profile(userId: widget.post.author.id));
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            "Post by:",
+                            style: AppTexts.tlgr.copyWith(
+                              color: AppColors.gray.shade600,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        ProfilePicture(image: widget.post.author, size: 32),
-                        const SizedBox(width: 8),
-                        Text(
-                          widget.post.author,
-                          style: AppTexts.tlgm.copyWith(
-                            color: AppColors.gray.shade700,
+                          const SizedBox(width: 12),
+                          ProfilePicture(
+                            image: widget.post.author.image,
+                            size: 32,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Text(
+                            widget.post.author.name,
+                            style: AppTexts.tlgm.copyWith(
+                              color: AppColors.gray.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Text(
@@ -288,132 +299,130 @@ class _PostDetailsState extends State<PostDetails> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Column(
-                      spacing: 24,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Total Earnings",
-                              style: AppTexts.tlgm.copyWith(
-                                color: AppColors.gray,
-                              ),
-                            ),
-                            Text(
-                              "\$500",
-                              style: AppTexts.txlb.copyWith(
-                                color: AppColors.gray.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Units Sold",
-                              style: AppTexts.tlgm.copyWith(
-                                color: AppColors.gray,
-                              ),
-                            ),
-                            Text(
-                              "10/40",
-                              style: AppTexts.txlb.copyWith(
-                                color: AppColors.gray.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Unit Price",
-                              style: AppTexts.tlgm.copyWith(
-                                color: AppColors.gray,
-                              ),
-                            ),
-                            Text(
-                              "\$50",
-                              style: AppTexts.txlb.copyWith(
-                                color: AppColors.gray.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        InkWell(
-                          onTap: () {
-                            Get.to(
-                              () => UsersList(
-                                title: "Attending",
-                                getListMethod: (loadMore) {
-                                  return Get.find<UserController>()
-                                      .getFollowers();
-                                },
-                              ),
-                            );
-                          },
-                          child: Row(
+                    if (widget.post.author.id !=
+                        Get.find<UserController>().userData!.id)
+                      Column(
+                        spacing: 24,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Attending",
+                                "Total Earnings",
                                 style: AppTexts.tlgm.copyWith(
                                   color: AppColors.gray,
                                 ),
                               ),
-                              Spacer(),
-                              SizedBox(
-                                width: 79,
-                                height: 26,
-                                child: Stack(
-                                  children: [
-                                    for (
-                                      int i = 0;
-                                      i <
-                                          min(
-                                            5,
-                                            widget.post.attenders?.length ?? 0,
-                                          );
-                                      i++
-                                    )
-                                      Positioned(
-                                        left: 12.0 * i,
-                                        child: Container(
-                                          padding: EdgeInsets.all(1),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.white,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: ProfilePicture(
-                                            image: widget.post.attenders!
-                                                .elementAt(i),
-                                            size: 24,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              if (widget.post.attenders!.length > 5)
-                                Text(
-                                  "+${max(0, widget.post.attenders!.length - 5)}",
-                                  style: AppTexts.txsr.copyWith(
-                                    color: AppColors.gray,
-                                  ),
-                                ),
-                              const SizedBox(width: 8),
                               Text(
-                                "See all",
-                                style: AppTexts.txss.copyWith(
-                                  color: AppColors.green.shade600,
+                                "\$500",
+                                style: AppTexts.txlb.copyWith(
+                                  color: AppColors.gray.shade700,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Units Sold",
+                                style: AppTexts.tlgm.copyWith(
+                                  color: AppColors.gray,
+                                ),
+                              ),
+                              Text(
+                                "10/40",
+                                style: AppTexts.txlb.copyWith(
+                                  color: AppColors.gray.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Unit Price",
+                                style: AppTexts.tlgm.copyWith(
+                                  color: AppColors.gray,
+                                ),
+                              ),
+                              Text(
+                                "\$50",
+                                style: AppTexts.txlb.copyWith(
+                                  color: AppColors.gray.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 0),
+                        ],
+                      ),
+                    InkWell(
+                      onTap: () {
+                        Get.to(
+                          () => UsersList(
+                            title: "Attending",
+                            getListMethod: (loadMore) {
+                              return Get.find<UserController>().getFollowers();
+                            },
+                          ),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            "Attending",
+                            style: AppTexts.tlgm.copyWith(
+                              color: AppColors.gray,
+                            ),
+                          ),
+                          Spacer(),
+                          SizedBox(
+                            width: 79,
+                            height: 26,
+                            child: Stack(
+                              children: [
+                                for (
+                                  int i = 0;
+                                  i < min(5, widget.post.attenders.length);
+                                  i++
+                                )
+                                  Positioned(
+                                    left: 12.0 * i,
+                                    child: Container(
+                                      padding: EdgeInsets.all(1),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: ProfilePicture(
+                                        image: widget.post.attenders
+                                            .elementAt(i)
+                                            .image,
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          if (widget.post.attenders.length > 5)
+                            Text(
+                              "+${max(0, widget.post.attenders.length - 5)}",
+                              style: AppTexts.txsr.copyWith(
+                                color: AppColors.gray,
+                              ),
+                            ),
+                          const SizedBox(width: 8),
+                          Text(
+                            "See all",
+                            style: AppTexts.txss.copyWith(
+                              color: AppColors.green.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Text(
@@ -432,78 +441,93 @@ class _PostDetailsState extends State<PostDetails> {
                       ),
                       physics: NeverScrollableScrollPhysics(),
                       children: [
-                        for (
-                          int i = 0;
-                          i < (widget.post.media?.length ?? 0);
-                          i++
-                        )
+                        for (int i = 0; i < (widget.post.media.length); i++)
                           CustomNetworkedImage(
-                            url: widget.post.media?[i],
+                            url: widget.post.media[i],
                             radius: 12,
                           ),
                       ],
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        Text(
-                          "Missing Person’s Information",
-                          style: AppTexts.tlgm.copyWith(
-                            color: AppColors.gray.shade600,
+                    if (widget.post.subcategory != null &&
+                        widget.post.subcategory == "Missing Person")
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+                          Text(
+                            "Missing Person’s Information",
+                            style: AppTexts.tlgm.copyWith(
+                              color: AppColors.gray.shade600,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "Name: John Doe",
-                          style: AppTexts.tmdr.copyWith(color: AppColors.gray),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Age: 21",
-                          style: AppTexts.tmdr.copyWith(color: AppColors.gray),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Clothing Info: wearing red shirt & black pant",
-                          style: AppTexts.tmdr.copyWith(color: AppColors.gray),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Contact Info: name@example.com",
-                          style: AppTexts.tmdr.copyWith(color: AppColors.gray),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Name: John Doe",
+                            style: AppTexts.tmdr.copyWith(
+                              color: AppColors.gray,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Age: 21",
+                            style: AppTexts.tmdr.copyWith(
+                              color: AppColors.gray,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Clothing Info: wearing red shirt & black pant",
+                            style: AppTexts.tmdr.copyWith(
+                              color: AppColors.gray,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Contact Info: name@example.com",
+                            style: AppTexts.tmdr.copyWith(
+                              color: AppColors.gray,
+                            ),
+                          ),
+                        ],
+                      ),
                     const SizedBox(height: 20),
                     Text(
-                      widget.post.hasTag!.map((val) => "#$val ").join(),
+                      widget.post.hasTag
+                              ?.map(
+                                (val) => val.contains("#") ? "$val " : "#$val ",
+                              )
+                              .join() ??
+                          "",
                       style: AppTexts.tsmr.copyWith(
                         color: AppColors.green.shade700,
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Text(
-                          "Start From",
-                          style: AppTexts.tmdr.copyWith(color: AppColors.gray),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          "\$${widget.post.price}",
-                          style: AppTexts.dxss.copyWith(
-                            color: AppColors.gray.shade700,
+                    if (widget.post.price != null)
+                      Row(
+                        children: [
+                          Text(
+                            "Start From",
+                            style: AppTexts.tmdr.copyWith(
+                              color: AppColors.gray,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      "Expires in 7 days",
-                      style: AppTexts.tmdm.copyWith(
-                        color: AppColors.gray.shade400,
+                          const SizedBox(width: 4),
+                          Text(
+                            "\$${widget.post.price}",
+                            style: AppTexts.dxss.copyWith(
+                              color: AppColors.gray.shade700,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                    if (widget.post.expireLimit != null)
+                      Text(
+                        "Expires in 7 days",
+                        style: AppTexts.tmdm.copyWith(
+                          color: AppColors.gray.shade400,
+                        ),
+                      ),
                     const SizedBox(height: 32),
                     CustomButton(
                       onTap: () {

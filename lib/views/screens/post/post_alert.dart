@@ -81,7 +81,7 @@ class _PostAlertState extends State<PostAlert> {
                       title: "Clothing Information",
                       hintText: "Enter clothing information",
                     ),
-                    LocationPicker(title: "Last Seen Location"),
+                    LocationPicker(title: "Last Seen Location", controller: TextEditingController(),),
                     CustomTextField(
                       onTap: () async {
                         date = await showDatePicker(

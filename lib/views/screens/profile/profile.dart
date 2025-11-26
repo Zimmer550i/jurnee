@@ -7,6 +7,7 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_list_handler.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
+import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/auth/login.dart';
@@ -16,8 +17,8 @@ import 'package:jurnee/views/screens/profile/bookings.dart';
 import 'package:jurnee/views/screens/profile/support.dart';
 
 class Profile extends StatefulWidget {
-  final bool isUser;
-  const Profile({super.key, this.isUser = false});
+  final String? userId;
+  const Profile({super.key, this.userId});
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -34,21 +35,23 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
       key: _key,
       endDrawerEnableOpenDragGesture: false,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: AppColors.scaffoldBG,
-        surfaceTintColor: Colors.transparent,
-        titleSpacing: 0,
-        title: Row(
-          children: [
-            const SizedBox(width: 24),
-            CustomSvg(asset: "assets/icons/logo.svg"),
-            Spacer(),
-            const SizedBox(width: 24),
-          ],
-        ),
-      ),
-      endDrawer: drawer(context),
+      appBar: widget.userId == null
+          ? AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: AppColors.scaffoldBG,
+              surfaceTintColor: Colors.transparent,
+              titleSpacing: 0,
+              title: Row(
+                children: [
+                  const SizedBox(width: 24),
+                  CustomSvg(asset: "assets/icons/logo.svg"),
+                  Spacer(),
+                  const SizedBox(width: 24),
+                ],
+              ),
+            )
+          : CustomAppBar(title: "Profile"),
+      endDrawer: widget.userId == null ? drawer(context) : null,
       body: CustomListHandler(
         onRefresh: () => user.getUserData(),
         child: Obx(
@@ -178,7 +181,7 @@ class _ProfileState extends State<Profile> {
                   // Spacer(),
                 ],
               ),
-              if (!widget.isUser)
+              if (widget.userId != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 16),
                   child: Row(
@@ -261,36 +264,36 @@ class _ProfileState extends State<Profile> {
                       ),
                     ),
                   ),
-                  // if(!widget.isUser)
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          index = 2;
-                        });
-                      },
-                      child: Container(
-                        height: 48,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: index == 2
-                                ? BorderSide(color: AppColors.green.shade600)
-                                : BorderSide.none,
+                  if (widget.userId == null)
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            index = 2;
+                          });
+                        },
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: index == 2
+                                  ? BorderSide(color: AppColors.green.shade600)
+                                  : BorderSide.none,
+                            ),
                           ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Saved",
-                            style: AppTexts.tmds.copyWith(
-                              color: index == 2
-                                  ? AppColors.green.shade600
-                                  : AppColors.gray.shade400,
+                          child: Center(
+                            child: Text(
+                              "Saved",
+                              style: AppTexts.tmds.copyWith(
+                                color: index == 2
+                                    ? AppColors.green.shade600
+                                    : AppColors.gray.shade400,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
               const SizedBox(height: 24),

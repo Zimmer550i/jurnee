@@ -66,7 +66,7 @@ class _PostCardState extends State<PostCard> {
             children: [
               CustomNetworkedImage(
                 height: 184,
-                // width: double.infinity,
+                width: double.infinity,
                 url: widget.post.image,
                 fit: BoxFit.cover,
                 radius: 0,

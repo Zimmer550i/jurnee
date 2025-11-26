@@ -13,6 +13,8 @@ class LocationMap extends StatefulWidget {
 
 class _LocationMapState extends State<LocationMap> {
   Set<Marker> markers = {};
+  GoogleMapController? mapController;
+  Offset? overlayPos;
   LatLng? cardPosition;
 
   @override
@@ -24,18 +26,50 @@ class _LocationMapState extends State<LocationMap> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(37.42796133580664, -122.085749655962),
-          zoom: 14.4746,
-        ),
-        onCameraMove: (position) {
-          loadMarkers();
-        },
-        markers: markers,
+      child: Stack(
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                cardPosition = null;
+              });
+            },
+            child: GoogleMap(
+              mapType: MapType.normal,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(37.42796133580664, -122.085749655962),
+                zoom: 14.4746,
+              ),
+              onMapCreated: (controller) async {
+                mapController = controller;
+                await updateOverlayPosition();
+              },
+              onCameraMove: (position) {
+                loadMarkers();
+                updateOverlayPosition();
+              },
+              markers: markers,
+            ),
+          ),
+          if (overlayPos != null)
+            Positioned(
+              left: overlayPos!.dx - 150,
+              top: overlayPos!.dy - 180,
+              child: const PostCardSmall(),
+            ),
+        ],
       ),
     );
+  }
+
+  Future<void> updateOverlayPosition() async {
+    if (mapController == null || cardPosition == null) return;
+
+    final screenPoint = await mapController!.getScreenCoordinate(cardPosition!);
+
+    setState(() {
+      overlayPos = Offset(screenPoint.x.toDouble(), screenPoint.y.toDouble());
+    });
   }
 
   void loadMarkers() async {
@@ -50,9 +84,9 @@ class _LocationMapState extends State<LocationMap> {
             ),
         onTap: () async {
           setState(() {
-            cardPosition = LatLng(37.42796133580664, -122.085749655962);
+            cardPosition = const LatLng(37.42796133580664, -122.085749655962);
           });
-          loadMarkers();
+          await updateOverlayPosition();
         },
       ),
       Marker(
@@ -65,42 +99,40 @@ class _LocationMapState extends State<LocationMap> {
             ),
         onTap: () async {
           setState(() {
-            if (cardPosition == LatLng(37.42858833580664, -122.085749655962)) {
+            if (cardPosition != null &&
+                cardPosition!.latitude == 37.42858833580664 &&
+                cardPosition!.longitude == -122.085749655962) {
               cardPosition = null;
             } else {
-              cardPosition = LatLng(37.42858833580664, -122.085749655962);
+              cardPosition = const LatLng(37.42858833580664, -122.085749655962);
             }
           });
-          loadMarkers();
+          await updateOverlayPosition();
         },
       ),
     ]);
-    while (markers.length > 2) {
-      markers.remove(markers.elementAt(0));
-    }
 
-    if (cardPosition != null) {
-      markers.add(
-        Marker(
-          markerId: MarkerId("card"),
-          position: cardPosition!,
-          icon:
-              await Padding(
-                padding: EdgeInsetsGeometry.only(bottom: 60),
-                child: PostCardSmall(),
-              ).toBitmapDescriptor(
-                logicalSize: Size(400, 500),
-                imageSize: Size(400, 500),
-                waitToRender: Duration.zero,
-              ),
-          onTap: () {
-            // Get.to(() => PostDetails());
-          },
-        ),
-      );
-    }
+    // if (cardPosition != null) {
+    //   markers.add(
+    //     Marker(
+    //       markerId: MarkerId("card"),
+    //       position: cardPosition!,
+    //       icon:
+    //           await Padding(
+    //             padding: EdgeInsetsGeometry.only(bottom: 60),
+    //             child: PostCardSmall(),
+    //           ).toBitmapDescriptor(
+    //             logicalSize: Size(400, 500),
+    //             imageSize: Size(400, 500),
+    //             waitToRender: Duration.zero,
+    //           ),
+    //       onTap: () {
+    //         // Get.to(() => PostDetails());
+    //       },
+    //     ),
+    //   );
+    // }
 
-    setState(() {
-    });
+    setState(() {});
   }
 }

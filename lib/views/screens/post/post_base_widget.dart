@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_image_picker.dart';
@@ -17,6 +18,9 @@ class PostBaseWidget extends StatefulWidget {
 
 class PostBaseWidgetState extends State<PostBaseWidget> {
   final GlobalKey<PostBaseWidgetState> _locationKey = GlobalKey();
+  final titleCtrl = TextEditingController();
+  final descriptionCtrl = TextEditingController();
+  final locationCtrl = TextEditingController();
 
   File? cover;
   List<File?> images = List.generate(5, (_) => null);
@@ -88,11 +92,13 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
               for (int i = 0; i < 5; i++)
                 GestureDetector(
                   onTap: () async {
-                    images[i] = await customImagePicker(
-                      isCircular: false,
-                      isSquared: false,
+                    final XFile? picked = await ImagePicker().pickMedia(
+                      imageQuality: 90,
                     );
-                    setState(() {});
+                    if (picked != null) {
+                      images[i] = File(picked.path);
+                      setState(() {});
+                    }
                   },
                   child: Container(
                     width: 64,
@@ -119,15 +125,20 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
           ),
         ),
         const SizedBox(height: 16),
-        CustomTextField(title: "Title", hintText: "Enter title"),
+        CustomTextField(
+          controller: titleCtrl,
+          title: "Title",
+          hintText: "Enter title",
+        ),
         const SizedBox(height: 16),
         CustomTextField(
+          controller: descriptionCtrl,
           title: "Description",
           hintText: "Enter description",
           lines: 5,
         ),
         const SizedBox(height: 16),
-        LocationPicker(key: _locationKey),
+        LocationPicker(key: _locationKey, controller: locationCtrl),
         const SizedBox(height: 16),
       ],
     );

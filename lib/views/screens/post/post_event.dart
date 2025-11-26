@@ -1,5 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
+import 'package:jurnee/utils/formatter.dart';
+import 'package:jurnee/utils/get_location.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
@@ -18,13 +23,83 @@ class _PostEventState extends State<PostEvent> {
 
   File? cover;
   List<File?> images = [];
-  String? title;
-  String? description;
   String? placeId;
   DateTime? date;
   TimeOfDay? time;
 
-  void publish() async {}
+  void publish() async {
+    if (!isValid()) {
+      return;
+    }
+
+    final pos = await getLocation();
+
+    Map<String, dynamic> payload = {
+      "data": {
+        "title": _baseKey.currentState?.titleCtrl.text.trim(),
+        "description": _baseKey.currentState?.descriptionCtrl.text.trim(),
+        "category": "Event",
+        "address": _baseKey.currentState?.locationCtrl.text.trim(),
+        "location": {
+          "type": "Point",
+          "coordinates": [pos!.longitude, pos.latitude],
+        },
+        "hasTag": hashtagCtrl.text.split(" "),
+        "startDate": date?.toIso8601String(),
+        "startTime": date
+            ?.copyWith(hour: time?.hour, minute: time?.minute)
+            .toIso8601String(),
+      },
+      "image": _baseKey.currentState?.cover,
+      "media": _baseKey.currentState?.images,
+    };
+
+    final message = await Get.find<PostController>().createPost(
+      "event",
+      payload,
+    );
+    if (message == "success") {
+      if (context.mounted) {
+        Get.back();
+        Get.back();
+      }
+      customSnackBar("Post created successfully", isError: false);
+    } else {
+      customSnackBar(message);
+    }
+  }
+
+  bool isValid() {
+    final title = _baseKey.currentState?.titleCtrl.text.trim();
+    final description = _baseKey.currentState?.descriptionCtrl.text.trim();
+    final address = _baseKey.currentState?.locationCtrl.text.trim();
+
+    if (title == null || title.isEmpty) {
+      customSnackBar("Title is required");
+      return false;
+    }
+    if (description == null || description.isEmpty) {
+      customSnackBar("Description is required");
+      return false;
+    }
+    if (address == null || address.isEmpty) {
+      customSnackBar("Address is required");
+      return false;
+    }
+    if (date == null) {
+      customSnackBar("Date is required");
+      return false;
+    }
+    if (time == null) {
+      customSnackBar("Time is required");
+      return false;
+    }
+    if (_baseKey.currentState?.cover == null) {
+      customSnackBar("Cover image is required");
+      return false;
+    }
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +126,11 @@ class _PostEventState extends State<PostEvent> {
                         setState(() {});
                       },
                       title: "Date",
+                      controller: date != null
+                          ? TextEditingController(
+                              text: Formatter.dateFormatter(date!),
+                            )
+                          : null,
                       hintText: "Pick date",
                       trailing: "assets/icons/calendar.svg",
                     ),
@@ -65,6 +145,11 @@ class _PostEventState extends State<PostEvent> {
                         setState(() {});
                       },
                       title: "Time",
+                      controller: time != null
+                          ? TextEditingController(
+                              text: Formatter.timeFormatter(time: time),
+                            )
+                          : null,
                       hintText: "Pick time",
                       trailing: "assets/icons/clock.svg",
                     ),
@@ -79,7 +164,13 @@ class _PostEventState extends State<PostEvent> {
               ),
 
               const SizedBox(height: 40),
-              CustomButton(onTap: publish, text: "Publish"),
+              Obx(
+                () => CustomButton(
+                  onTap: publish,
+                  isLoading: Get.find<PostController>().isLoading.value,
+                  text: "Publish",
+                ),
+              ),
               const SizedBox(height: 28),
             ],
           ),

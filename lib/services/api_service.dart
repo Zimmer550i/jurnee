@@ -56,15 +56,24 @@ class ApiService {
         request.headers.addAll(headers);
 
         for (var entry in data.entries) {
-          if (entry.value is File) {
+          final key = entry.key;
+          final value = entry.value;
+
+          if (value is File) {
             request.files.add(
-              await http.MultipartFile.fromPath(
-                entry.key,
-                (entry.value as File).path,
-              ),
+              await http.MultipartFile.fromPath(key, value.path),
             );
+          } else if (value is List<File?>) {
+            for (var file in value) {
+              if (file == null) {
+                continue;
+              }
+              request.files.add(
+                await http.MultipartFile.fromPath(key, file.path),
+              );
+            }
           } else {
-            request.fields[entry.key] = jsonEncode(entry.value);
+            request.fields[key] = jsonEncode(value);
           }
         }
 
