@@ -9,10 +9,11 @@ class AvailabilityWidget extends StatefulWidget {
   const AvailabilityWidget({super.key});
 
   @override
-  State<AvailabilityWidget> createState() => _AvailabilityWidgetState();
+  State<AvailabilityWidget> createState() => AvailabilityWidgetState();
 }
 
-class _AvailabilityWidgetState extends State<AvailabilityWidget> {
+class AvailabilityWidgetState extends State<AvailabilityWidget> {
+  List<Map<String, dynamic>> schedule = [];
   bool repeat = false;
   int index = 0;
 

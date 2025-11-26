@@ -59,9 +59,8 @@ class _PostEventState extends State<PostEvent> {
       payload,
     );
     if (message == "success") {
-      if (context.mounted) {
-        Get.back();
-        Get.back();
+      if (mounted) {
+        Get.until((route) => Get.currentRoute == "/app");
       }
       customSnackBar("Post created successfully", isError: false);
     } else {

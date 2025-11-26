@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:jurnee/utils/app_texts.dart';
+import 'package:get/get.dart';
+import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
+import 'package:jurnee/utils/get_location.dart';
 import 'package:jurnee/views/base/availability_widget.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
@@ -16,18 +19,123 @@ class PostService extends StatefulWidget {
 }
 
 class _PostServiceState extends State<PostService> {
+  final GlobalKey<AvailabilityWidgetState> _availabilityKey = GlobalKey();
   final GlobalKey<PostBaseWidgetState> _baseKey = GlobalKey();
-  final GlobalKey<PostBaseWidgetState> _availabilityKey = GlobalKey();
   final hashtagCtrl = TextEditingController();
+  final priceCtrl = TextEditingController();
 
   File? cover;
   List<File?> images = [];
-  String? title;
-  String? description;
+  File? lisenses;
   String? placeId;
-  String? category;
+  DateTime? date;
+  TimeOfDay? time;
+  String? subCategory;
 
-  void publish() async {}
+  void publish() async {
+    if (!isValid()) {
+      return;
+    }
+
+    final pos = await getLocation();
+
+    Map<String, dynamic> payload = {
+      "data": {
+        "title": _baseKey.currentState?.titleCtrl.text.trim(),
+        "description": _baseKey.currentState?.descriptionCtrl.text.trim(),
+        "category": "Service",
+        "subcategory": subCategory,
+        "address": _baseKey.currentState?.locationCtrl.text.trim(),
+        "location": {
+          "type": "Point",
+          "coordinates": [pos!.longitude, pos.latitude],
+        },
+        "hasTag": hashtagCtrl.text.split(" "),
+        "startDate": date?.toIso8601String(),
+        "startTime": date
+            ?.copyWith(hour: time?.hour, minute: time?.minute)
+            .toIso8601String(),
+
+        "schedule": _availabilityKey.currentState?.schedule,
+      },
+      "image": _baseKey.currentState?.cover,
+      "media": _baseKey.currentState?.images,
+    };
+
+    switch (subCategory) {
+      case "Food & Beverage":
+        (payload['data'] as Map<String, dynamic>).addAll({
+          "price": num.tryParse(priceCtrl.text),
+        });
+        break;
+      case "Entertainment":
+        (payload['data'] as Map<String, dynamic>).addAll({
+          "price": num.tryParse(priceCtrl.text),
+        });
+        break;
+      case "Personal/Home Services":
+        (payload['data'] as Map<String, dynamic>).addAll({
+          "price": num.tryParse(priceCtrl.text),
+        });
+        break;
+      case "Venues":
+        (payload['data'] as Map<String, dynamic>).addAll({
+          "price": num.tryParse(priceCtrl.text),
+        });
+        if (lisenses != null) payload.addAll({"licenses": lisenses});
+        break;
+    }
+
+    final message = await Get.find<PostController>().createPost(
+      "service",
+      payload,
+    );
+    if (message == "success") {
+      if (mounted) {
+        Get.until((route) => Get.currentRoute == "/app");
+      }
+      customSnackBar("Post created successfully", isError: false);
+    } else {
+      customSnackBar(message);
+    }
+  }
+
+  bool isValid() {
+    final title = _baseKey.currentState?.titleCtrl.text.trim();
+    final description = _baseKey.currentState?.descriptionCtrl.text.trim();
+    final address = _baseKey.currentState?.locationCtrl.text.trim();
+
+    if (title == null || title.isEmpty) {
+      customSnackBar("Title is required");
+      return false;
+    }
+    if (description == null || description.isEmpty) {
+      customSnackBar("Description is required");
+      return false;
+    }
+    if (address == null || address.isEmpty) {
+      customSnackBar("Address is required");
+      return false;
+    }
+    if (date == null) {
+      customSnackBar("Date is required");
+      return false;
+    }
+    if (time == null) {
+      customSnackBar("Time is required");
+      return false;
+    }
+    if (_baseKey.currentState?.cover == null) {
+      customSnackBar("Cover image is required");
+      return false;
+    }
+    
+    if (subCategory == null) {
+      customSnackBar("Category is required");
+      return false;
+    }
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +160,7 @@ class _PostServiceState extends State<PostService> {
                 title: "Category",
                 onChanged: (val) {
                   setState(() {
-                    category = val;
+                    subCategory = val;
                   });
                 },
                 hintText: "Select service category",
@@ -78,53 +186,29 @@ class _PostServiceState extends State<PostService> {
   }
 
   Widget getAdditionalFields() {
-    switch (category) {
+    switch (subCategory) {
       case "Food & Beverage":
         return CustomTextField(
           title: "Starting Price",
+          controller: priceCtrl,
+          textInputType: TextInputType.number,
           hintText: "\$ Enter the selling price",
         );
       case "Entertainment":
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text("Rates", style: AppTexts.txsb),
-            ),
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Color(0xffE6E6E6)),
-              ),
-              child: Row(
-                spacing: 16,
-                children: [
-                  Expanded(
-                    child: CustomTextField(
-                      title: "Hourly",
-                      hintText: "\$ Enter rate",
-                    ),
-                  ),
-                  Expanded(
-                    child: CustomTextField(
-                      title: "Day",
-                      hintText: "\$ Enter rate",
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        return CustomTextField(
+          title: "Starting Price",
+          controller: priceCtrl,
+          textInputType: TextInputType.number,
+          hintText: "\$ Enter the starting price",
         );
       case "Personal/Home Services":
         return Column(
           children: [
             CustomTextField(
               title: "Starting Price",
-              hintText: "\$ Enter the selling price",
+              controller: priceCtrl,
+              textInputType: TextInputType.number,
+              hintText: "\$ Enter the starting price",
             ),
             const SizedBox(height: 16),
             CustomTextField(
@@ -145,10 +229,16 @@ class _PostServiceState extends State<PostService> {
           children: [
             CustomTextField(
               title: "Starting Price",
-              hintText: "\$ Enter the selling price",
+              controller: priceCtrl,
+              textInputType: TextInputType.number,
+              hintText: "\$ Enter the starting price",
             ),
             const SizedBox(height: 16),
-            CustomTextField(title: "Capacity", hintText: "Enter max guests"),
+            CustomTextField(
+              title: "Capacity",
+              textInputType: TextInputType.number,
+              hintText: "Enter max guests",
+            ),
             const SizedBox(height: 16),
             CustomTextField(title: "Amenities", hintText: "Enter amenities"),
           ],
