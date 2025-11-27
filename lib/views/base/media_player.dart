@@ -1,24 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/video_widget.dart';
+import 'package:jurnee/views/screens/profile/profile.dart';
 
 class MediaPlayer extends StatefulWidget {
   final List<String?> mediaList;
-  const MediaPlayer({super.key, this.mediaList = const []});
+  final PostModel postData;
+  final String? preferedStart;
+  const MediaPlayer({
+    super.key,
+    this.preferedStart,
+    this.mediaList = const [],
+    required this.postData,
+  });
 
   @override
   State<MediaPlayer> createState() => _MediaPlayerState();
 }
 
 class _MediaPlayerState extends State<MediaPlayer> {
+  int index = 0;
+
   @override
   void initState() {
     super.initState();
+    getIndex();
+  }
+
+  void getIndex() {
+    for (index = 0; index < widget.mediaList.length; index++) {
+      if (widget.preferedStart == widget.mediaList[index]) {
+        return;
+      }
+    }
+    if (index == widget.mediaList.length) {
+      index == 0;
+    }
   }
 
   @override
@@ -36,13 +61,17 @@ class _MediaPlayerState extends State<MediaPlayer> {
           top: false,
           child: PageView.builder(
             scrollDirection: Axis.vertical,
+            controller: PageController(initialPage: index),
             itemCount: widget.mediaList.length,
             itemBuilder: (context, index) {
               return Stack(
                 children: [
                   if (isVideo(widget.mediaList.elementAt(index)!))
                     Positioned.fill(
-                      child: VideoWidget(widget.mediaList.elementAt(index)!),
+                      child: VideoWidget(
+                        widget.mediaList.elementAt(index)!,
+                        postData: widget.postData,
+                      ),
                     ),
 
                   if (!isVideo(widget.mediaList.elementAt(index)!))
@@ -75,18 +104,17 @@ class _MediaPlayerState extends State<MediaPlayer> {
                               child: SafeArea(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
+                                    // Text(
+                                    //   "Post from event",
+                                    //   style: AppTexts.tmdr.copyWith(
+                                    //     color: AppColors.gray[25],
+                                    //   ),
+                                    // ),
+                                    // const SizedBox(height: 12),
                                     Text(
-                                      "Post from event",
-                                      style: AppTexts.tmdr.copyWith(
-                                        color: AppColors.gray[25],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      "Event Name",
+                                      widget.postData.title,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: AppTexts.dxsm.copyWith(
@@ -97,7 +125,17 @@ class _MediaPlayerState extends State<MediaPlayer> {
                                     Row(
                                       children: [
                                         Text(
-                                          "0.8 mi",
+                                          Get.find<PostController>()
+                                              .getDistance(
+                                                widget
+                                                    .postData
+                                                    .location
+                                                    .coordinates[0],
+                                                widget
+                                                    .postData
+                                                    .location
+                                                    .coordinates[1],
+                                              ),
                                           style: AppTexts.tmdm.copyWith(
                                             color: AppColors.gray[25],
                                           ),
@@ -114,7 +152,8 @@ class _MediaPlayerState extends State<MediaPlayer> {
                                           ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          "4.7",
+                                          widget.postData.averageRating
+                                              .toString(),
                                           style: AppTexts.tmdm.copyWith(
                                             color: AppColors.gray[25],
                                           ),
@@ -122,21 +161,29 @@ class _MediaPlayerState extends State<MediaPlayer> {
                                       ],
                                     ),
                                     const SizedBox(height: 12),
-                                    Row(
-                                      children: [
-                                        ProfilePicture(
-                                          image:
-                                              "https://thispersondoesnotexist.com",
-                                          size: 52,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          "Sample Name",
-                                          style: AppTexts.txlm.copyWith(
-                                            color: AppColors.gray[25],
+                                    GestureDetector(
+                                      onTap: () {
+                                        Get.to(
+                                          () => Profile(
+                                            userId: widget.postData.author.id,
                                           ),
-                                        ),
-                                      ],
+                                        );
+                                      },
+                                      child: Row(
+                                        children: [
+                                          ProfilePicture(
+                                            image: widget.postData.author.image,
+                                            size: 52,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            widget.postData.author.name,
+                                            style: AppTexts.txlm.copyWith(
+                                              color: AppColors.gray[25],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                     const SizedBox(height: 20),
                                   ],

@@ -13,6 +13,7 @@ import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/media_player.dart';
+import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/home/reviews.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
@@ -38,6 +39,8 @@ class PostDetails extends StatelessWidget {
                 onTap: () {
                   Get.to(
                     () => MediaPlayer(
+                      postData: post,
+                      preferedStart: post.image,
                       mediaList: [post.image, ...post.media ?? []],
                     ),
                   );
@@ -405,10 +408,30 @@ class PostDetails extends StatelessWidget {
                             physics: NeverScrollableScrollPhysics(),
                             children: [
                               for (int i = 0; i < (post.media!.length); i++)
-                                CustomNetworkedImage(
-                                  url: post.media![i],
-                                  radius: 12,
+                                GestureDetector(
+                                  onTap: () {
+                                    Get.to(
+                                      () => MediaPlayer(
+                                        postData: post,
+                                        preferedStart: post.media![i],
+                                        mediaList: [
+                                          post.image,
+                                          ...post.media ?? [],
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadiusGeometry.circular(
+                                      12,
+                                    ),
+                                    child: MediaThumbnail(path: post.media![i]),
+                                  ),
                                 ),
+                              // CustomNetworkedImage(
+                              //   url: post.media![i],
+                              //   radius: 12,
+                              // ),
                             ],
                           ),
                         ],
@@ -510,9 +533,7 @@ class PostDetails extends StatelessWidget {
     if (post.author.id == Get.find<UserController>().userData!.id) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 8.0),
-        child: CustomButton(onTap: () {
-          
-        }, text: "Edit Post", isSecondary: true),
+        child: CustomButton(onTap: () {}, text: "Edit Post", isSecondary: true),
       );
     }
 

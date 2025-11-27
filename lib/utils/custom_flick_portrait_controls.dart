@@ -1,3 +1,5 @@
+import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
@@ -9,12 +11,14 @@ import 'package:jurnee/views/base/profile_picture.dart';
 /// Default portrait controls.
 class CustomFlickPortraitControls extends StatelessWidget {
   final bool hasBackButton;
+  final PostModel postData;
   const CustomFlickPortraitControls({
     super.key,
     this.iconSize = 20,
     this.fontSize = 12,
     this.progressBarSettings,
     this.hasBackButton = true,
+    required this.postData,
   });
 
   /// Icon size.
@@ -61,22 +65,22 @@ class CustomFlickPortraitControls extends StatelessWidget {
             top: 12,
             left: 22,
             child: FlickAutoHideChild(
-              child: GestureDetector(
-                onTap: () {
-                  Get.back();
-                },
-                behavior: HitTestBehavior.translucent,
-                child: Container(
-                  height: 32,
-                  width: 32,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: CustomSvg(
-                      asset: "assets/icons/back.svg",
-                      color: Colors.white,
-                      size: 24,
+              child: SafeArea(
+                child: GestureDetector(
+                  onTap: () {
+                    Get.back();
+                  },
+                  behavior: HitTestBehavior.translucent,
+                  child: Container(
+                    height: 32,
+                    width: 32,
+                    decoration: BoxDecoration(shape: BoxShape.circle),
+                    child: Center(
+                      child: CustomSvg(
+                        asset: "assets/icons/back.svg",
+                        color: Colors.white,
+                        size: 24,
+                      ),
                     ),
                   ),
                 ),
@@ -102,15 +106,15 @@ class CustomFlickPortraitControls extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      // Text(
+                      //   "Post from event",
+                      //   style: AppTexts.tmdr.copyWith(
+                      //     color: AppColors.gray[25],
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 12),
                       Text(
-                        "Post from event",
-                        style: AppTexts.tmdr.copyWith(
-                          color: AppColors.gray[25],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        "Event Name",
+                        postData.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTexts.dxsm.copyWith(
@@ -121,7 +125,10 @@ class CustomFlickPortraitControls extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            "0.8 mi",
+                            Get.find<PostController>().getDistance(
+                              postData.location.coordinates[0],
+                              postData.location.coordinates[1],
+                            ),
                             style: AppTexts.tmdm.copyWith(
                               color: AppColors.gray[25],
                             ),
@@ -136,7 +143,7 @@ class CustomFlickPortraitControls extends StatelessWidget {
                             ),
                           const SizedBox(width: 4),
                           Text(
-                            "4.7",
+                            postData.averageRating.toString(),
                             style: AppTexts.tmdm.copyWith(
                               color: AppColors.gray[25],
                             ),
@@ -147,12 +154,12 @@ class CustomFlickPortraitControls extends StatelessWidget {
                       Row(
                         children: [
                           ProfilePicture(
-                            image: "https://thispersondoesnotexist.com",
+                            image: postData.author.image,
                             size: 52,
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            "Sample Name",
+                            postData.author.name,
                             style: AppTexts.txlm.copyWith(
                               color: AppColors.gray[25],
                             ),

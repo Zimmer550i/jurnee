@@ -1,3 +1,5 @@
+import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_flick_portrait_controls.dart';
@@ -11,7 +13,13 @@ import 'package:video_player/video_player.dart';
 class VideoWidget extends StatefulWidget {
   final String? url;
   final VideoPlayerController? controller;
-  const VideoWidget(this.url, {super.key, this.controller});
+  final PostModel postData;
+  const VideoWidget(
+    this.url, {
+    super.key,
+    this.controller,
+    required this.postData,
+  });
 
   @override
   State<VideoWidget> createState() => _VideoWidgetState();
@@ -95,15 +103,15 @@ class _VideoWidgetState extends State<VideoWidget> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
+                          // Text(
+                          //   "Post from event",
+                          //   style: AppTexts.tmdr.copyWith(
+                          //     color: AppColors.gray[25],
+                          //   ),
+                          // ),
+                          // const SizedBox(height: 12),
                           Text(
-                            "Post from event",
-                            style: AppTexts.tmdr.copyWith(
-                              color: AppColors.gray[25],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            "Event Name",
+                            widget.postData.title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppTexts.dxsm.copyWith(
@@ -114,7 +122,10 @@ class _VideoWidgetState extends State<VideoWidget> {
                           Row(
                             children: [
                               Text(
-                                "0.8 mi",
+                                Get.find<PostController>().getDistance(
+                                  widget.postData.location.coordinates[0],
+                                  widget.postData.location.coordinates[1],
+                                ),
                                 style: AppTexts.tmdm.copyWith(
                                   color: AppColors.gray[25],
                                 ),
@@ -129,7 +140,7 @@ class _VideoWidgetState extends State<VideoWidget> {
                                 ),
                               const SizedBox(width: 4),
                               Text(
-                                "4.7",
+                                widget.postData.averageRating.toString(),
                                 style: AppTexts.tmdm.copyWith(
                                   color: AppColors.gray[25],
                                 ),
@@ -140,12 +151,12 @@ class _VideoWidgetState extends State<VideoWidget> {
                           Row(
                             children: [
                               ProfilePicture(
-                                image: "https://thispersondoesnotexist.com",
+                                image: widget.postData.author.image,
                                 size: 52,
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                "Sample Name",
+                                widget.postData.author.name,
                                 style: AppTexts.txlm.copyWith(
                                   color: AppColors.gray[25],
                                 ),
@@ -201,7 +212,7 @@ class _VideoWidgetState extends State<VideoWidget> {
             ),
           ],
         ),
-        controls: CustomFlickPortraitControls(),
+        controls: CustomFlickPortraitControls(postData: widget.postData),
       ),
     );
   }

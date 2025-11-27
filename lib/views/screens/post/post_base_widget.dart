@@ -7,6 +7,7 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_image_picker.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
+import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/screens/post/location_picker.dart';
 
 class PostBaseWidget extends StatefulWidget {
@@ -117,7 +118,7 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
                           )
                         : ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: Image.file(images[i]!, fit: BoxFit.cover),
+                            child: MediaThumbnail(path: images[i]!.path),
                           ),
                   ),
                 ),
