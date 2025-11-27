@@ -385,6 +385,7 @@ class PostDetails extends StatelessWidget {
                     if (post.media != null)
                       Column(
                         spacing: 8,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 12),
                           Text(

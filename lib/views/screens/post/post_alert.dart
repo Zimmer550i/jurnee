@@ -26,6 +26,7 @@ class _PostAlertState extends State<PostAlert> {
   final nameCtrl = TextEditingController();
   final ageCtrl = TextEditingController();
   final clothCtrl = TextEditingController();
+  final locationCtrl = TextEditingController();
 
   File? cover;
   List<File?> images = [];
@@ -34,7 +35,7 @@ class _PostAlertState extends State<PostAlert> {
   String? placeId;
 
   String? category;
-  String? expiry = "7 Days";
+  String expiry = "7 Days";
   DateTime? date;
 
   void publish() async {
@@ -57,14 +58,27 @@ class _PostAlertState extends State<PostAlert> {
         },
         "hasTag": hashtagCtrl.text.split(" "),
         "contactInfo": contactCtrl.text,
-        "expireLimit": expiry?.split(" ").last,
+        "expireLimit": num.tryParse(expiry.split(" ").first),
       },
       "image": _baseKey.currentState?.cover,
       "media": _baseKey.currentState?.images,
     };
 
+    if (category == "Missing Person") {
+      (payload['data'] as Map<String, dynamic>).addAll({
+        "missingName": nameCtrl.text.trim(),
+        "missingAge": num.tryParse(ageCtrl.text),
+        "clothingDescription": clothCtrl.text.trim(),
+        "lastSeenDate": date!.toIso8601String(),
+        "lastSeenLocation": {
+          "type": "Point",
+          "coordinates": [pos.longitude, pos.latitude],
+        },
+      });
+    }
+
     final message = await Get.find<PostController>().createPost(
-      "alert/${category == "Missing Person" ? "missing-person": "others"}",
+      "alert/${category == "Missing Person" ? "missing-person" : "others"}",
       payload,
     );
     if (message == "success") {
@@ -102,7 +116,9 @@ class _PostAlertState extends State<PostAlert> {
     if (category == "Missing Person") {
       if (nameCtrl.text.isEmpty ||
           ageCtrl.text.isEmpty ||
-          clothCtrl.text.isEmpty) {
+          clothCtrl.text.isEmpty ||
+          date == null) {
+        customSnackBar("Provide missing person's information");
         return false;
       }
     }
@@ -148,6 +164,7 @@ class _PostAlertState extends State<PostAlert> {
                     ),
                     CustomTextField(
                       controller: ageCtrl,
+                      textInputType: TextInputType.number,
                       title: "Missing Person's Age",
                       hintText: "Enter missing person age",
                     ),
@@ -158,7 +175,7 @@ class _PostAlertState extends State<PostAlert> {
                     ),
                     LocationPicker(
                       title: "Last Seen Location",
-                      controller: TextEditingController(),
+                      controller: locationCtrl,
                     ),
                     CustomTextField(
                       onTap: () async {
