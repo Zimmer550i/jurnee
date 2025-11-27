@@ -2,16 +2,25 @@ import 'dart:convert';
 
 import 'package:get/state_manager.dart';
 import 'package:jurnee/models/pagination_meta.dart';
+import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/models/user.dart';
 import 'package:jurnee/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserController extends GetxController {
   Rxn<User> user = Rxn();
+  Rxn<User> specificUser = Rxn();
+  RxList<PostModel> posts = RxList.empty();
   RxBool isLoading = RxBool(false);
 
   final api = ApiService();
   late SharedPreferences prefs;
+
+  RxInt currentPage = 1.obs;
+  int limit = 10;
+  RxInt totalPages = 1.obs;
+  RxBool isFirstLoad = true.obs;
+  RxBool isMoreLoading = false.obs;
 
   User? get userData => user.value;
   String? get userImage {
@@ -30,6 +39,25 @@ class UserController extends GetxController {
     prefs = await SharedPreferences.getInstance();
   }
 
+  Future<String> getSpecificUserInfo(String id) async {
+    isLoading(true);
+    try {
+      final res = await api.get("/user/get-single-user/$id", authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        specificUser.value = User.fromJson(body['data']);
+        return "success";
+      } else {
+        return body["message"] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<String> getUserData() async {
     try {
       final res = await api.get("/user/profile", authReq: true);
@@ -46,6 +74,59 @@ class UserController extends GetxController {
     } finally {
       getFollowers();
       getFollowing();
+    }
+  }
+
+  Future<String> getUserPosts(
+    int index,
+    String? id, {
+    bool loadMore = false,
+  }) async {
+    if (loadMore && currentPage.value >= totalPages.value) return "success";
+
+    if (!loadMore) {
+      isFirstLoad(true);
+      currentPage(1);
+    } else {
+      isMoreLoading(true);
+      currentPage.value++;
+    }
+    try {
+      final res = await api.get(
+        [
+          "/post/user-post/$id",
+          "/post/user-join-event/$id",
+          "/save/my-saved-post",
+        ][index],
+        queryParams: {
+          "page": currentPage.value.toString(),
+          "limit": limit.toString(),
+        },
+        authReq: true,
+      );
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        if (!loadMore) {
+          posts.clear();
+        }
+        final meta = PaginationMeta.fromJson(body['meta']);
+        totalPages(meta.totalPage);
+
+        final List<dynamic> dataList = body['data'];
+        final newItems = dataList.map((e) => PostModel.fromJson(e)).toList();
+
+        posts.addAll(newItems);
+
+        return "success";
+      } else {
+        return body["message"] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isFirstLoad(false);
+      isMoreLoading(false);
     }
   }
 

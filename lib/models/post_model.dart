@@ -44,7 +44,7 @@ class PostModel {
     final double? distance;
     final int? boostPriority;
     final dynamic averageRating;
-    final int reviewsCount;
+    final int? reviewsCount;
 
     PostModel({
         required this.id,
@@ -264,40 +264,34 @@ class PostModel {
 class Author {
     final String id;
     final String name;
-    final String email;
     final String image;
 
     Author({
         required this.id,
         required this.name,
-        required this.email,
         required this.image,
     });
 
     Author copyWith({
         String? id,
         String? name,
-        String? email,
         String? image,
     }) => 
         Author(
             id: id ?? this.id,
             name: name ?? this.name,
-            email: email ?? this.email,
             image: image ?? this.image,
         );
 
     factory Author.fromJson(Map<String, dynamic> json) => Author(
         id: json["_id"],
         name: json["name"],
-        email: json["email"],
         image: json["image"],
     );
 
     Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
-        "email": email,
         "image": image,
     };
 }

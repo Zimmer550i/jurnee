@@ -427,28 +427,28 @@ class PostDetails extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            "Name: John Doe",
+                            "Name: ${post.missingName}",
                             style: AppTexts.tmdr.copyWith(
                               color: AppColors.gray,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Age: 21",
+                            "Age: ${post.missingAge}",
                             style: AppTexts.tmdr.copyWith(
                               color: AppColors.gray,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Clothing Info: wearing red shirt & black pant",
+                            "Clothing Info: ${post.clothingDescription}",
                             style: AppTexts.tmdr.copyWith(
                               color: AppColors.gray,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Contact Info: name@example.com",
+                            "Contact Info: ${post.contactInfo}",
                             style: AppTexts.tmdr.copyWith(
                               color: AppColors.gray,
                             ),
@@ -488,18 +488,13 @@ class PostDetails extends StatelessWidget {
                       ),
                     if (post.expireLimit != null)
                       Text(
-                        "Expires in 7 days",
+                        "Expires in ${post.expireLimit} days",
                         style: AppTexts.tmdm.copyWith(
                           color: AppColors.gray.shade400,
                         ),
                       ),
                     const SizedBox(height: 32),
-                    CustomButton(
-                      onTap: () {
-                        Get.to(() => BoostPost());
-                      },
-                      text: "Boost Post",
-                    ),
+                    getButton(),
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -509,5 +504,26 @@ class PostDetails extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget getButton() {
+    if (post.author.id == Get.find<UserController>().userData!.id) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: CustomButton(onTap: () {
+          
+        }, text: "Edit Post", isSecondary: true),
+      );
+    }
+
+    switch (post.category) {
+      default:
+        return CustomButton(
+          onTap: () {
+            Get.to(() => BoostPost());
+          },
+          text: "Boost Post",
+        );
+    }
   }
 }
