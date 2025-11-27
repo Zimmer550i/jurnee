@@ -39,7 +39,7 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     final time = Stopwatch();
     time.start();
     isVerified = await Get.find<AuthController>().previouslyLoggedIn();
-    if (isVerified) Get.find<UserController>().getUserData();
+    if (isVerified) await Get.find<UserController>().getUserData();
 
     if (time.elapsed < animationDuration) {
       await Future.delayed(animationDuration - time.elapsed);

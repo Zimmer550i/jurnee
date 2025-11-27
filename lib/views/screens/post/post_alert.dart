@@ -1,5 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
+import 'package:jurnee/utils/get_location.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_drop_down.dart';
@@ -29,11 +34,81 @@ class _PostAlertState extends State<PostAlert> {
   String? placeId;
 
   String? category;
-  String? expiry;
-  String? contactInfo;
+  String? expiry = "7 Days";
   DateTime? date;
 
-  void publish() async {}
+  void publish() async {
+    if (!isValid()) {
+      return;
+    }
+
+    final pos = await getLocation();
+
+    Map<String, dynamic> payload = {
+      "data": {
+        "title": _baseKey.currentState?.titleCtrl.text.trim(),
+        "description": _baseKey.currentState?.descriptionCtrl.text.trim(),
+        "category": "Alert",
+        "subcategory": category,
+        "address": _baseKey.currentState?.locationCtrl.text.trim(),
+        "location": {
+          "type": "Point",
+          "coordinates": [pos!.longitude, pos.latitude],
+        },
+        "hasTag": hashtagCtrl.text.split(" "),
+        "contactInfo": contactCtrl.text,
+        "expireLimit": expiry?.split(" ").last,
+      },
+      "image": _baseKey.currentState?.cover,
+      "media": _baseKey.currentState?.images,
+    };
+
+    final message = await Get.find<PostController>().createPost(
+      "alert/${category == "Missing Person" ? "missing-person": "others"}",
+      payload,
+    );
+    if (message == "success") {
+      if (mounted) {
+        Get.until((route) => Get.currentRoute == "/app");
+      }
+      customSnackBar("Post created successfully", isError: false);
+    } else {
+      customSnackBar(message);
+    }
+  }
+
+  bool isValid() {
+    final title = _baseKey.currentState?.titleCtrl.text.trim();
+    final description = _baseKey.currentState?.descriptionCtrl.text.trim();
+    final address = _baseKey.currentState?.locationCtrl.text.trim();
+
+    if (title == null || title.isEmpty) {
+      customSnackBar("Title is required");
+      return false;
+    }
+    if (description == null || description.isEmpty) {
+      customSnackBar("Description is required");
+      return false;
+    }
+    if (address == null || address.isEmpty) {
+      customSnackBar("Address is required");
+      return false;
+    }
+    if (_baseKey.currentState?.cover == null) {
+      customSnackBar("Cover image is required");
+      return false;
+    }
+
+    if (category == "Missing Person") {
+      if (nameCtrl.text.isEmpty ||
+          ageCtrl.text.isEmpty ||
+          clothCtrl.text.isEmpty) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +156,10 @@ class _PostAlertState extends State<PostAlert> {
                       title: "Clothing Information",
                       hintText: "Enter clothing information",
                     ),
-                    LocationPicker(title: "Last Seen Location", controller: TextEditingController(),),
+                    LocationPicker(
+                      title: "Last Seen Location",
+                      controller: TextEditingController(),
+                    ),
                     CustomTextField(
                       onTap: () async {
                         date = await showDatePicker(
@@ -93,6 +171,11 @@ class _PostAlertState extends State<PostAlert> {
                       },
                       title: "Last Seen Date",
                       hintText: "--- / --- / -----",
+                      controller: date != null
+                          ? TextEditingController(
+                              text: DateFormat("dd / MMMM / yyy").format(date!),
+                            )
+                          : null,
                       trailing: "assets/icons/calendar.svg",
                     ),
                   ],
@@ -113,11 +196,21 @@ class _PostAlertState extends State<PostAlert> {
               CustomDropDown(
                 title: "Set auto-expire",
                 initialPick: 1,
+                onChanged: (val) {
+                  setState(() {
+                    expiry = val;
+                  });
+                },
                 options: ["1 Day", "7 Days", "14 Days", "30 Days", "90 Days"],
               ),
-
               const SizedBox(height: 40),
-              CustomButton(onTap: publish, text: "Publish"),
+              Obx(
+                () => CustomButton(
+                  onTap: publish,
+                  isLoading: Get.find<PostController>().isLoading.value,
+                  text: "Publish",
+                ),
+              ),
               const SizedBox(height: 28),
             ],
           ),
