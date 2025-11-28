@@ -21,6 +21,8 @@ class _LocationMapState extends State<LocationMap> {
   GoogleMapController? mapController;
   Offset? overlayPos;
   LatLng? cardPosition;
+  PostModel? cardPost;
+  double zoom = 15;
 
   @override
   void initState() {
@@ -43,24 +45,27 @@ class _LocationMapState extends State<LocationMap> {
               mapType: MapType.normal,
               initialCameraPosition: CameraPosition(
                 target: LatLng(pos.latitude, pos.longitude),
-                zoom: 14.4746,
+                zoom: zoom,
               ),
               onMapCreated: (controller) async {
                 mapController = controller;
                 await updateOverlayPosition();
               },
-              onCameraMove: (position) {
-                // loadMarkers();
+              onCameraMove: (position) async {
+                setState(() {
+                  zoom = position.zoom;
+                });
                 updateOverlayPosition();
               },
               markers: markers,
             ),
           ),
-          if (overlayPos != null)
+          if (overlayPos != null && zoom > 13)
             Positioned(
               left: overlayPos!.dx - 150,
               top: overlayPos!.dy - 180,
-              child: const PostCardSmall(),
+              child: PostCardSmall(
+                post: cardPost!),
             ),
         ],
       ),
@@ -83,11 +88,13 @@ class _LocationMapState extends State<LocationMap> {
       markers.add(
         Marker(
           markerId: MarkerId(i.id),
-          position: LatLng(pos!.latitude, pos.longitude),
+          position: LatLng(pos.latitude, pos.longitude),
           onTap: () {
             setState(() {
               cardPosition = LatLng(pos.latitude, pos.longitude);
+              cardPost = i;
             });
+            updateOverlayPosition();
           },
         ),
       );

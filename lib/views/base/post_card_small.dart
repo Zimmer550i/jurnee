@@ -1,58 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
+import 'package:jurnee/views/screens/home/post_details.dart';
 
 class PostCardSmall extends StatelessWidget {
-  const PostCardSmall({super.key});
+  final PostModel post;
+  final double multiplier;
+  const PostCardSmall({super.key, required this.post, this.multiplier = 1});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.green, width: 0.5),
-      ),
-      child: Row(
-        spacing: 20,
-        children: [
-          CustomNetworkedImage(radius: 10, height: 102, width: 102),
-          Column(
-            spacing: 8,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Transform.scale(
+      scale: multiplier,
+      child: GestureDetector(
+        onTap: () => Get.to(() => PostDetails(post)),
+        child: Container(
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.green, width: 0.5),
+          ),
+          child: Row(
+            spacing: 20,
             children: [
-              Text(
-                "Cozy Coffee Spot",
-                style: AppTexts.dxss.copyWith(color: AppColors.gray.shade600),
+              CustomNetworkedImage(
+                url: post.image,
+                radius: 10,
+                height: 102,
+                width: 102,
               ),
-
-              Row(
-                spacing: 4,
+              Column(
+                spacing: 8,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CustomSvg(asset: "assets/icons/location.svg"),
                   Text(
-                    "2.3 miles",
-                    style: AppTexts.tsmm.copyWith(
+                    post.title,
+                    style: AppTexts.dxss.copyWith(
                       color: AppColors.gray.shade600,
                     ),
                   ),
-                  Container(),
-                  CustomSvg(asset: "assets/icons/star.svg"),
-                  Text(
-                    "4.9",
-                    style: AppTexts.tsmm.copyWith(
-                      color: AppColors.gray.shade600,
-                    ),
+
+                  Row(
+                    spacing: 4,
+                    children: [
+                      CustomSvg(asset: "assets/icons/location.svg"),
+                      Text(
+                        Get.find<PostController>().getDistance(
+                          post.location.coordinates[0],
+                          post.location.coordinates[1],
+                        ),
+                        style: AppTexts.tsmm.copyWith(
+                          color: AppColors.gray.shade600,
+                        ),
+                      ),
+                      Container(),
+                      CustomSvg(asset: "assets/icons/star.svg"),
+                      Text(
+                        (post.averageRating ?? "N/A").toString(),
+                        style: AppTexts.tsmm.copyWith(
+                          color: AppColors.gray.shade600,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

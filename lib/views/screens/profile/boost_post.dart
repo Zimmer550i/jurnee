@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
@@ -7,7 +8,8 @@ import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/post_card_small.dart';
 
 class BoostPost extends StatelessWidget {
-  const BoostPost({super.key});
+  final PostModel post;
+  const BoostPost({super.key, required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +84,7 @@ class BoostPost extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              PostCardSmall(),
+              PostCardSmall(post: post),
               Spacer(),
               CustomButton(text: "Boost Now- \$5"),
               const SizedBox(height: 16),

@@ -541,7 +541,7 @@ class PostDetails extends StatelessWidget {
       default:
         return CustomButton(
           onTap: () {
-            Get.to(() => BoostPost());
+            Get.to(() => BoostPost(post: post));
           },
           text: "Boost Post",
         );
