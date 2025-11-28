@@ -53,8 +53,6 @@ class PostController extends GetxController {
   }) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 
-    isLoading(true);
-
     if (!loadMore) {
       isFirstLoad(true);
       currentPage(1);
@@ -98,7 +96,6 @@ class PostController extends GetxController {
     } finally {
       isFirstLoad(false);
       isMoreLoading(false);
-      isLoading(false);
     }
   }
 

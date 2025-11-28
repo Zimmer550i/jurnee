@@ -26,15 +26,12 @@ class PostCard extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Hero(
-                tag: "post_cover_${post.id}",
-                child: CustomNetworkedImage(
-                  height: 184,
-                  width: double.infinity,
-                  url: post.image,
-                  fit: BoxFit.cover,
-                  radius: 0,
-                ),
+              CustomNetworkedImage(
+                height: 184,
+                width: double.infinity,
+                url: post.image,
+                fit: BoxFit.cover,
+                radius: 0,
               ),
               ConstrainedBox(
                 constraints: BoxConstraints(maxHeight: 136, minHeight: 120),

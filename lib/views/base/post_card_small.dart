@@ -29,14 +29,11 @@ class PostCardSmall extends StatelessWidget {
         child: Row(
           spacing: 20,
           children: [
-            Hero(
-              tag: "post_cover_${post.id}",
-              child: CustomNetworkedImage(
-                url: post.image,
-                radius: 10,
-                height: 102,
-                width: 102,
-              ),
+            CustomNetworkedImage(
+              url: post.image,
+              radius: 10,
+              height: 102,
+              width: 102,
             ),
             Column(
               spacing: 8,

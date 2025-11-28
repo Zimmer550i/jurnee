@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jurnee/utils/app_colors.dart';
+import 'package:jurnee/views/base/custom_loading.dart';
 
 class CustomListHandler extends StatelessWidget {
   final Future<void> Function()? onRefresh;
@@ -9,12 +10,14 @@ class CustomListHandler extends StatelessWidget {
   final Widget child;
   final bool reverse;
   final bool topPadding;
+  final bool isLoading;
   const CustomListHandler({
     super.key,
     required this.child,
     this.onRefresh,
     this.onLoadMore,
     this.reverse = false,
+    this.isLoading = false,
     this.topPadding = false,
     this.scrollThreshold = 200,
     this.horizontalPadding = 24,
@@ -37,7 +40,9 @@ class CustomListHandler extends StatelessWidget {
 
         return false;
       },
-      child: reverse
+      child: isLoading
+          ? Center(child: CustomLoading())
+          : reverse
           ? SingleChildScrollView(
               clipBehavior: Clip.none,
               reverse: reverse,

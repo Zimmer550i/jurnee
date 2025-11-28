@@ -92,31 +92,26 @@ class HomepageState extends State<Homepage> {
               showMap
                   ? LocationMap()
                   : Expanded(
-                      child: CustomListHandler(
-                        onRefresh: () =>
-                            post.fetchPosts(category: categoryList[tab]),
-                        onLoadMore: () => post.fetchPosts(
-                          loadMore: true,
-                          category: categoryList[tab],
-                        ),
-                        child: Obx(
-                          () => Column(
+                      child: Obx(
+                        () => CustomListHandler(
+                          isLoading: post.isFirstLoad.value,
+                          onRefresh: () =>
+                              post.fetchPosts(category: categoryList[tab]),
+                          onLoadMore: () => post.fetchPosts(
+                            loadMore: true,
+                            category: categoryList[tab],
+                          ),
+                          child: Column(
                             children: [
                               const SizedBox(height: 12),
-                              if (post.isLoading.value) CustomLoading(),
-                              if (!post.isLoading.value)
-                                for (var i
-                                    in post.postMap[PostType.defaultPosts]!)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 20),
-                                    child: PostCard(i),
-                                  ),
-                              if (!post.isLoading.value &&
-                                  post.isMoreLoading.value)
-                                CustomLoading(),
-                              if (!post.isLoading.value &&
-                                  post.totalPages.value ==
-                                      post.currentPage.value)
+                              for (var i
+                                  in post.postMap[PostType.defaultPosts]!)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  child: PostCard(i),
+                                ),
+                              if (post.isMoreLoading.value) CustomLoading(),
+                              if (!post.isMoreLoading.value)
                                 Text(
                                   "End of list",
                                   style: AppTexts.tsmr.copyWith(

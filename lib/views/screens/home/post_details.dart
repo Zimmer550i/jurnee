@@ -15,9 +15,7 @@ import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
-import 'package:jurnee/views/screens/home/reviews.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
-import 'package:jurnee/views/screens/profile/boost_post.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
 class PostDetails extends StatelessWidget {
@@ -45,14 +43,11 @@ class PostDetails extends StatelessWidget {
                     ),
                   );
                 },
-                child: Hero(
-                  tag: "post_cover_${post.id}",
-                  child: CustomNetworkedImage(
-                    url: post.image,
-                    height: MediaQuery.of(context).size.width / 2,
-                    width: MediaQuery.of(context).size.width,
-                    radius: 0,
-                  ),
+                child: CustomNetworkedImage(
+                  url: post.image,
+                  height: MediaQuery.of(context).size.width / 2,
+                  width: MediaQuery.of(context).size.width,
+                  radius: 0,
                 ),
               ),
 
@@ -184,7 +179,7 @@ class PostDetails extends StatelessWidget {
                     const SizedBox(height: 8),
                     GestureDetector(
                       onTap: () {
-                        Get.to(() => Reviews(count: 25));
+                        // Get.to(() => Reviews(count: 25));
                       },
                       child: Row(
                         children: [
@@ -198,12 +193,12 @@ class PostDetails extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Text(
-                            "See All",
-                            style: AppTexts.tsmr.copyWith(
-                              color: AppColors.green.shade600,
-                            ),
-                          ),
+                          // Text(
+                          //   "See All",
+                          //   style: AppTexts.tsmr.copyWith(
+                          //     color: AppColors.green.shade600,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -263,7 +258,7 @@ class PostDetails extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    if (post.author.id !=
+                    if (post.author.id ==
                         Get.find<UserController>().userData!.id)
                       Column(
                         spacing: 24,
@@ -371,6 +366,13 @@ class PostDetails extends StatelessWidget {
                               ],
                             ),
                           ),
+                          if (post.attenders.isEmpty)
+                            Text(
+                              "No one joined yet",
+                              style: AppTexts.txsr.copyWith(
+                                color: AppColors.gray,
+                              ),
+                            ),
                           if (post.attenders.length > 5)
                             Text(
                               "+${max(0, post.attenders.length - 5)}",
@@ -379,12 +381,13 @@ class PostDetails extends StatelessWidget {
                               ),
                             ),
                           const SizedBox(width: 8),
-                          Text(
-                            "See all",
-                            style: AppTexts.txss.copyWith(
-                              color: AppColors.green.shade600,
+                          if (post.attenders.length > 5)
+                            Text(
+                              "See all",
+                              style: AppTexts.txss.copyWith(
+                                color: AppColors.green.shade600,
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -533,21 +536,47 @@ class PostDetails extends StatelessWidget {
   }
 
   Widget getButton() {
-    if (post.author.id == Get.find<UserController>().userData!.id) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: CustomButton(onTap: () {}, text: "Edit Post", isSecondary: true),
-      );
-    }
+    // if (post.author.id == Get.find<UserController>().userData!.id) {
+    //   return Column(
+    //     spacing: 8,
+    //     children: [
+    //       CustomButton(onTap: () {}, text: "Edit Post", isSecondary: true),
+    //       CustomButton(
+    //         onTap: () => Get.to(() => BoostPost(post: post)),
+    //         text: "Boost Post",
+    //       ),
+    //     ],
+    //   );
+    // }
 
-    switch (post.category) {
-      default:
-        return CustomButton(
-          onTap: () {
-            Get.to(() => BoostPost(post: post));
-          },
-          text: "Boost Post",
-        );
+    if (post.schedule.isEmpty) {
+      return CustomButton(onTap: () {}, text: "Contact Owner");
+    } else {
+      return Row(
+        spacing: 10,
+        children: [
+          Expanded(
+            child: CustomButton(onTap: () {}, text: "Request Quote"),
+          ),
+          GestureDetector(
+            onTap: () {
+              
+            },
+            child: Container(
+              height: 48,
+              width: 48,
+              decoration: BoxDecoration(
+                color: AppColors.green[25],
+                shape: BoxShape.circle,
+                border: Border.all(width: 2, color: AppColors.green.shade600),
+              ),
+              child: Center(
+                child: CustomSvg(asset: "assets/icons/message_rounded.svg"),
+              ),
+            ),
+          ),
+        ],
+      );
     }
   }
 }
