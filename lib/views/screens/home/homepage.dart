@@ -11,18 +11,18 @@ import 'package:jurnee/views/base/search_widget.dart';
 import 'package:jurnee/views/screens/home/location_map.dart';
 
 class Homepage extends StatefulWidget {
-  final bool showMap;
-  const Homepage({super.key, this.showMap = false});
+  const Homepage({super.key});
 
   @override
-  State<Homepage> createState() => _HomepageState();
+  State<Homepage> createState() => HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class HomepageState extends State<Homepage> {
   final post = Get.find<PostController>();
   final search = TextEditingController();
   int tab = 0;
   bool searchEnabled = false;
+  bool showMap = false;
 
   final List<String?> categoryList = [
     null,
@@ -89,7 +89,7 @@ class _HomepageState extends State<Homepage> {
                 height: 1,
                 color: AppColors.gray.shade200,
               ),
-              widget.showMap
+              showMap
                   ? LocationMap()
                   : Expanded(
                       child: CustomListHandler(

@@ -16,6 +16,8 @@ import 'package:jurnee/views/screens/post/post_event.dart';
 import 'package:jurnee/views/screens/post/post_service.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
+final GlobalKey<HomepageState> _globalKey = GlobalKey();
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -37,7 +39,12 @@ class _HomeState extends State<Home> {
     });
   }
 
-  List<Widget> pages = [Homepage(), Messages(), Notifications(), Profile()];
+  List<Widget> pages = [
+    Homepage(key: _globalKey),
+    Messages(),
+    Notifications(),
+    Profile(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -260,10 +267,17 @@ class _HomeState extends State<Home> {
           ? null
           : GestureDetector(
               onTap: () {
-                Get.to(
-                  () => Homepage(showMap: true),
-                  transition: Transition.noTransition,
-                );
+                final state = _globalKey.currentState;
+
+                if (state != null) {
+                  state.setState(() {
+                    state.showMap = !state.showMap;
+                  });
+                }
+                // Get.to(
+                //   () => Homepage(showMap: true),
+                //   transition: Transition.noTransition,
+                // );
               },
               child: Container(
                 height: 60,
