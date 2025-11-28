@@ -24,16 +24,20 @@ class PostCard extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(color: AppColors.white),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              CustomNetworkedImage(
-                height: 184,
-                width: double.infinity,
-                url: post.image,
-                fit: BoxFit.cover,
-                radius: 0,
+              Hero(
+                tag: "post_cover_${post.id}",
+                child: CustomNetworkedImage(
+                  height: 184,
+                  width: double.infinity,
+                  url: post.image,
+                  fit: BoxFit.cover,
+                  radius: 0,
+                ),
               ),
-              SizedBox(
-                height: 124,
+              ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: 136, minHeight: 120),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -45,6 +49,8 @@ class PostCard extends StatelessWidget {
                     children: [
                       Text(
                         post.title.toString(),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: AppTexts.dxss.copyWith(
                           color: AppColors.gray.shade600,
                         ),

@@ -26,6 +26,9 @@ class PostController extends GetxController {
     getLocation().then((val) {
       userLocation.value = val;
     });
+    getLocation(forceRefresh: true).then((val) {
+      userLocation.value = val;
+    });
   }
 
   String getDistance(double targetLat, double targetLong) {

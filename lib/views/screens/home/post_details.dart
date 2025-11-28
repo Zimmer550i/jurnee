@@ -45,11 +45,14 @@ class PostDetails extends StatelessWidget {
                     ),
                   );
                 },
-                child: CustomNetworkedImage(
-                  url: post.image,
-                  height: MediaQuery.of(context).size.width / 2,
-                  width: MediaQuery.of(context).size.width,
-                  radius: 0,
+                child: Hero(
+                  tag: "post_cover_${post.id}",
+                  child: CustomNetworkedImage(
+                    url: post.image,
+                    height: MediaQuery.of(context).size.width / 2,
+                    width: MediaQuery.of(context).size.width,
+                    radius: 0,
+                  ),
                 ),
               ),
 

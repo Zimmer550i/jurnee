@@ -15,65 +15,67 @@ class PostCardSmall extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.scale(
-      scale: multiplier,
-      child: GestureDetector(
-        onTap: () => Get.to(() => PostDetails(post)),
-        child: Container(
-          padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.green, width: 0.5),
-          ),
-          child: Row(
-            spacing: 20,
-            children: [
-              CustomNetworkedImage(
+    return GestureDetector(
+      onTap: () => Get.to(() => PostDetails(post)),
+      child: Container(
+        height: 126,
+        width: 350,
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.green, width: 0.5),
+        ),
+        child: Row(
+          spacing: 20,
+          children: [
+            Hero(
+              tag: "post_cover_${post.id}",
+              child: CustomNetworkedImage(
                 url: post.image,
                 radius: 10,
                 height: 102,
                 width: 102,
               ),
-              Column(
-                spacing: 8,
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    post.title,
-                    style: AppTexts.dxss.copyWith(
-                      color: AppColors.gray.shade600,
+            ),
+            Column(
+              spacing: 8,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  post.title,
+                  style: AppTexts.dxss.copyWith(
+                    color: AppColors.gray.shade600,
+                  ),
+                ),
+    
+                Row(
+                  spacing: 4,
+                  children: [
+                    CustomSvg(asset: "assets/icons/location.svg"),
+                    Text(
+                      Get.find<PostController>().getDistance(
+                        post.location.coordinates[0],
+                        post.location.coordinates[1],
+                      ),
+                      style: AppTexts.tsmm.copyWith(
+                        color: AppColors.gray.shade600,
+                      ),
                     ),
-                  ),
-
-                  Row(
-                    spacing: 4,
-                    children: [
-                      CustomSvg(asset: "assets/icons/location.svg"),
-                      Text(
-                        Get.find<PostController>().getDistance(
-                          post.location.coordinates[0],
-                          post.location.coordinates[1],
-                        ),
-                        style: AppTexts.tsmm.copyWith(
-                          color: AppColors.gray.shade600,
-                        ),
+                    Container(),
+                    CustomSvg(asset: "assets/icons/star.svg"),
+                    Text(
+                      (post.averageRating ?? "N/A").toString(),
+                      style: AppTexts.tsmm.copyWith(
+                        color: AppColors.gray.shade600,
                       ),
-                      Container(),
-                      CustomSvg(asset: "assets/icons/star.svg"),
-                      Text(
-                        (post.averageRating ?? "N/A").toString(),
-                        style: AppTexts.tsmm.copyWith(
-                          color: AppColors.gray.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
