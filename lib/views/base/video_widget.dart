@@ -70,14 +70,14 @@ class _VideoWidgetState extends State<VideoWidget> {
                       Get.back();
                     },
                     child: Container(
-                      height: 32,
-                      width: 32,
+                      height: 48,
+                      width: 48,
                       decoration: BoxDecoration(
                         color: Color(0xff1b1b1b).withAlpha(128),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
-                        child: CustomSvg(asset: "assets/icons/back.svg"),
+                        child: CustomSvg(asset: "assets/icons/back.svg", size: 32,),
                       ),
                     ),
                   ),

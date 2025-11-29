@@ -5,7 +5,12 @@ import 'package:jurnee/utils/custom_svg.dart';
 
 class RatingWidget extends StatelessWidget {
   final num? averageRating;
-  const RatingWidget({super.key, required this.averageRating});
+  final bool isSmall;
+  const RatingWidget({
+    super.key,
+    required this.averageRating,
+    this.isSmall = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +21,7 @@ class RatingWidget extends StatelessWidget {
       child: Row(
         children: [
           for (int i = 0; i < 5; i++)
-            CustomSvg(asset: "assets/icons/star.svg", size: 24),
+            CustomSvg(asset: "assets/icons/star.svg", size: isSmall ? 16 : 24),
           const SizedBox(width: 4),
           Text(
             averageRating == null ? "N/A" : averageRating.toString(),

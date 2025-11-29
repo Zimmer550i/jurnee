@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
+import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:path/path.dart' as p;
 
@@ -64,10 +65,8 @@ class _MediaThumbnailState extends State<MediaThumbnail> {
         _loading = false;
       });
     } catch (e) {
-      setState(() {
-        _thumbnailFile = null;
-        _loading = false;
-      });
+      _thumbnailFile = null;
+      _loading = false;
     }
   }
 
@@ -77,15 +76,13 @@ class _MediaThumbnailState extends State<MediaThumbnail> {
 
     if (!_isVideo) {
       if (_isNetwork) {
-        return Image.network(
-          widget.path,
+        return CustomNetworkedImage(
+          url: widget.path,
           fit: BoxFit.cover,
+          radius: 0,
         );
       } else {
-        return Image.file(
-          File(widget.path),
-          fit: BoxFit.cover,
-        );
+        return Image.file(File(widget.path), fit: BoxFit.cover);
       }
     }
 

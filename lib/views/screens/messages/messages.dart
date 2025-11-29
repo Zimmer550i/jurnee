@@ -86,6 +86,8 @@ class _MessagesState extends State<Messages> {
   }
 
   Widget messageWidget(ChatModel chat) {
+    // Hides chat with single member
+    if (chat.members.length == 1) return Container();
     final Member recipent = chat.members.where((mem) => mem.id != userId).first;
 
     return GestureDetector(

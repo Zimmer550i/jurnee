@@ -10,7 +10,6 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
-import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
@@ -36,21 +35,30 @@ class PostDetails extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              GestureDetector(
-                onTap: () {
-                  Get.to(
-                    () => MediaPlayer(
-                      postData: post,
-                      preferedStart: post.image,
-                      mediaList: [post.image, ...post.media ?? []],
-                    ),
-                  );
-                },
-                child: CustomNetworkedImage(
-                  url: post.image,
-                  height: MediaQuery.of(context).size.width / 2,
-                  width: MediaQuery.of(context).size.width,
-                  radius: 0,
+              SizedBox(
+                height: MediaQuery.of(context).size.width / 2,
+                width: MediaQuery.of(context).size.width,
+                child: PageView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    for (var i in [
+                      post.image,
+                      if (post.media != null) ...post.media!,
+                    ])
+                      GestureDetector(
+                        onTap: () {
+                          Get.to(
+                            () => MediaPlayer(
+                              postData: post,
+                              preferedStart: i,
+                              mediaList: [post.image, ...post.media ?? []],
+                            ),
+                            transition: Transition.noTransition,
+                          );
+                        },
+                        child: MediaThumbnail(path: i!),
+                      ),
+                  ],
                 ),
               ),
 
@@ -142,6 +150,7 @@ class PostDetails extends StatelessWidget {
                     const SizedBox(height: 20),
                     Text(
                       post.description.toString(),
+                      textAlign: TextAlign.justify,
                       style: AppTexts.tlgr.copyWith(
                         color: AppColors.gray.shade600,
                       ),

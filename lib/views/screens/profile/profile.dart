@@ -182,17 +182,21 @@ class _ProfileState extends State<Profile> {
                             },
                             child: Column(
                               children: [
-                                Text(
-                                  (widget.userId != null
-                                          ? user.specificUser.value?.followers
-                                                .toString()
-                                          : user.userData?.followers
-                                                .toString()) ??
-                                      "",
-                                  style: AppTexts.dxsm.copyWith(
-                                    color: AppColors.gray.shade700,
+                                if (widget.userId != null)
+                                  Text(
+                                    user.specificUser.value!.followers
+                                        .toString(),
+                                    style: AppTexts.dxsm.copyWith(
+                                      color: AppColors.gray.shade700,
+                                    ),
                                   ),
-                                ),
+                                if (widget.userId == null)
+                                  Text(
+                                    user.userData!.followers.toString(),
+                                    style: AppTexts.dxsm.copyWith(
+                                      color: AppColors.gray.shade700,
+                                    ),
+                                  ),
                                 Text(
                                   "Followers",
                                   style: AppTexts.tsmr.copyWith(
@@ -215,17 +219,21 @@ class _ProfileState extends State<Profile> {
                             },
                             child: Column(
                               children: [
-                                Text(
-                                  (widget.userId != null
-                                          ? user.specificUser.value?.following
-                                                .toString()
-                                          : user.userData?.following
-                                                .toString()) ??
-                                      "",
-                                  style: AppTexts.dxsm.copyWith(
-                                    color: AppColors.gray.shade700,
+                                if (widget.userId != null)
+                                  Text(
+                                    user.specificUser.value!.following
+                                        .toString(),
+                                    style: AppTexts.dxsm.copyWith(
+                                      color: AppColors.gray.shade700,
+                                    ),
                                   ),
-                                ),
+                                if (widget.userId == null)
+                                  Text(
+                                    user.userData!.following.toString(),
+                                    style: AppTexts.dxsm.copyWith(
+                                      color: AppColors.gray.shade700,
+                                    ),
+                                  ),
                                 Text(
                                   "Following",
                                   style: AppTexts.tsmr.copyWith(
@@ -239,7 +247,8 @@ class _ProfileState extends State<Profile> {
                         // Spacer(),
                       ],
                     ),
-                    if (widget.userId != null)
+                    if (widget.userId != null &&
+                        user.userData!.id != widget.userId)
                       Padding(
                         padding: const EdgeInsets.only(top: 16),
                         child: Row(

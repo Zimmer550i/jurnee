@@ -56,8 +56,8 @@ class User {
       createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
       updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
       post: json['post'] ?? 0,
-      followers: json['followers'],
-      following: json['following'],
+      followers: json['followers'] ?? 0,
+      following: json['following'] ?? 0,
       location: Location.fromJson(json['location'] ?? {}),
     );
   }

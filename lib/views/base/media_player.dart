@@ -8,6 +8,7 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
+import 'package:jurnee/views/base/rating_widget.dart';
 import 'package:jurnee/views/base/video_widget.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
@@ -84,6 +85,31 @@ class _MediaPlayerState extends State<MediaPlayer> {
                             fit: BoxFit.contain,
                           ),
                         ),
+                        Positioned(
+                          top: 12,
+                          left: 20,
+                          child: SafeArea(
+                            child: GestureDetector(
+                              onTap: () {
+                                Get.back();
+                              },
+                              child: Container(
+                                height: 48,
+                                width: 48,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.30),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: CustomSvg(
+                                    asset: "assets/icons/back.svg",
+                                    size: 32,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                         Positioned.fill(
                           child: Align(
                             alignment: Alignment.bottomCenter,
@@ -141,22 +167,10 @@ class _MediaPlayerState extends State<MediaPlayer> {
                                           ),
                                         ),
                                         const SizedBox(width: 8),
-                                        for (int i = 0; i < 4; i++)
-                                          CustomSvg(
-                                            asset: "assets/icons/star.svg",
-                                          ),
-                                        for (int i = 0; i < 1; i++)
-                                          CustomSvg(
-                                            asset: "assets/icons/star.svg",
-                                            color: Colors.white,
-                                          ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          widget.postData.averageRating
-                                              .toString(),
-                                          style: AppTexts.tmdm.copyWith(
-                                            color: AppColors.gray[25],
-                                          ),
+                                        RatingWidget(
+                                          isSmall: true,
+                                          averageRating:
+                                              widget.postData.averageRating,
                                         ),
                                       ],
                                     ),
