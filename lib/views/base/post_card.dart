@@ -6,7 +6,7 @@ import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
-import 'package:jurnee/views/screens/home/post_details.dart';
+import 'package:jurnee/views/screens/post/post_details.dart';
 
 class PostCard extends StatelessWidget {
   final PostModel post;

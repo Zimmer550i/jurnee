@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/get_location.dart';
 import 'package:jurnee/views/base/availability_widget.dart';
@@ -13,7 +14,8 @@ import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/post/post_base_widget.dart';
 
 class PostService extends StatefulWidget {
-  const PostService({super.key});
+  final PostModel? post;
+  const PostService({super.key, this.post});
 
   @override
   State<PostService> createState() => _PostServiceState();
