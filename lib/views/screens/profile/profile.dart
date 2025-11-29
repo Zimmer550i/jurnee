@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
+import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -251,10 +252,17 @@ class _ProfileState extends State<Profile> {
                             ),
                             const SizedBox(width: 16),
                             Expanded(
-                              child: CustomButton(
-                                leading: "assets/icons/message.svg",
-                                text: "Message",
-                                isSecondary: true,
+                              child: Obx(
+                                () => CustomButton(
+                                  onTap: () => Get.find<ChatController>()
+                                      .createOrGetChat(widget.userId!),
+                                  isLoading: Get.find<ChatController>()
+                                      .isLoading
+                                      .value,
+                                  leading: "assets/icons/message.svg",
+                                  text: "Message",
+                                  isSecondary: true,
+                                ),
                               ),
                             ),
                           ],

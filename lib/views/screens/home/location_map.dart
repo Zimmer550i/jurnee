@@ -38,6 +38,8 @@ class _LocationMapState extends State<LocationMap> {
               });
             },
             child: GoogleMap(
+              webCameraControlEnabled: false,
+              zoomControlsEnabled: false,
               mapType: MapType.normal,
               initialCameraPosition: CameraPosition(
                 target: LatLng(

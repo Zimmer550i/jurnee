@@ -46,6 +46,17 @@ class _NotificationsState extends State<Notifications> {
               const SizedBox(height: 20),
               for (var i in controller.notifications) notificationWidget(i),
               if (controller.isLoading.value) CustomLoading(),
+              if (!controller.isMoreLoading.value &&
+                  !controller.isFirstLoad.value &&
+                  controller.notifications.isEmpty)
+                Center(
+                  child: Text(
+                    "You have to notifications",
+                    style: AppTexts.tsmr.copyWith(
+                      color: AppColors.gray.shade300,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 20),
             ],
           ),

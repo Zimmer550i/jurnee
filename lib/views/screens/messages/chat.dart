@@ -35,7 +35,7 @@ class _ChatState extends State<Chat> {
   @override
   void dispose() {
     super.dispose();
-    chat.disconnect();
+    chat.disconnectSocket();
     textCtrl.dispose();
   }
 
@@ -78,17 +78,31 @@ class _ChatState extends State<Chat> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: CustomListHandler(
-              reverse: true,
-              onLoadMore: () =>
-                  chat.fetchMessages(widget.inboxId, loadMore: true),
-              child: Obx(
-                () => Column(
+            child: Obx(
+              () => CustomListHandler(
+                isLoading: chat.isFirstLoad.value,
+                reverse: true,
+                onLoadMore: () =>
+                    chat.fetchMessages(widget.inboxId, loadMore: true),
+                child: Column(
                   children: [
-                    if (chat.isLoading.value) CustomLoading(),
+                    if (chat.isMoreLoading.value) CustomLoading(),
                     if (chat.messages.isNotEmpty)
                       for (int i = chat.messages.length - 1; i >= 0; i--)
                         getMessage(i),
+                    if (chat.messages.isEmpty)
+                      Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).size.height / 3,
+                        ),
+                        child: Text(
+                          "Send somthing to start chatting",
+                          textAlign: TextAlign.center,
+                          style: AppTexts.tlgm.copyWith(
+                            color: AppColors.gray.shade300,
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 70),
                   ],
                 ),
@@ -149,9 +163,9 @@ class _ChatState extends State<Chat> {
 
   Widget getMessage(int index) {
     String message = chat.messages[index].message ?? "____";
-    bool isReciever = widget.chatMember.id == chat.messages[index].sender?.id;
+    bool isRecieving = widget.chatMember.id == chat.messages[index].sender?.id;
 
-    if (isReciever) {
+    if (isRecieving) {
       return recieveMessage(
         message,
         hasPrev:

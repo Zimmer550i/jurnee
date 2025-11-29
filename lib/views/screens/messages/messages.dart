@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/chat_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -20,11 +21,13 @@ class Messages extends StatefulWidget {
 
 class _MessagesState extends State<Messages> {
   final chat = Get.find<ChatController>();
+  late String userId;
 
   @override
   void initState() {
     super.initState();
     chat.fetchChats();
+    userId = Get.find<UserController>().userData!.id;
   }
 
   @override
@@ -48,24 +51,46 @@ class _MessagesState extends State<Messages> {
         onRefresh: () => chat.fetchChats(),
         onLoadMore: () => chat.fetchChats(loadMore: true),
         child: Obx(
-          () => Column(
-            spacing: 8,
-            children: [
-              const SizedBox(height: 12),
-              if (chat.isLoading.value) CustomLoading(),
-              for (var i in chat.chats) messageWidget(i),
-              const SizedBox(height: 12),
-            ],
-          ),
+          () => chat.isFirstLoad.value
+              ? CustomLoading()
+              : Column(
+                  spacing: 8,
+                  children: [
+                    const SizedBox(height: 12),
+                    for (var i in chat.chats) messageWidget(i),
+                    if (chat.isMoreLoading.value) CustomLoading(),
+                    if (!chat.isMoreLoading.value)
+                      Text(
+                        "End of list",
+                        style: AppTexts.tsmr.copyWith(
+                          color: AppColors.gray.shade300,
+                        ),
+                      ),
+                    if (!chat.isMoreLoading.value &&
+                        !chat.isFirstLoad.value &&
+                        chat.chats.isEmpty)
+                      Center(
+                        child: Text(
+                          "You have to messages",
+                          style: AppTexts.tsmr.copyWith(
+                            color: AppColors.gray.shade300,
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
         ),
       ),
     );
   }
 
   Widget messageWidget(ChatModel chat) {
+    final Member recipent = chat.members.where((mem) => mem.id != userId).first;
+
     return GestureDetector(
       onTap: () {
-        Get.to(() => Chat(inboxId: chat.id, chatMember: chat.members.last));
+        Get.to(() => Chat(inboxId: chat.id, chatMember: recipent));
       },
       child: Container(
         padding: EdgeInsets.all(12),
@@ -75,7 +100,7 @@ class _MessagesState extends State<Messages> {
         ),
         child: Row(
           children: [
-            ProfilePicture(image: chat.members.last.image, size: 48),
+            ProfilePicture(image: recipent.image, size: 48),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -84,7 +109,7 @@ class _MessagesState extends State<Messages> {
                     children: [
                       Expanded(
                         child: Text(
-                          chat.members.last.name,
+                          recipent.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTexts.tlgs.copyWith(
