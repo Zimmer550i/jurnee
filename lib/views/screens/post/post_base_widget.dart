@@ -6,6 +6,7 @@ import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_image_picker.dart';
 import 'package:jurnee/utils/custom_svg.dart';
+import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/screens/post/location_picker.dart';
@@ -18,13 +19,15 @@ class PostBaseWidget extends StatefulWidget {
 }
 
 class PostBaseWidgetState extends State<PostBaseWidget> {
-  final GlobalKey<PostBaseWidgetState> _locationKey = GlobalKey();
+  final GlobalKey<PostBaseWidgetState> locationKey = GlobalKey();
   final titleCtrl = TextEditingController();
   final descriptionCtrl = TextEditingController();
   final locationCtrl = TextEditingController();
 
   File? cover;
+  String? coverImgUrl;
   List<File?> images = List.generate(5, (_) => null);
+  List<String?> imageUrls = List.generate(5, (_) => null);
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +57,18 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Color(0xffE6E6E6)),
             ),
-            child: cover == null
-                ? Column(
+            child: cover != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(cover!, fit: BoxFit.cover),
+                  )
+                : coverImgUrl != null
+                ? CustomNetworkedImage(
+                    url: coverImgUrl,
+                    radius: 12,
+                    fit: BoxFit.cover,
+                  )
+                : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomSvg(
@@ -67,10 +80,6 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
                         style: AppTexts.tsmr.copyWith(color: AppColors.gray),
                       ),
                     ],
-                  )
-                : ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(cover!, fit: BoxFit.cover),
                   ),
           ),
         ),
@@ -109,16 +118,18 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Color(0xffE6E6E6)),
                     ),
-                    child: images[i] == null
-                        ? Center(
+                    child: images[i] != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: MediaThumbnail(path: images[i]!.path),
+                          )
+                        : imageUrls[i] != null
+                        ? CustomNetworkedImage(url: imageUrls[i], radius: 12)
+                        : Center(
                             child: CustomSvg(
                               asset: "assets/icons/plus.svg",
                               color: AppColors.gray.shade300,
                             ),
-                          )
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: MediaThumbnail(path: images[i]!.path),
                           ),
                   ),
                 ),
@@ -139,7 +150,7 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
           lines: 5,
         ),
         const SizedBox(height: 16),
-        LocationPicker(key: _locationKey, controller: locationCtrl),
+        LocationPicker(key: locationKey, controller: locationCtrl),
         const SizedBox(height: 16),
       ],
     );

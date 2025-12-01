@@ -138,15 +138,25 @@ class ApiService {
         var request = http.MultipartRequest('PATCH', uri);
         request.headers.addAll(headers);
 
-        for (final entry in data.entries) {
+        for (var entry in data.entries) {
           final key = entry.key;
           final value = entry.value;
+
           if (value is File) {
             request.files.add(
               await http.MultipartFile.fromPath(key, value.path),
             );
+          } else if (value is List<File?>) {
+            for (var file in value) {
+              if (file == null) {
+                continue;
+              }
+              request.files.add(
+                await http.MultipartFile.fromPath(key, file.path),
+              );
+            }
           } else {
-            request.fields[key] = value.toString();
+            request.fields[key] = jsonEncode(value);
           }
         }
 

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
+import 'package:jurnee/controllers/maps_controller.dart';
 import 'package:jurnee/controllers/notification_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
@@ -28,6 +29,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.put(UserController());
   Get.put(ChatController());
   Get.put(PostController());
+  Get.put(MapsController());
 
   //Retrieving localized data
   Map<String, Map<String, String>> _languages = Map();

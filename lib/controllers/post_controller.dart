@@ -121,4 +121,26 @@ class PostController extends GetxController {
       isLoading(false);
     }
   }
+
+  Future<String> updatePost(String id, Map<String, dynamic> data) async {
+    isLoading(true);
+    try {
+      final res = await api.patch(
+        "/post/$id",
+        data,
+        authReq: true,
+      );
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
+    }
+  }
 }

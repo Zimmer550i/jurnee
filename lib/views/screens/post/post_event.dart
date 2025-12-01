@@ -1,17 +1,18 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/maps_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/formatter.dart';
-import 'package:jurnee/utils/get_location.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/post/post_base_widget.dart';
 
 class PostEvent extends StatefulWidget {
-  const PostEvent({super.key});
+  final PostModel? post;
+  const PostEvent({super.key, this.post});
 
   @override
   State<PostEvent> createState() => _PostEventState();
@@ -19,20 +20,36 @@ class PostEvent extends StatefulWidget {
 
 class _PostEventState extends State<PostEvent> {
   final GlobalKey<PostBaseWidgetState> _baseKey = GlobalKey();
+  final map = Get.find<MapsController>();
   final hashtagCtrl = TextEditingController();
 
-  File? cover;
-  List<File?> images = [];
   String? placeId;
   DateTime? date;
   TimeOfDay? time;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.post != null) populateFields();
+  }
 
   void publish() async {
     if (!isValid()) {
       return;
     }
 
-    final pos = await getLocation();
+    late Map<String, dynamic> pos;
+
+    if (widget.post == null) {
+      pos = await map.getPlacePosition(map.selected.value!.placeId) ?? {};
+    } else {
+      pos =
+          await map.getPlacePosition(map.selected.value?.placeId) ??
+          {
+            "lng": widget.post!.location.coordinates[0],
+            "lat": widget.post!.location.coordinates[1],
+          };
+    }
 
     Map<String, dynamic> payload = {
       "data": {
@@ -42,7 +59,7 @@ class _PostEventState extends State<PostEvent> {
         "address": _baseKey.currentState?.locationCtrl.text.trim(),
         "location": {
           "type": "Point",
-          "coordinates": [pos!.longitude, pos.latitude],
+          "coordinates": [pos['lng'], pos['lat']],
         },
         "hasTag": hashtagCtrl.text.split(" "),
         "startDate": date?.toIso8601String(),
@@ -50,14 +67,22 @@ class _PostEventState extends State<PostEvent> {
             ?.copyWith(hour: time?.hour, minute: time?.minute)
             .toIso8601String(),
       },
-      "image": _baseKey.currentState?.cover,
-      "media": _baseKey.currentState?.images,
+      if (widget.post == null || _baseKey.currentState!.cover != null)
+        "image": _baseKey.currentState?.cover,
+        "media": _baseKey.currentState?.images,
     };
 
-    final message = await Get.find<PostController>().createPost(
-      "event",
-      payload,
-    );
+    late String message;
+
+    if (widget.post == null) {
+      message = await Get.find<PostController>().createPost("event", payload);
+    } else {
+      message = await Get.find<PostController>().updatePost(
+        widget.post!.id,
+        payload,
+      );
+    }
+
     if (message == "success") {
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
@@ -93,11 +118,32 @@ class _PostEventState extends State<PostEvent> {
       customSnackBar("Time is required");
       return false;
     }
-    if (_baseKey.currentState?.cover == null) {
+    if (_baseKey.currentState?.cover == null && widget.post == null) {
       customSnackBar("Cover image is required");
       return false;
     }
     return true;
+  }
+
+  void populateFields() {
+    // Base Widget
+    WidgetsBinding.instance.addPostFrameCallback((val) {
+      setState(() {
+        _baseKey.currentState!.titleCtrl.text = widget.post!.title;
+        _baseKey.currentState!.descriptionCtrl.text = widget.post!.description;
+        _baseKey.currentState!.locationCtrl.text = widget.post!.address;
+        _baseKey.currentState!.coverImgUrl = widget.post!.image;
+        _baseKey.currentState!.imageUrls =
+            widget.post!.media ?? List.generate(5, (_) => null);
+      });
+    });
+
+    // Others
+    hashtagCtrl.text = widget.post!.hasTag?.join(" ") ?? "";
+    date = widget.post!.startDate;
+    time = widget.post!.startTime != null
+        ? TimeOfDay.fromDateTime(widget.post!.startTime!)
+        : null;
   }
 
   @override
@@ -167,7 +213,7 @@ class _PostEventState extends State<PostEvent> {
                 () => CustomButton(
                   onTap: publish,
                   isLoading: Get.find<PostController>().isLoading.value,
-                  text: "Publish",
+                  text: widget.post != null ? "Update" : "Publish",
                 ),
               ),
               const SizedBox(height: 28),

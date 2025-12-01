@@ -16,6 +16,7 @@ import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/rating_widget.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
+import 'package:jurnee/views/screens/post/post_event.dart';
 import 'package:jurnee/views/screens/profile/boost_post.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
@@ -56,7 +57,7 @@ class PostDetails extends StatelessWidget {
                             transition: Transition.noTransition,
                           );
                         },
-                        child: MediaThumbnail(path: i!),
+                        child: MediaThumbnail(path: i),
                       ),
                   ],
                 ),
@@ -496,7 +497,15 @@ class PostDetails extends StatelessWidget {
       return Column(
         spacing: 8,
         children: [
-          CustomButton(onTap: () {}, text: "Edit Post", isSecondary: true),
+          CustomButton(
+            onTap: () {
+              if (post.category == "Event") {
+                Get.to(() => PostEvent(post: post));
+              }
+            },
+            text: "Edit Post",
+            isSecondary: true,
+          ),
           CustomButton(
             onTap: () => Get.to(() => BoostPost(post: post)),
             text: "Boost Post",

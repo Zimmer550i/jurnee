@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:jurnee/utils/app_colors.dart';
+import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:path/path.dart' as p;
 
 class MediaThumbnail extends StatefulWidget {
-  final String path; // can be local file path or network URL
+  final String? path; // can be local file path or network URL
 
   const MediaThumbnail({super.key, required this.path});
 
@@ -23,12 +25,14 @@ class _MediaThumbnailState extends State<MediaThumbnail> {
   @override
   void initState() {
     super.initState();
-    _loadThumbnail();
+    if (widget.path != null) {
+      _loadThumbnail();
+    }
   }
 
   Future<void> _loadThumbnail() async {
     final path = widget.path;
-    _isNetwork = path.startsWith('http://') || path.startsWith('https://');
+    _isNetwork = path!.startsWith('http://') || path.startsWith('https://');
 
     String ext = p.extension(path).toLowerCase();
 
@@ -72,6 +76,24 @@ class _MediaThumbnailState extends State<MediaThumbnail> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.path == null) {
+      return Container(
+        color: AppColors.gray.shade200,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error, color: AppColors.gray.shade200),
+              Text(
+                "No Cover Image",
+                textAlign: TextAlign.center,
+                style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade400),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     if (_loading) return const CustomLoading();
 
     if (!_isVideo) {
@@ -82,7 +104,7 @@ class _MediaThumbnailState extends State<MediaThumbnail> {
           radius: 0,
         );
       } else {
-        return Image.file(File(widget.path), fit: BoxFit.cover);
+        return Image.file(File(widget.path!), fit: BoxFit.cover);
       }
     }
 

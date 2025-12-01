@@ -12,7 +12,7 @@ class PostModel {
     final String title;
     final String description;
     final DateTime? startDate;
-    final String? startTime;
+    final DateTime? startTime;
     final String address;
     final Location location;
     final List<String>? hasTag;
@@ -97,7 +97,7 @@ class PostModel {
         String? title,
         String? description,
         DateTime? startDate,
-        String? startTime,
+        DateTime? startTime,
         String? address,
         Location? location,
         List<String>? hasTag,
@@ -182,7 +182,7 @@ class PostModel {
         title: json["title"],
         description: json["description"],
         startDate: json["startDate"] == null ? null : DateTime.parse(json["startDate"]),
-        startTime: json["startTime"],
+        startTime: json["startTime"] == null ? null : DateTime.parse(json["startTime"]),
         address: json["address"],
         location: Location.fromJson(json["location"]),
         hasTag: json["hasTag"] == null ? null : List<String>.from(json["hasTag"].map((x) => x)),
@@ -225,7 +225,7 @@ class PostModel {
         "title": title,
         "description": description,
         "startDate": startDate?.toIso8601String(),
-        "startTime": startTime,
+        "startTime": startTime?.toIso8601String(),
         "address": address,
         "location": location.toJson(),
         "hasTag": hasTag == null ? null : List<dynamic>.from(hasTag!.map((x) => x)),
