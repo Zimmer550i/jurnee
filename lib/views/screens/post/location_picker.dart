@@ -16,8 +16,6 @@ class LocationPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Inject the controller
-    // If you have two pickers (pickup & dropoff), consider using tag: 'pickup'
     final MapsController mapCtrl = Get.put(MapsController());
 
     return Column(
@@ -26,7 +24,6 @@ class LocationPicker extends StatelessWidget {
         CustomTextField(
           controller: controller,
           onChanged: (val) {
-            // Update the reactive variable in the controller
             mapCtrl.onSearchChanged(val);
           },
           title: title,
@@ -34,7 +31,6 @@ class LocationPicker extends StatelessWidget {
           trailing: "assets/icons/location.svg",
         ),
 
-        // Reactive UI update
         Obx(() {
           if (mapCtrl.predictions.isEmpty) return const SizedBox.shrink();
 

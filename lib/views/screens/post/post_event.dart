@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/maps_controller.dart';
@@ -69,8 +71,10 @@ class _PostEventState extends State<PostEvent> {
       },
       if (widget.post == null || _baseKey.currentState!.cover != null)
         "image": _baseKey.currentState?.cover,
-        "media": _baseKey.currentState?.images,
+      "media": _baseKey.currentState?.images,
     };
+
+    payload['data'] = jsonEncode(payload['data']);
 
     late String message;
 

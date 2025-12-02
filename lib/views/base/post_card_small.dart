@@ -35,42 +35,44 @@ class PostCardSmall extends StatelessWidget {
               height: 102,
               width: 102,
             ),
-            Column(
-              spacing: 8,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  post.title,
-                  style: AppTexts.dxss.copyWith(
-                    color: AppColors.gray.shade600,
+            Expanded(
+              child: Column(
+                spacing: 8,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    post.title,
+                    style: AppTexts.dxss.copyWith(
+                      color: AppColors.gray.shade600,
+                    ),
                   ),
-                ),
-    
-                Row(
-                  spacing: 4,
-                  children: [
-                    CustomSvg(asset: "assets/icons/location.svg"),
-                    Text(
-                      Get.find<PostController>().getDistance(
-                        post.location.coordinates[0],
-                        post.location.coordinates[1],
+                  
+                  Row(
+                    spacing: 4,
+                    children: [
+                      CustomSvg(asset: "assets/icons/location.svg"),
+                      Text(
+                        Get.find<PostController>().getDistance(
+                          post.location.coordinates[0],
+                          post.location.coordinates[1],
+                        ),
+                        style: AppTexts.tsmm.copyWith(
+                          color: AppColors.gray.shade600,
+                        ),
                       ),
-                      style: AppTexts.tsmm.copyWith(
-                        color: AppColors.gray.shade600,
+                      Container(),
+                      CustomSvg(asset: "assets/icons/star.svg"),
+                      Text(
+                        (post.averageRating ?? "N/A").toString(),
+                        style: AppTexts.tsmm.copyWith(
+                          color: AppColors.gray.shade600,
+                        ),
                       ),
-                    ),
-                    Container(),
-                    CustomSvg(asset: "assets/icons/star.svg"),
-                    Text(
-                      (post.averageRating ?? "N/A").toString(),
-                      style: AppTexts.tsmm.copyWith(
-                        color: AppColors.gray.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),

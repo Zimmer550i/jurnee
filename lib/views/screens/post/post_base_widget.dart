@@ -123,7 +123,7 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
                             borderRadius: BorderRadius.circular(12),
                             child: MediaThumbnail(path: images[i]!.path),
                           )
-                        : imageUrls[i] != null
+                        : imageUrls.length > i && imageUrls[i] != null
                         ? CustomNetworkedImage(url: imageUrls[i], radius: 12)
                         : Center(
                             child: CustomSvg(

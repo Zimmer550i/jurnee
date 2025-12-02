@@ -53,14 +53,17 @@ class CustomNetworkedImage extends StatelessWidget {
                   color: AppColors.gray.shade200,
                   child: Center(
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error, color: AppColors.gray.shade200),
-                        Text(
-                          error.toString(),
-                          textAlign: TextAlign.center,
-                          style: AppTexts.tsmr.copyWith(
-                            color: AppColors.gray.shade400,
+                        Icon(Icons.error, color: AppColors.gray.shade400),
+                        Expanded(
+                          child: Text(
+                            error.toString(),
+                            textAlign: TextAlign.center,
+                            style: AppTexts.tsmr.copyWith(
+                              color: AppColors.gray.shade400,
+                            ),
                           ),
                         ),
                       ],
