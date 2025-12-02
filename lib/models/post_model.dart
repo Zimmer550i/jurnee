@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-
 PostModel postModelFromJson(String str) => PostModel.fromJson(json.decode(str));
 
 String postModelToJson(PostModel data) => json.encode(data.toJson());
@@ -189,10 +187,11 @@ class PostModel {
         : DateTime.parse(json["startDate"]),
     startTime: json["startTime"] == null
         ? null
-        : DateTime.now().copyWith(
-            hour: int.parse(json['startTime'].split(":").first),
-            minute: int.parse(json['startTime'].split(":").last),
-          ),
+        // : DateTime.now().copyWith(
+        //     hour: int.parse(json['startTime'].split(":").first),
+        //     minute: int.parse(json['startTime'].split(":").last),
+        //   ),
+        : DateTime.tryParse(json['startTime']),
     address: json["address"],
     location: Location.fromJson(json["location"]),
     hasTag: json["hasTag"] == null

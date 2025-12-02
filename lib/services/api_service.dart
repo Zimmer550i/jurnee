@@ -132,7 +132,7 @@ class ApiService {
 
       http.Response response;
 
-      bool hasFile = data.values.any((value) => value is File);
+      bool hasFile = data.values.any((value) => value is File? || value is List<File?>);
 
       if (hasFile) {
         var request = http.MultipartRequest('PATCH', uri);

@@ -18,10 +18,20 @@ class MapsController extends GetxController {
   final String _apiKey = "AIzaSyDltI2vV-mbS5Qy-gz2lPMTf7RAbR4tZRs";
   final int cacheDays = 3; // default cache validity
 
+  // Count
+  int hit = 0;
+  int miss = 0;
+
   @override
   void onInit() {
     super.onInit();
     _sessionToken = const Uuid().v4();
+
+    debounce(
+      query,
+      (val) => _handleCachedSuggestions(val),
+      time: Duration(milliseconds: 100),
+    );
   }
 
   // 1. Update the query signal (called from UI)
@@ -132,6 +142,7 @@ class MapsController extends GetxController {
       final bool valid = DateTime.now().difference(saved).inDays < cacheDays;
 
       if (valid) {
+        debugPrint("Hit Count: ${hit++}");
         final decoded = json.decode(cached) as List;
         predictions.value = decoded
             .map((p) => PlacePrediction.fromJson(p))
@@ -157,6 +168,7 @@ class MapsController extends GetxController {
 
     try {
       final response = await http.get(Uri.parse(request));
+      debugPrint("Miss Count: ${miss++}");
       if (response.statusCode == 200) {
         final result = json.decode(response.body);
 

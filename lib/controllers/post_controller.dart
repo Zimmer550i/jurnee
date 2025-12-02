@@ -125,14 +125,22 @@ class PostController extends GetxController {
   Future<String> updatePost(String id, Map<String, dynamic> data) async {
     isLoading(true);
     try {
-      final res = await api.patch(
-        "/post/$id",
-        data,
-        authReq: true,
-      );
+      final res = await api.patch("/post/$id", data, authReq: true);
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
+        // final data = body['data'];
+
+        // final post = PostModel.fromJson(data);
+
+        // int? index = postMap[PostType.defaultPosts]?.indexWhere(
+        //   (val) => val.id == id,
+        // );
+
+        // if (index != null && index != -1) {
+        //   postMap[PostType.defaultPosts]![index] = post;
+        // }
+
         return "success";
       } else {
         return body['message'] ?? "Something went wrong";
