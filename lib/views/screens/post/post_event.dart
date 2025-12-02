@@ -74,7 +74,10 @@ class _PostEventState extends State<PostEvent> {
       "media": _baseKey.currentState?.images,
     };
 
-    payload['data'] = jsonEncode(payload['data']);
+    // Why?? No one knows. But this is the LAW!
+    if (widget.post != null) {
+      payload['data'] = jsonEncode(payload['data']);
+    }
 
     late String message;
 
@@ -91,7 +94,10 @@ class _PostEventState extends State<PostEvent> {
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
       }
-      customSnackBar("Post created successfully", isError: false);
+      customSnackBar(
+        "Post ${widget.post != null ? "created" : "updated"} successfully",
+        isError: false,
+      );
     } else {
       customSnackBar(message);
     }
