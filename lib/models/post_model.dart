@@ -199,7 +199,9 @@ class PostModel {
         : List<String>.from(json["hasTag"].map((x) => x)),
     views: json["views"],
     likes: json["likes"],
-    endDate: json["endDate"],
+    endDate: json["endDate"] != null
+        ? DateTime.tryParse(json["endDate"])
+        : null,
     price: json["price"]?.toDouble(),
     category: json["category"],
     subcategory: json["subcategory"],

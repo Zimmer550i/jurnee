@@ -16,6 +16,7 @@ import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/rating_widget.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
+import 'package:jurnee/views/screens/post/post_deal.dart';
 import 'package:jurnee/views/screens/post/post_event.dart';
 import 'package:jurnee/views/screens/profile/boost_post.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
@@ -501,6 +502,9 @@ class PostDetails extends StatelessWidget {
             onTap: () {
               if (post.category == "Event") {
                 Get.to(() => PostEvent(post: post));
+              }else if(post.category == "Deal"){
+                Get.to(() => PostDeal(post: post));
+
               }
             },
             text: "Edit Post",

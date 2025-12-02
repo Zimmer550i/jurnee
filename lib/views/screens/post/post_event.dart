@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -74,11 +73,6 @@ class _PostEventState extends State<PostEvent> {
       "media": _baseKey.currentState?.images,
     };
 
-    // Why?? No one knows. But this is the LAW!
-    if (widget.post != null) {
-      payload['data'] = jsonEncode(payload['data']);
-    }
-
     late String message;
 
     if (widget.post == null) {
@@ -95,7 +89,7 @@ class _PostEventState extends State<PostEvent> {
         Get.until((route) => Get.currentRoute == "/app");
       }
       customSnackBar(
-        "Post ${widget.post != null ? "created" : "updated"} successfully",
+        "Event ${widget.post == null ? "created" : "updated"} successfully",
         isError: false,
       );
     } else {
