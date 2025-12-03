@@ -90,7 +90,7 @@ class HomepageState extends State<Homepage> {
                 color: AppColors.gray.shade200,
               ),
               showMap
-                  ? LocationMap()
+                  ? Expanded(child: LocationMap())
                   : Expanded(
                       child: Obx(
                         () => CustomListHandler(

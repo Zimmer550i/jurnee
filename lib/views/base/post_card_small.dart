@@ -43,6 +43,8 @@ class PostCardSmall extends StatelessWidget {
                 children: [
                   Text(
                     post.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: AppTexts.dxss.copyWith(
                       color: AppColors.gray.shade600,
                     ),

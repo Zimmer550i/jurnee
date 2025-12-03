@@ -15,6 +15,7 @@ import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/rating_widget.dart';
+import 'package:jurnee/views/screens/home/post_location.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/post/post_deal.dart';
 import 'package:jurnee/views/screens/post/post_event.dart';
@@ -108,19 +109,27 @@ class PostDetails extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Row(
-                      spacing: 4,
-                      children: [
-                        CustomSvg(asset: "assets/icons/location.svg", size: 24),
-                        Expanded(
-                          child: Text(
-                            post.address.toString(),
-                            style: AppTexts.tmdm.copyWith(
-                              color: AppColors.gray.shade400,
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(() => PostLocation(post: post));
+                      },
+                      child: Row(
+                        spacing: 4,
+                        children: [
+                          CustomSvg(
+                            asset: "assets/icons/location.svg",
+                            size: 24,
+                          ),
+                          Expanded(
+                            child: Text(
+                              post.address.toString(),
+                              style: AppTexts.tmdm.copyWith(
+                                color: AppColors.gray.shade400,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 8),
                     RatingWidget(averageRating: post.averageRating),
@@ -502,9 +511,8 @@ class PostDetails extends StatelessWidget {
             onTap: () {
               if (post.category == "Event") {
                 Get.to(() => PostEvent(post: post));
-              }else if(post.category == "Deal"){
+              } else if (post.category == "Deal") {
                 Get.to(() => PostDeal(post: post));
-
               }
             },
             text: "Edit Post",

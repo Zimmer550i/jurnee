@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -32,6 +33,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    Get.find<PostController>().fetchLocation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.find<UserController>().userData!.interested.isEmpty) {
         Get.to(() => UserInterests());
