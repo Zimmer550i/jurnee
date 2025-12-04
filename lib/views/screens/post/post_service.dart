@@ -58,7 +58,7 @@ class _PostServiceState extends State<PostService> {
         },
         "hasTag": hashtagCtrl.text.split(" "),
 
-        "schedule": _availabilityKey.currentState?.schedule,
+        "schedule": _availabilityKey.currentState?.getSchedule(),
       },
       "image": _baseKey.currentState?.cover,
       "media": _baseKey.currentState?.images,

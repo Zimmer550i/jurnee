@@ -34,7 +34,7 @@ class PostCard extends StatelessWidget {
                 radius: 0,
               ),
               ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: 136, minHeight: 120),
+                constraints: BoxConstraints(maxHeight: 184, minHeight: 100),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -42,6 +42,7 @@ class PostCard extends StatelessWidget {
                   ),
                   child: Column(
                     spacing: 8,
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
