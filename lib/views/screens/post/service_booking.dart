@@ -23,6 +23,8 @@ class ServiceBooking extends StatefulWidget {
 
 class _ServiceBookingState extends State<ServiceBooking> {
   DateTime? date;
+  // Map<String, TimeSlot> selected = {};
+  List<String> selected = [];
 
   void _onDateSelected(DateTime? val) {
     setState(() {
@@ -100,30 +102,50 @@ class _ServiceBookingState extends State<ServiceBooking> {
                       spacing: 8,
                       children: [
                         for (var i in getSlots())
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 4,
-                              horizontal: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: AppColors.gray.shade300,
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (selected.contains(i.id)) {
+                                  selected.remove(i.id);
+                                } else {
+                                  selected.add(i.id!);
+                                }
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 12,
                               ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              Formatter.timeFormatter(
-                                time: TimeOfDay(
-                                  hour:
-                                      int.tryParse(i.start!.split(":").first) ??
-                                      0,
-                                  minute:
-                                      int.tryParse(i.start!.split(":").last) ??
-                                      0,
+                              decoration: BoxDecoration(
+                                color: selected.contains(i.id)
+                                    ? AppColors.green.shade100
+                                    : null,
+                                border: Border.all(
+                                  color: selected.contains(i.id)
+                                      ? AppColors.green.shade600
+                                      : AppColors.gray.shade300,
                                 ),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              style: AppTexts.tsms.copyWith(
-                                color: AppColors.gray,
+                              child: Text(
+                                Formatter.timeFormatter(
+                                  time: TimeOfDay(
+                                    hour:
+                                        int.tryParse(
+                                          i.start!.split(":").first,
+                                        ) ??
+                                        0,
+                                    minute:
+                                        int.tryParse(
+                                          i.start!.split(":").last,
+                                        ) ??
+                                        0,
+                                  ),
+                                ),
+                                style: AppTexts.tsms.copyWith(
+                                  color: AppColors.gray,
+                                ),
                               ),
                             ),
                           ),

@@ -30,6 +30,7 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   final user = Get.find<UserController>();
   final GlobalKey<ScaffoldState> _key = GlobalKey();
+  bool isFollowing = false;
 
   int index = 0;
 
@@ -254,9 +255,26 @@ class _ProfileState extends State<Profile> {
                         child: Row(
                           children: [
                             Expanded(
-                              child: CustomButton(
-                                leading: "assets/icons/follow.svg",
-                                text: "Follow",
+                              child: Obx(
+                                () => CustomButton(
+                                  onTap: () {
+                                    user
+                                        .followUnfollowUser(widget.userId!)
+                                        .then((val) {
+                                          if (val is String) {
+                                            customSnackBar(val);
+                                          } else {
+                                            setState(() {
+                                              isFollowing = (val as bool);
+                                            });
+                                          }
+                                        });
+                                  },
+                                  isSecondary: isFollowing,
+                                  isLoading: user.isFollowLoading.value,
+                                  leading: "assets/icons/follow.svg",
+                                  text: isFollowing ? "Unfollow" : "Follow",
+                                ),
                               ),
                             ),
                             const SizedBox(width: 16),

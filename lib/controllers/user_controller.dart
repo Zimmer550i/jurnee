@@ -12,6 +12,7 @@ class UserController extends GetxController {
   Rxn<User> specificUser = Rxn();
   RxList<PostModel> posts = RxList.empty();
   RxBool isLoading = RxBool(false);
+  RxBool isFollowLoading = RxBool(false);
 
   final api = ApiService();
   late SharedPreferences prefs;
@@ -55,6 +56,27 @@ class UserController extends GetxController {
       return e.toString();
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future followUnfollowUser(String id) async {
+    isFollowLoading(true);
+    try {
+      final res = await api.post("/follower/follow-unfollow", {
+        "follower": id,
+      }, authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        bool isFollower = body['data']['isFollower'];
+        return isFollower;
+      } else {
+        return body["message"] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isFollowLoading(false);
     }
   }
 
