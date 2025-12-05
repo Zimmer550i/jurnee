@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:jurnee/models/schedule_model.dart';
+
 PostModel postModelFromJson(String str) => PostModel.fromJson(json.decode(str));
 
 String postModelToJson(PostModel data) => json.encode(data.toJson());
@@ -38,7 +40,7 @@ class PostModel {
   final List<Author> attenders;
   final bool isSaved;
   final int totalSaved;
-  final List<dynamic> schedule;
+  final List<Schedule> schedule;
   final DateTime createdAt;
   final DateTime updatedAt;
   final double? distance;
@@ -80,7 +82,7 @@ class PostModel {
     required this.attenders,
     required this.isSaved,
     required this.totalSaved,
-    required this.schedule,
+    this.schedule = const [],
     required this.createdAt,
     required this.updatedAt,
     this.distance,
@@ -123,7 +125,7 @@ class PostModel {
     List<Author>? attenders,
     bool? isSaved,
     int? totalSaved,
-    List<dynamic>? schedule,
+    List<Schedule>? schedule,
     DateTime? createdAt,
     DateTime? updatedAt,
     double? distance,
@@ -227,7 +229,9 @@ class PostModel {
     ),
     isSaved: json["isSaved"],
     totalSaved: json["totalSaved"],
-    schedule: List<dynamic>.from(json["schedule"].map((x) => x)),
+    schedule: json["schedule"] == null
+        ? []
+        : List<Schedule>.from(json["schedule"].map((x) => Schedule.fromJson(x))),
     createdAt: DateTime.parse(json["createdAt"]),
     updatedAt: DateTime.parse(json["updatedAt"]),
     distance: json["distance"]?.toDouble(),
@@ -272,7 +276,7 @@ class PostModel {
     "attenders": List<dynamic>.from(attenders.map((x) => x.toJson())),
     "isSaved": isSaved,
     "totalSaved": totalSaved,
-    "schedule": List<dynamic>.from(schedule.map((x) => x)),
+    "schedule": List<dynamic>.from(schedule.map((x) => x.toJson())),
     "createdAt": createdAt.toIso8601String(),
     "updatedAt": updatedAt.toIso8601String(),
     "distance": distance,

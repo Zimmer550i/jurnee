@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/post_model.dart';
@@ -10,6 +11,7 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
+import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
@@ -17,9 +19,7 @@ import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/rating_widget.dart';
 import 'package:jurnee/views/screens/home/post_location.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
-import 'package:jurnee/views/screens/post/post_deal.dart';
-import 'package:jurnee/views/screens/post/post_event.dart';
-import 'package:jurnee/views/screens/profile/boost_post.dart';
+import 'package:jurnee/views/screens/post/service_booking.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
 class PostDetails extends StatelessWidget {
@@ -503,28 +503,28 @@ class PostDetails extends StatelessWidget {
   }
 
   Widget getButton(bool isOwner) {
-    if (isOwner) {
-      return Column(
-        spacing: 8,
-        children: [
-          CustomButton(
-            onTap: () {
-              if (post.category == "Event") {
-                Get.to(() => PostEvent(post: post));
-              } else if (post.category == "Deal") {
-                Get.to(() => PostDeal(post: post));
-              }
-            },
-            text: "Edit Post",
-            isSecondary: true,
-          ),
-          CustomButton(
-            onTap: () => Get.to(() => BoostPost(post: post)),
-            text: "Boost Post",
-          ),
-        ],
-      );
-    }
+    // if (isOwner) {
+    //   return Column(
+    //     spacing: 8,
+    //     children: [
+    //       CustomButton(
+    //         onTap: () {
+    //           if (post.category == "Event") {
+    //             Get.to(() => PostEvent(post: post));
+    //           } else if (post.category == "Deal") {
+    //             Get.to(() => PostDeal(post: post));
+    //           }
+    //         },
+    //         text: "Edit Post",
+    //         isSecondary: true,
+    //       ),
+    //       CustomButton(
+    //         onTap: () => Get.to(() => BoostPost(post: post)),
+    //         text: "Boost Post",
+    //       ),
+    //     ],
+    //   );
+    // }
 
     if (post.schedule.isEmpty) {
       return CustomButton(onTap: () {}, text: "Contact Owner");
@@ -533,20 +533,33 @@ class PostDetails extends StatelessWidget {
         spacing: 10,
         children: [
           Expanded(
-            child: CustomButton(onTap: () {}, text: "Request Quote"),
+            child: CustomButton(
+              onTap: () {
+                Get.to(() => ServiceBooking(post: post));
+              },
+              text: "Request Quote",
+            ),
           ),
           GestureDetector(
-            onTap: () {},
-            child: Container(
-              height: 48,
-              width: 48,
-              decoration: BoxDecoration(
-                color: AppColors.green[25],
-                shape: BoxShape.circle,
-                border: Border.all(width: 2, color: AppColors.green.shade600),
-              ),
-              child: Center(
-                child: CustomSvg(asset: "assets/icons/message_rounded.svg"),
+            onTap: () {
+              Get.find<ChatController>().createOrGetChat(post.author.id);
+            },
+            child: Obx(
+              () => Container(
+                height: 48,
+                width: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.green[25],
+                  shape: BoxShape.circle,
+                  border: Border.all(width: 2, color: AppColors.green.shade600),
+                ),
+                child: Get.find<ChatController>().isLoading.value
+                    ? CustomLoading()
+                    : Center(
+                        child: CustomSvg(
+                          asset: "assets/icons/message_rounded.svg",
+                        ),
+                      ),
               ),
             ),
           ),

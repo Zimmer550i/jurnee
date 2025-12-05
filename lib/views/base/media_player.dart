@@ -117,8 +117,8 @@ class _MediaPlayerState extends State<MediaPlayer> {
                               decoration: BoxDecoration(
                                 // color: Color(0xff1b1b1b).withAlpha(128),
                                 gradient: LinearGradient(
-                                  begin: AlignmentGeometry.bottomCenter,
-                                  end: AlignmentGeometry.topCenter,
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
                                   colors: [Colors.black, Colors.transparent],
                                 ),
                               ),
