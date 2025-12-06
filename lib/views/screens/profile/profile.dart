@@ -30,7 +30,6 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   final user = Get.find<UserController>();
   final GlobalKey<ScaffoldState> _key = GlobalKey();
-  bool isFollowing = false;
 
   int index = 0;
 
@@ -184,11 +183,13 @@ class _ProfileState extends State<Profile> {
                             child: Column(
                               children: [
                                 if (widget.userId != null)
-                                  Text(
-                                    user.specificUser.value!.followers
-                                        .toString(),
-                                    style: AppTexts.dxsm.copyWith(
-                                      color: AppColors.gray.shade700,
+                                  Obx(
+                                    () => Text(
+                                      user.specificUser.value!.followers
+                                          .toString(),
+                                      style: AppTexts.dxsm.copyWith(
+                                        color: AppColors.gray.shade700,
+                                      ),
                                     ),
                                   ),
                                 if (widget.userId == null)
@@ -221,11 +222,13 @@ class _ProfileState extends State<Profile> {
                             child: Column(
                               children: [
                                 if (widget.userId != null)
-                                  Text(
-                                    user.specificUser.value!.following
-                                        .toString(),
-                                    style: AppTexts.dxsm.copyWith(
-                                      color: AppColors.gray.shade700,
+                                  Obx(
+                                    () => Text(
+                                      user.specificUser.value!.following
+                                          .toString(),
+                                      style: AppTexts.dxsm.copyWith(
+                                        color: AppColors.gray.shade700,
+                                      ),
                                     ),
                                   ),
                                 if (widget.userId == null)
@@ -258,22 +261,15 @@ class _ProfileState extends State<Profile> {
                               child: Obx(
                                 () => CustomButton(
                                   onTap: () {
-                                    user
-                                        .followUnfollowUser(widget.userId!)
-                                        .then((val) {
-                                          if (val is String) {
-                                            customSnackBar(val);
-                                          } else {
-                                            setState(() {
-                                              isFollowing = (val as bool);
-                                            });
-                                          }
-                                        });
+                                    user.followUnfollowUser(widget.userId!);
                                   },
-                                  isSecondary: isFollowing,
+                                  isSecondary:
+                                      user.specificUser.value!.isFollow,
                                   isLoading: user.isFollowLoading.value,
                                   leading: "assets/icons/follow.svg",
-                                  text: isFollowing ? "Unfollow" : "Follow",
+                                  text: user.specificUser.value!.isFollow
+                                      ? "Unfollow"
+                                      : "Follow",
                                 ),
                               ),
                             ),

@@ -14,8 +14,9 @@ class User {
   final DateTime createdAt;
   final DateTime updatedAt;
   final int post;
-  int? followers;
-  int? following;
+  bool isFollow;
+  int followers;
+  int following;
   final Location location;
 
   User({
@@ -34,8 +35,9 @@ class User {
     required this.createdAt,
     required this.updatedAt,
     required this.post,
-    this.followers,
-    this.following,
+    this.isFollow = false,
+    this.followers = 0,
+    this.following = 0,
     required this.location,
   });
 
@@ -56,6 +58,7 @@ class User {
       createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
       updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
       post: json['post'] ?? 0,
+      isFollow: json['isFollow'] ?? false,
       followers: json['followers'] ?? 0,
       following: json['following'] ?? 0,
       location: Location.fromJson(json['location'] ?? {}),
@@ -79,6 +82,7 @@ class User {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'post': post,
+      'isFollow': isFollow,
       'followers': followers,
       'following': following,
       'location': location.toJson(),

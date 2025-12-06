@@ -59,7 +59,7 @@ class UserController extends GetxController {
     }
   }
 
-  Future followUnfollowUser(String id) async {
+  Future<String> followUnfollowUser(String id) async {
     isFollowLoading(true);
     try {
       final res = await api.post("/follower/follow-unfollow", {
@@ -69,7 +69,17 @@ class UserController extends GetxController {
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         bool isFollower = body['data']['isFollower'];
-        return isFollower;
+
+        if (isFollower) {
+          specificUser.value!.following += 1;
+        } else {
+          specificUser.value!.following -= 1;
+        }
+        specificUser.value!.isFollow = isFollower;
+
+        specificUser.refresh();
+
+        return "success";
       } else {
         return body["message"] ?? "Something went wrong";
       }
@@ -93,9 +103,6 @@ class UserController extends GetxController {
       }
     } catch (e) {
       return e.toString();
-    } finally {
-      getFollowers();
-      getFollowing();
     }
   }
 
@@ -171,18 +178,28 @@ class UserController extends GetxController {
     }
   }
 
-  Future<String> getFollowers({int page = 1, int limit = 5}) async {
+  Future<String> getFollowers(String id, {bool loadMore = false}) async {
+    if (loadMore && currentPage.value >= totalPages.value) return "success";
+
+    if (!loadMore) {
+      isFirstLoad(true);
+      currentPage(1);
+    } else {
+      isMoreLoading(true);
+      currentPage.value++;
+    }
     try {
       final res = await api.get(
-        "/follower/my-followers",
-        queryParams: {"page": page.toString(), "limit": limit.toString()},
+        "/follower/my-followers/$id",
+        queryParams: {
+          "page": currentPage.value.toString(),
+          "limit": limit.toString(),
+        },
         authReq: true,
       );
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        user.value?.followers = PaginationMeta.fromJson(body['meta']).total;
-        user.refresh();
         return "success";
       } else {
         return body["message"] ?? "Something went wrong";
@@ -192,18 +209,28 @@ class UserController extends GetxController {
     }
   }
 
-  Future<String> getFollowing({int page = 1, int limit = 5}) async {
+  Future<String> getFollowing(String id, {bool loadMore = false}) async {
+    if (loadMore && currentPage.value >= totalPages.value) return "success";
+
+    if (!loadMore) {
+      isFirstLoad(true);
+      currentPage(1);
+    } else {
+      isMoreLoading(true);
+      currentPage.value++;
+    }
     try {
       final res = await api.get(
-        "/follower/my-following",
-        queryParams: {"page": page.toString(), "limit": limit.toString()},
+        "/follower/my-following/$id",
+        queryParams: {
+          "page": currentPage.value.toString(),
+          "limit": limit.toString(),
+        },
         authReq: true,
       );
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        user.value?.following = PaginationMeta.fromJson(body['meta']).total;
-        user.refresh();
         return "success";
       } else {
         return body["message"] ?? "Something went wrong";
