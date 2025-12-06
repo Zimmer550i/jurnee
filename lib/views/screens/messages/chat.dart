@@ -9,6 +9,7 @@ import 'package:jurnee/utils/custom_list_handler.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
+import 'package:jurnee/views/screens/profile/profile.dart';
 
 class Chat extends StatefulWidget {
   final String inboxId;
@@ -26,7 +27,7 @@ class _ChatState extends State<Chat> {
   @override
   void initState() {
     super.initState();
-    chat.connectAndListen(widget.inboxId);
+    chat.addChatListener(widget.inboxId);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       chat.fetchMessages(widget.inboxId);
     });
@@ -35,7 +36,7 @@ class _ChatState extends State<Chat> {
   @override
   void dispose() {
     super.dispose();
-    chat.disconnectSocket();
+    chat.removeChatListener(widget.inboxId);
     textCtrl.dispose();
   }
 
@@ -64,15 +65,18 @@ class _ChatState extends State<Chat> {
         surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Row(
-          spacing: 12,
-          children: [
-            ProfilePicture(image: widget.chatMember.image, size: 40),
-            Text(
-              widget.chatMember.name,
-              style: AppTexts.tlgb.copyWith(color: AppColors.gray),
-            ),
-          ],
+        title: GestureDetector(
+          onTap: () => Get.to(() => Profile(userId: widget.chatMember.id)),
+          child: Row(
+            spacing: 12,
+            children: [
+              ProfilePicture(image: widget.chatMember.image, size: 40),
+              Text(
+                widget.chatMember.name,
+                style: AppTexts.tlgb.copyWith(color: AppColors.gray),
+              ),
+            ],
+          ),
         ),
       ),
       body: Stack(

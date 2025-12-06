@@ -1,17 +1,21 @@
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:jurnee/views/screens/messages/chat.dart';
-import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:get/get.dart';
 import 'package:jurnee/models/chat_model.dart';
 import 'package:jurnee/models/message_model.dart';
 import 'package:jurnee/models/pagination_meta.dart';
 import 'package:jurnee/services/api_service.dart';
+// ignore: library_prefixes
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatController extends GetxController {
   final api = ApiService();
-  io.Socket? socket;
-  final socketUrl = "http://10.10.12.54:3001";
+
+  RxBool isConnected = RxBool(false);
+  IO.Socket? socket;
+  final _socketUrl = "http://10.10.12.54:3001";
+
   final RxList<ChatModel> chats = RxList.empty();
   final RxList<MessageModel> messages = RxList.empty();
 
@@ -23,77 +27,71 @@ class ChatController extends GetxController {
   RxBool isMoreLoading = false.obs;
   RxBool isLoading = RxBool(false);
 
-  // Assuming io.Socket? socket; is now declared at the class level
-
-  void connectAndListen(String chatId) {
-    messages.clear();
-    debugPrint("🔌 Connecting to socket…");
-
-    String eventName = "receive-message:$chatId";
-
-    // --- 🔑 CRITICAL: Comprehensive Cleanup of the previous socket ---
-    if (socket != null) {
-      debugPrint("🗑️ Cleaning up previous socket instance.");
-      socket!
-          .offAny(); // Remove ALL listeners (including onConnect, onDisconnect, etc.)
-      socket!.off(
-        eventName,
-      ); // Remove the specific chat listener (optional, but clean)
-      socket!.disconnect();
-      socket!.destroy();
-      socket = null; // Set the reference to null
-    }
-    // ---------------------------------------------------------------
-
-    // Initialize and connect the new socket instance
-    socket = io.io(
-      socketUrl,
-      io.OptionBuilder()
-          .setTransports(['websocket'])
-          .disableAutoConnect()
-          .build(),
-    );
-
-    socket!
-        .connect(); // Use the null assertion operator since we just created it
-
-    socket!.onConnect((_) {
-      debugPrint("🟢 Socket connected");
-      debugPrint("👂 Listening to event: $eventName");
-
-      socket!.on(eventName, (data) {
-        try {
-          final message = MessageModel.fromJson(data);
-          if (messages.isNotEmpty && messages.elementAt(0).id == "demo") {
-            messages.removeAt(0);
-          }
-          messages.insert(0, message);
-          debugPrint("📩 New message received: ${message.message}");
-        } catch (e) {
-          debugPrint("❌ Message parsing error: $e");
-        }
-      });
-    });
-
-    socket!.onDisconnect((_) {
-      debugPrint("🔴 Socket disconnected");
-    });
+  @override
+  void onInit() {
+    super.onInit();
+    _initSocket();
   }
 
-  /// Disconnects and destroys the socket connection
-  void disconnectSocket() {
-    // Use a null check for safe disconnection
-    if (socket != null) {
-      try {
-        socket!.offAny();
-        socket!.disconnect();
-        socket!.destroy();
-        socket = null; // Important: Clear the reference
-        debugPrint("🛑 Socket disconnected and destroyed");
-      } catch (e) {
-        debugPrint("🛑 Error during socket disconnection: $e");
-      }
+  /// ⚙️ Initializes the Socket.IO client instance
+  void _initSocket() {
+    try {
+      socket = IO.io(_socketUrl, <String, dynamic>{
+        'transports': ['websocket'],
+        'autoConnect': false,
+      });
+
+      // Setup general connection listeners
+      socket?.on('connect', (_) {
+        isConnected.value = true;
+        debugPrint('Socket.IO Connected');
+      });
+
+      socket?.on('disconnect', (_) {
+        isConnected.value = false;
+        debugPrint('Socket.IO Disconnected');
+      });
+
+      socket?.on('connect_error', (data) {
+        debugPrint('Connection Error: $data');
+        isConnected.value = false;
+      });
+    } catch (e) {
+      debugPrint('Socket.IO initialization error: $e');
     }
+  }
+
+  /// 👂 Adds the specific message listener for the current chat ID.
+  void addChatListener(String chatId) {
+    messages.clear();
+    debugPrint("🔌 Preparing socket connection for chat: $chatId…");
+    String eventName = "receive-message:$chatId";
+
+    if (!socket!.connected) {
+      socket!.connect();
+    }
+
+    socket?.on(eventName, (data) {
+      try {
+        final message = MessageModel.fromJson(data);
+        if (messages.isNotEmpty && messages.elementAt(0).id == "demo") {
+          messages.removeAt(0);
+        }
+        messages.insert(0, message);
+        debugPrint("📩 New message received: ${message.message}");
+      } catch (e) {
+        debugPrint('Error parsing incoming message: $e, Data: $data');
+      }
+    });
+    debugPrint('Listening to event: $eventName');
+  }
+
+  /// 🛑 Removes the specific message listener for the current chat ID.
+  void removeChatListener(String chatId) {
+    final eventName = 'receive-message:$chatId';
+    // Use the off method to stop listening to a specific event
+    socket?.off(eventName);
+    debugPrint('Stopped listening to event: $eventName');
   }
 
   /// Send message to server
@@ -102,6 +100,15 @@ class ChatController extends GetxController {
     required String senderId,
     required String message,
   }) {
+    // Check if socket is null or disconnected before attempting to send
+    if (socket == null || !socket!.connected) {
+      debugPrint(
+        "⚠️ Cannot send message: Socket is not connected or initialized.",
+      );
+      // Optionally show a user message or try to reconnect
+      return;
+    }
+
     messages.insert(
       0,
       MessageModel(id: "demo", chat: chatId, message: message),
