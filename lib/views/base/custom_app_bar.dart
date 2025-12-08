@@ -9,11 +9,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool hasLeading;
   final String? trailing;
+  final void Function()? trailingAction;
   const CustomAppBar({
     super.key,
     required this.title,
     this.hasLeading = true,
     this.trailing,
+    this.trailingAction,
   });
 
   @override
@@ -50,7 +52,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
             trailing != null
-                ? CustomSvg(asset: trailing!)
+                ? GestureDetector(
+                    onTap: () {
+                      if (trailingAction != null) {
+                        trailingAction!();
+                      }
+                    },
+                    child: CustomSvg(asset: trailing!),
+                  )
                 : SizedBox(width: 32),
             SizedBox(width: 12),
           ],

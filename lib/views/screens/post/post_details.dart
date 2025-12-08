@@ -21,6 +21,7 @@ import 'package:jurnee/views/screens/home/post_location.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/post/service_booking.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
+import 'package:share_plus/share_plus.dart';
 
 class PostDetails extends StatelessWidget {
   final PostModel post;
@@ -33,6 +34,16 @@ class PostDetails extends StatelessWidget {
       appBar: CustomAppBar(
         title: "Event Details",
         trailing: "assets/icons/share.svg",
+        trailingAction: () {
+          final deepLink = "https://jurnee.app/post/${post.id}";
+
+          SharePlus.instance.share(
+            ShareParams(
+              text: "Check out this post on Jurnee:\n$deepLink",
+              subject: "Jurnee Post",
+            ),
+          );
+        },
       ),
       body: SingleChildScrollView(
         child: SafeArea(
@@ -304,7 +315,7 @@ class PostDetails extends StatelessWidget {
           () => UsersList(
             title: "Attending",
             getListMethod: (loadMore) {
-              return Get.find<UserController>().getFollowers();
+              // return Get.find<UserController>().getFollowers();
             },
           ),
         );

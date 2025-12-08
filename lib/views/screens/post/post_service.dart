@@ -49,7 +49,7 @@ class _PostServiceState extends State<PostService> {
       "data": {
         "title": _baseKey.currentState?.titleCtrl.text.trim(),
         "description": _baseKey.currentState?.descriptionCtrl.text.trim(),
-        "category": "Service",
+        "category": "service",
         "subcategory": subCategory,
         "address": _baseKey.currentState?.locationCtrl.text.trim(),
         "location": {

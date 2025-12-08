@@ -49,7 +49,7 @@ class _PostAlertState extends State<PostAlert> {
       "data": {
         "title": _baseKey.currentState?.titleCtrl.text.trim(),
         "description": _baseKey.currentState?.descriptionCtrl.text.trim(),
-        "category": "Alert",
+        "category": "alert",
         "subcategory": category,
         "address": _baseKey.currentState?.locationCtrl.text.trim(),
         "location": {

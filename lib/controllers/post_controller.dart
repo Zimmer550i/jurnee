@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/pagination_meta.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/services/api_service.dart';
@@ -28,10 +29,16 @@ class PostController extends GetxController {
     });
     getLocation(forceRefresh: true).then((val) {
       userLocation.value = val;
+      Get.find<UserController>().updateUserData({
+        "location": {
+          "type": "Point",
+          "coordinates": [val!.longitude, val.latitude],
+        },
+      });
     });
   }
 
-  String getDistance(double targetLat, double targetLong) {
+  String getDistance(double targetLong, double targetLat) {
     // Calculate distance in meters
     double distanceInMeters = Geolocator.distanceBetween(
       userLocation.value?.latitude ?? 0,

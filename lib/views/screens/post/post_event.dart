@@ -56,7 +56,7 @@ class _PostEventState extends State<PostEvent> {
       "data": {
         "title": _baseKey.currentState?.titleCtrl.text.trim(),
         "description": _baseKey.currentState?.descriptionCtrl.text.trim(),
-        "category": "Event",
+        "category": "event",
         "address": _baseKey.currentState?.locationCtrl.text.trim(),
         "location": {
           "type": "Point",
