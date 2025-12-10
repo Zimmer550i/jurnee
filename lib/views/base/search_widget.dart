@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:jurnee/controllers/maps_controller.dart';
+import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
@@ -14,6 +17,8 @@ class SearchWidget extends StatefulWidget {
 }
 
 class _SearchWidgetState extends State<SearchWidget> {
+    final MapsController mapCtrl = Get.put(MapsController());
+  final post = Get.find<PostController>();
   List<bool> values = List.generate(9, (_) {
     return false;
   });

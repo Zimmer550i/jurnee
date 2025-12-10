@@ -23,6 +23,12 @@ class PostController extends GetxController {
   RxBool isFirstLoad = true.obs;
   RxBool isMoreLoading = false.obs;
 
+  RxnString search = RxnString();
+  RxnInt minPrice = RxnInt();
+  RxnInt maxPrice = RxnInt();
+  RxnInt distance = RxnInt();
+  Rxn<Position> customLocation = Rxn();
+
   void fetchLocation() {
     getLocation().then((val) {
       userLocation.value = val;
@@ -53,11 +59,7 @@ class PostController extends GetxController {
     return "${distanceInMiles.toStringAsFixed(1)} miles";
   }
 
-  Future<String> fetchPosts({
-    bool loadMore = false,
-    String? category,
-    String? search,
-  }) async {
+  Future<String> fetchPosts({bool loadMore = false, String? category}) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 
     if (!loadMore) {
@@ -74,8 +76,13 @@ class PostController extends GetxController {
         queryParams: {
           "page": currentPage.value.toString(),
           "limit": limit.toString(),
+          "lat": customLocation.value?.latitude,
+          "lng": customLocation.value?.longitude,
+          "maxDistance": distance.value,
+          "minPrice": minPrice.value,
+          "maxPrice": maxPrice.value,
           "category": category,
-          "search": search,
+          "search": search.value,
         },
         authReq: true,
       );

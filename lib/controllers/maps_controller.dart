@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:jurnee/models/place_prediction.dart';
@@ -15,7 +16,7 @@ class MapsController extends GetxController {
 
   // Internal variables
   String? _sessionToken;
-  final String _apiKey = "AIzaSyDltI2vV-mbS5Qy-gz2lPMTf7RAbR4tZRs";
+  final String _apiKey = dotenv.env['GOOGLE_MAPS_KEY'] ?? '';
   final int cacheDays = 3; // default cache validity
 
   // Count

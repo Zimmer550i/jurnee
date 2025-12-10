@@ -37,6 +37,7 @@ dependencies:
   path: ^1.9.1
   syncfusion_flutter_datepicker: ^31.1.19
   share_plus: ^12.0.1
+  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +54,7 @@ flutter:
     - assets/fonts/
     - assets/icons/
     - assets/language/
+    - .env
   
   fonts:
     - family: Lato
