@@ -17,7 +17,9 @@ class SearchWidget extends StatefulWidget {
 }
 
 class _SearchWidgetState extends State<SearchWidget> {
-    final MapsController mapCtrl = Get.put(MapsController());
+  final MapsController mapCtrl = Get.put(MapsController());
+  final searchCtrl = TextEditingController();
+  final placeCtrl = TextEditingController();
   final post = Get.find<PostController>();
   List<bool> values = List.generate(9, (_) {
     return false;
@@ -113,7 +115,6 @@ class _SearchWidgetState extends State<SearchWidget> {
           if (expanded == 0)
             SizedBox(
               width: double.infinity,
-              height: 200,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -130,6 +131,8 @@ class _SearchWidgetState extends State<SearchWidget> {
                         CustomSvg(asset: "assets/icons/search.svg"),
                         Expanded(
                           child: TextField(
+                            controller: placeCtrl,
+                            onChanged: (value) => mapCtrl.onSearchChanged(value),
                             decoration: InputDecoration(
                               isCollapsed: true,
                               isDense: true,
@@ -161,20 +164,22 @@ class _SearchWidgetState extends State<SearchWidget> {
                   ),
                   Expanded(
                     child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          for (int i = 0; i < 50; i++)
-                            SizedBox(
-                              height: 32,
-                              width: double.infinity,
-                              child: Text(
-                                "Sample city name",
-                                style: AppTexts.tsmr.copyWith(
-                                  color: AppColors.gray.shade700,
+                      child: Obx(
+                        () => Column(
+                          children: [
+                            for (var i in mapCtrl.predictions)
+                              SizedBox(
+                                height: 32,
+                                width: double.infinity,
+                                child: Text(
+                                  i.description,
+                                  style: AppTexts.tsmr.copyWith(
+                                    color: AppColors.gray.shade700,
+                                  ),
                                 ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
