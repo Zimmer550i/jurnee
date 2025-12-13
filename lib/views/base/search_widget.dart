@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jurnee/controllers/maps_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_button.dart';
+import 'package:jurnee/views/base/custom_text_field.dart';
+import 'package:jurnee/views/screens/home/home.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class SearchWidget extends StatefulWidget {
@@ -17,13 +21,15 @@ class SearchWidget extends StatefulWidget {
 }
 
 class _SearchWidgetState extends State<SearchWidget> {
-  final MapsController mapCtrl = Get.put(MapsController());
+  final post = Get.find<PostController>();
+  final mapCtrl = Get.put(MapsController());
+
   final searchCtrl = TextEditingController();
   final placeCtrl = TextEditingController();
-  final post = Get.find<PostController>();
-  List<bool> values = List.generate(9, (_) {
-    return false;
-  });
+  final minPriceCtrl = TextEditingController();
+  final maxPriceCtrl = TextEditingController();
+
+  bool showPrice = false;
   int expanded = -1;
   DateTime? start;
   DateTime? end;
@@ -64,6 +70,8 @@ class _SearchWidgetState extends State<SearchWidget> {
                 CustomSvg(asset: "assets/icons/search.svg"),
                 Expanded(
                   child: TextField(
+                    autofocus: true,
+                    onChanged: (value) => post.search.value = value,
                     decoration: InputDecoration(
                       isCollapsed: true,
                       isDense: true,
@@ -80,20 +88,94 @@ class _SearchWidgetState extends State<SearchWidget> {
           ),
           SizedBox(
             width: double.infinity,
-            child: Wrap(
-              runSpacing: 8,
-              spacing: 8,
-              alignment: WrapAlignment.start,
-              children: [
-                tab("Live Now", 0),
-                tab("Today", 1),
-                tab("4+", 2, leading: "assets/icons/star.svg"),
-                tab("\$", 3),
-                tab("\$\$", 4),
-                tab("\$\$\$", 5),
-              ],
+            child: Obx(
+              () => Wrap(
+                runSpacing: 8,
+                spacing: 8,
+                alignment: WrapAlignment.start,
+                children: [
+                  tab("4+", post.highlyRated.value, (val) {
+                    post.highlyRated.value = val;
+                  }, leading: "assets/icons/star.svg"),
+                  tab(
+                    "Events",
+                    post.categoryList.contains("event"),
+                    (val) {
+                      if (post.categoryList.contains("event")) {
+                        post.categoryList.remove('event');
+                      } else {
+                        post.categoryList.add('event');
+                      }
+                    },
+                    leading: "assets/icons/event.svg",
+                  ),
+                  tab(
+                    "Deals",
+                    post.categoryList.contains("deal"),
+                    (val) {
+                      if (post.categoryList.contains("deal")) {
+                        post.categoryList.remove('deal');
+                      } else {
+                        post.categoryList.add('deal');
+                      }
+                    },
+                    leading: "assets/icons/deal.svg",
+                  ),
+                  tab(
+                    "Services",
+                    post.categoryList.contains("service"),
+                    (val) {
+                      if (post.categoryList.contains("service")) {
+                        post.categoryList.remove('service');
+                      } else {
+                        post.categoryList.add('service');
+                      }
+                    },
+                    leading: "assets/icons/service.svg",
+                  ),
+                  tab(
+                    "Alerts",
+                    post.categoryList.contains("alert"),
+                    (val) {
+                      if (post.categoryList.contains("alert")) {
+                        post.categoryList.remove('alert');
+                      } else {
+                        post.categoryList.add('alert');
+                      }
+                    },
+                    leading: "assets/icons/alerts.svg",
+                  ),
+                  tab("Price", showPrice, (val) {
+                    setState(() {
+                      showPrice = val;
+                    });
+                  }, leading: "assets/icons/price.svg"),
+                ],
+              ),
             ),
           ),
+          if (showPrice)
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    title: "Min Price",
+                    controller: minPriceCtrl,
+                    hintText: "Enter minimum price",
+                    textInputType: TextInputType.number,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: CustomTextField(
+                    title: "Max Price",
+                    controller: maxPriceCtrl,
+                    hintText: "Enter maximum price",
+                    textInputType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
           Container(
             width: double.infinity,
             height: 1,
@@ -101,89 +183,112 @@ class _SearchWidgetState extends State<SearchWidget> {
           ),
           SizedBox(
             width: double.infinity,
-            child: Wrap(
-              runSpacing: 8,
-              spacing: 8,
-              alignment: WrapAlignment.spaceBetween,
-              children: [
-                dropDown("City", 0, placeId != null),
-                dropDown("Dates", 1, start != null && end != null),
-                dropDown("Distance", 2, distance != null),
-              ],
+            child: Obx(
+              () => Wrap(
+                runSpacing: 8,
+                spacing: 8,
+                alignment: WrapAlignment.spaceBetween,
+                children: [
+                  dropDown("City", 0, post.customLocation.value != null),
+                  dropDown("Dates", 1, start != null),
+                  dropDown("Distance", 2, post.distance.value != null),
+                ],
+              ),
             ),
           ),
           if (expanded == 0)
             SizedBox(
               width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.gray.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      spacing: 16,
-                      children: [
-                        CustomSvg(asset: "assets/icons/search.svg"),
-                        Expanded(
-                          child: TextField(
-                            controller: placeCtrl,
-                            onChanged: (value) => mapCtrl.onSearchChanged(value),
-                            decoration: InputDecoration(
-                              isCollapsed: true,
-                              isDense: true,
-                              border: InputBorder.none,
-                              hintText: "Search cities...",
-                              hintStyle: AppTexts.tsmr.copyWith(
-                                color: AppColors.gray.shade400,
+              child: Obx(
+                () => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppColors.gray.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        spacing: 16,
+                        children: [
+                          CustomSvg(asset: "assets/icons/search.svg"),
+                          Expanded(
+                            child: TextField(
+                              controller: placeCtrl,
+                              onChanged: (value) =>
+                                  mapCtrl.onSearchChanged(value),
+                              decoration: InputDecoration(
+                                isCollapsed: true,
+                                isDense: true,
+                                border: InputBorder.none,
+                                hintText: "Search cities...",
+                                hintStyle: AppTexts.tsmr.copyWith(
+                                  color: AppColors.gray.shade400,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 32,
-                    child: Row(
-                      spacing: 4,
-                      children: [
-                        CustomSvg(asset: "assets/icons/location.svg"),
-                        Text(
-                          "Use My Location",
-                          style: AppTexts.txsr.copyWith(
-                            color: AppColors.green.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Obx(
-                        () => Column(
-                          children: [
-                            for (var i in mapCtrl.predictions)
-                              SizedBox(
-                                height: 32,
-                                width: double.infinity,
-                                child: Text(
-                                  i.description,
-                                  style: AppTexts.tsmr.copyWith(
-                                    color: AppColors.gray.shade700,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+                    if (mapCtrl.predictions.isEmpty)
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            placeCtrl.text = "My Location";
+                            expanded = -1;
+                            try {
+                              post.customLocation.value = LatLng(
+                                post.userLocation.value!.latitude,
+                                post.userLocation.value!.longitude,
+                              );
+                            } catch (_) {
+                              customSnackBar("Couldn't fetch user location");
+                            }
+                          });
+                        },
+                        child: SizedBox(
+                          height: 32,
+                          child: Row(
+                            spacing: 8,
+                            children: [
+                              CustomSvg(
+                                asset: "assets/icons/location.svg",
+                                size: 18,
+                              ),
+                              Text(
+                                "Use My Location",
+                                style: AppTexts.tsmm.copyWith(
+                                  color: AppColors.green.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    for (var i in mapCtrl.predictions)
+                      GestureDetector(
+                        onTap: () {
+                          mapCtrl.selectPrediction(i, placeCtrl);
+                          setState(() {
+                            expanded = -1;
+                          });
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(2),
+                          child: Text(
+                            i.description,
+                            maxLines: 2,
+                            style: AppTexts.tsmr.copyWith(
+                              color: AppColors.gray.shade700,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           if (expanded == 1)
@@ -210,21 +315,25 @@ class _SearchWidgetState extends State<SearchWidget> {
               initialSelectedRange: PickerDateRange(start, end),
             ),
           if (expanded == 2)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Slider(
-                  value: 0.3,
-                  activeColor: AppColors.green,
-                  thumbColor: Colors.white,
-                  padding: EdgeInsets.zero,
-                  onChanged: (val) {},
-                ),
-                Text(
-                  "10 miles",
-                  style: AppTexts.txsr.copyWith(color: AppColors.gray),
-                ),
-              ],
+            Obx(
+              () => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Slider(
+                    value: post.distance.value ?? 0.05,
+                    activeColor: AppColors.green,
+                    thumbColor: Colors.white,
+                    padding: EdgeInsets.zero,
+                    onChanged: (val) {
+                      post.distance.value = val;
+                    },
+                  ),
+                  Text(
+                    "${post.distance.value == null ? "50" : (post.distance.value! * 1000).toInt()} miles",
+                    style: AppTexts.txsr.copyWith(color: AppColors.gray),
+                  ),
+                ],
+              ),
             ),
           Row(
             children: [
@@ -232,9 +341,20 @@ class _SearchWidgetState extends State<SearchWidget> {
               Expanded(
                 child: CustomButton(
                   onTap: () {
-                    setState(() {
-                      for (int i = 0; i < values.length; i++) {
-                        values[i] = false;
+                    post.customLocation.value = null;
+                    post.date.value = null;
+                    post.distance.value = null;
+                    post.maxPrice.value = null;
+                    post.minPrice.value = null;
+                    post.search.value = null;
+                    post.highlyRated.value = false;
+                    post.categoryList.clear();
+                    homeKey.currentState?.setState(() {
+                      homeKey.currentState?.searchEnabled = false;
+                    });
+                    post.fetchPosts().then((message) {
+                      if (message != "success") {
+                        customSnackBar(message);
                       }
                     });
                   },
@@ -244,7 +364,23 @@ class _SearchWidgetState extends State<SearchWidget> {
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(child: CustomButton(text: "Apply", height: 44)),
+              Expanded(
+                child: CustomButton(
+                  onTap: () {
+                    homeKey.currentState?.setState(() {
+                      homeKey.currentState!.searchEnabled = false;
+                      homeKey.currentState!.tab = 0;
+                    });
+                    post.fetchPosts().then((message) {
+                      if (message != "success") {
+                        customSnackBar(message);
+                      }
+                    });
+                  },
+                  text: "Apply",
+                  height: 44,
+                ),
+              ),
               const SizedBox(width: 24),
             ],
           ),
@@ -254,17 +390,19 @@ class _SearchWidgetState extends State<SearchWidget> {
     );
   }
 
-  Widget tab(String title, int pos, {String? leading, bool? dropDown}) {
+  Widget tab(
+    String title,
+    bool isSelected,
+    Function(bool) onTap, {
+    String? leading,
+    bool? dropDown,
+  }) {
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          values[pos] = !values[pos];
-        });
-      },
+      onTap: () => onTap(!isSelected),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: values[pos] ? AppColors.green.shade600 : Colors.transparent,
+          color: isSelected ? AppColors.green.shade600 : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: AppColors.gray.shade300),
         ),
@@ -272,17 +410,24 @@ class _SearchWidgetState extends State<SearchWidget> {
           spacing: 4,
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (leading != null) CustomSvg(asset: leading),
+            if (leading != null)
+              CustomSvg(
+                asset: leading,
+                height: 16,
+                color: isSelected
+                    ? AppColors.green[25]
+                    : AppColors.green.shade600,
+              ),
             Text(
               title,
               style: AppTexts.tsmr.copyWith(
-                color: values[pos] ? AppColors.white : AppColors.gray.shade700,
+                color: isSelected ? AppColors.white : AppColors.gray.shade700,
               ),
             ),
             if (dropDown == true)
               CustomSvg(
                 asset: "assets/icons/dropdown.svg",
-                color: values[pos] ? AppColors.white : AppColors.gray.shade700,
+                color: isSelected ? AppColors.white : AppColors.gray.shade700,
               ),
           ],
         ),

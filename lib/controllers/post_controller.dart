@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/pagination_meta.dart';
 import 'package:jurnee/models/post_model.dart';
@@ -23,11 +24,14 @@ class PostController extends GetxController {
   RxBool isFirstLoad = true.obs;
   RxBool isMoreLoading = false.obs;
 
+  RxBool highlyRated = RxBool(false);
+  RxList<String> categoryList = RxList.empty();
   RxnString search = RxnString();
   RxnInt minPrice = RxnInt();
   RxnInt maxPrice = RxnInt();
-  RxnInt distance = RxnInt();
-  Rxn<Position> customLocation = Rxn();
+  RxnDouble distance = RxnDouble();
+  Rxn<LatLng> customLocation = Rxn();
+  Rxn<DateTime> date = Rxn<DateTime>();
 
   void fetchLocation() {
     getLocation().then((val) {
@@ -59,6 +63,16 @@ class PostController extends GetxController {
     return "${distanceInMiles.toStringAsFixed(1)} miles";
   }
 
+  Map<String, String> _removeNullQueryParams(Map<String, dynamic> params) {
+    final Map<String, String> cleaned = {};
+    params.forEach((key, value) {
+      if (value != null && value.toString().isNotEmpty) {
+        cleaned[key] = value.toString();
+      }
+    });
+    return cleaned;
+  }
+
   Future<String> fetchPosts({bool loadMore = false, String? category}) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 
@@ -73,17 +87,21 @@ class PostController extends GetxController {
     try {
       final res = await api.get(
         "/post/all-post",
-        queryParams: {
-          "page": currentPage.value.toString(),
-          "limit": limit.toString(),
+        queryParams: _removeNullQueryParams({
+          "page": currentPage.value,
+          "limit": limit,
           "lat": customLocation.value?.latitude,
           "lng": customLocation.value?.longitude,
-          "maxDistance": distance.value,
+          "maxDistance": distance.value != null
+              ? (distance.value! * 1609.344 * 1000).toInt()
+              : null,
+          "rating": highlyRated.value ? "4" : null,
           "minPrice": minPrice.value,
           "maxPrice": maxPrice.value,
-          "category": category,
+          "category": category ?? categoryList.join(","),
+          "dateTime": date.value?.toIso8601String(),
           "search": search.value,
-        },
+        }),
         authReq: true,
       );
 

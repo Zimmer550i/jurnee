@@ -16,7 +16,7 @@ class MapsController extends GetxController {
 
   // Internal variables
   String? _sessionToken;
-  final String _apiKey = dotenv.env['GOOGLE_MAPS_KEY'] ?? '';
+  final String _apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
   final int cacheDays = 3; // default cache validity
 
   // Count

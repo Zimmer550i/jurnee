@@ -61,28 +61,48 @@ class HomepageState extends State<Homepage> {
                           searchEnabled = true;
                         });
                       },
-                      child: CustomSvg(asset: "assets/icons/search.svg"),
+                      child: Container(
+                        padding: EdgeInsets.all(4),
+                        decoration: isFiltering()
+                            ? BoxDecoration(
+                                color: AppColors.green.shade600,
+                                borderRadius: BorderRadius.circular(4),
+                                boxShadow: [
+                                  BoxShadow(
+                                    offset: Offset(0, 2),
+                                    blurRadius: 2,
+                                    color: Colors.black.withValues(alpha: 0.4),
+                                  ),
+                                ],
+                              )
+                            : null,
+                        child: CustomSvg(
+                          asset: "assets/icons/search.svg",
+                          color: isFiltering() ? AppColors.green[25] : null,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 24),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 8,
+              if (!isFiltering())
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      tabs("All", null, 0),
+                      tabs("Events", "assets/icons/calendar.svg", 1),
+                      tabs("Deals", "assets/icons/price_tag.svg", 2),
+                      tabs("Services", "assets/icons/info.svg", 3),
+                      tabs("Alerts", "assets/icons/wrench.svg", 4),
+                    ],
+                  ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    tabs("All", null, 0),
-                    tabs("Events", "assets/icons/calendar.svg", 1),
-                    tabs("Deals", "assets/icons/price_tag.svg", 2),
-                    tabs("Services", "assets/icons/info.svg", 3),
-                    tabs("Alerts", "assets/icons/wrench.svg", 4),
-                  ],
-                ),
-              ),
 
               Container(
                 width: double.infinity,
@@ -130,7 +150,7 @@ class HomepageState extends State<Homepage> {
           if (searchEnabled)
             Column(
               children: [
-                if (searchEnabled) SearchWidget(search),
+                SearchWidget(search),
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
@@ -194,5 +214,20 @@ class HomepageState extends State<Homepage> {
         ),
       ),
     );
+  }
+
+  bool isFiltering() {
+    if (post.customLocation.value != null ||
+        post.date.value != null ||
+        post.minPrice.value != null ||
+        post.maxPrice.value != null ||
+        post.search.value != null ||
+        post.customLocation.value != null ||
+        post.highlyRated.value == true ||
+        post.categoryList.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

@@ -17,7 +17,7 @@ import 'package:jurnee/views/screens/post/post_event.dart';
 import 'package:jurnee/views/screens/post/post_service.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
-final GlobalKey<HomepageState> _globalKey = GlobalKey();
+final GlobalKey<HomepageState> homeKey = GlobalKey();
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -42,7 +42,7 @@ class _HomeState extends State<Home> {
   }
 
   List<Widget> pages = [
-    Homepage(key: _globalKey),
+    Homepage(key: homeKey),
     Messages(),
     Notifications(),
     Profile(),
@@ -269,7 +269,7 @@ class _HomeState extends State<Home> {
           ? null
           : GestureDetector(
               onTap: () {
-                final state = _globalKey.currentState;
+                final state = homeKey.currentState;
 
                 if (state != null) {
                   state.setState(() {
