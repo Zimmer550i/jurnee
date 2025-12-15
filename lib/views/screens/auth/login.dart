@@ -5,12 +5,12 @@ import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
-import 'package:jurnee/utils/get_location.dart';
+// import 'package:jurnee/utils/get_location.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_checkbox.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
-import 'package:jurnee/views/screens/auth/cant_access_app.dart';
+// import 'package:jurnee/views/screens/auth/cant_access_app.dart';
 import 'package:jurnee/views/screens/auth/forgot_password.dart';
 import 'package:jurnee/views/screens/auth/register.dart';
 import 'package:jurnee/views/screens/home/home.dart';
@@ -31,11 +31,11 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (await isUserInCalifornia()) {
-        Get.offAll(() => CantAccessApp());
-      }
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   if (await isUserInCalifornia()) {
+    //     Get.offAll(() => CantAccessApp());
+    //   }
+    // });
   }
 
   void onSubmit() async {
