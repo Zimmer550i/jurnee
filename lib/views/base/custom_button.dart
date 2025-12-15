@@ -43,14 +43,16 @@ class _CustomButtonState extends State<CustomButton> {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(widget.radius),
-      onTap: widget.isLoading ? null : widget.onTap,
+      onTap: widget.isLoading || widget.isDisabled ? null : widget.onTap,
       child: AnimatedContainer(
         duration: Duration(milliseconds: 100),
         height: widget.height,
         width: widget.width,
         padding: EdgeInsets.symmetric(horizontal: widget.padding),
         decoration: BoxDecoration(
-          color: widget.isSecondary
+          color: widget.isDisabled
+              ? AppColors.gray
+              : widget.isSecondary
               ? AppColors.white
               : AppColors.green.shade600,
           borderRadius: BorderRadius.circular(widget.radius),

@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/user.dart';
 import 'package:jurnee/services/api_service.dart';
+import 'package:jurnee/views/screens/auth/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends GetxController {
@@ -160,6 +161,7 @@ class AuthController extends GetxController {
   }
 
   void logout() {
+    Get.offAll(() => Login());
     prefs.clear();
   }
 

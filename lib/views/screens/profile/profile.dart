@@ -470,7 +470,7 @@ class _ProfileState extends State<Profile> {
               }),
               drawerButton("Client Bookings", "client", () {
                 Get.back();
-                Get.to(() => Bookings());
+                Get.to(() => Bookings(showClientBooking: true));
                 // Get.to(() => EditProfile());
               }),
               drawerButton("Community Guidelines", "guidelines", () {

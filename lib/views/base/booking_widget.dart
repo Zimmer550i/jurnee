@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:jurnee/models/booking_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
@@ -6,7 +8,8 @@ import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 
 class BookingWidget extends StatelessWidget {
-  const BookingWidget({super.key});
+  final BookingModel booking;
+  const BookingWidget({super.key, required this.booking});
 
   @override
   Widget build(BuildContext context) {
@@ -22,24 +25,21 @@ class BookingWidget extends StatelessWidget {
         children: [
           Row(
             children: [
-              ProfilePicture(
-                image: "https://thispersondoesnotexist.com",
-                size: 40,
-              ),
+              ProfilePicture(image: booking.provider.image, size: 40),
               const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Maria Hernandez",
+                    booking.provider.name,
                     style: AppTexts.tmdm.copyWith(
                       color: AppColors.gray.shade700,
                     ),
                   ),
-                  Text(
-                    "Dj Performance",
-                    style: AppTexts.txsr.copyWith(color: AppColors.gray),
-                  ),
+                  // Text(
+                  //   "Dj Performance",
+                  //   style: AppTexts.txsr.copyWith(color: AppColors.gray),
+                  // ),
                 ],
               ),
             ],
@@ -54,20 +54,23 @@ class BookingWidget extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  "Plumbing Service",
+                  booking.service.title,
                   style: AppTexts.tmdm.copyWith(color: AppColors.gray.shade700),
                 ),
                 Spacer(),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.green.shade200,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    "See Post",
-                    style: AppTexts.tsms.copyWith(
-                      color: AppColors.green.shade900,
+                GestureDetector(
+                  // onTap: () => Get.to(()=> PostDetails(post)),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.green.shade200,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      "See Post",
+                      style: AppTexts.tsms.copyWith(
+                        color: AppColors.green.shade900,
+                      ),
                     ),
                   ),
                 ),
@@ -92,7 +95,7 @@ class BookingWidget extends StatelessWidget {
                         size: 16,
                       ),
                       Text(
-                        "Monday, June 15",
+                        DateFormat("EEE, MMMM dd").format(booking.serviceDate),
                         style: AppTexts.tsmm.copyWith(color: AppColors.gray),
                       ),
                     ],
@@ -110,7 +113,7 @@ class BookingWidget extends StatelessWidget {
                         size: 16,
                       ),
                       Text(
-                        "10:00 AM",
+                        DateFormat("hh:mm a").format(booking.serviceDate),
                         style: AppTexts.tsmm.copyWith(color: AppColors.gray),
                       ),
                     ],
@@ -120,7 +123,10 @@ class BookingWidget extends StatelessWidget {
             ),
           ),
 
-          CustomButton(text: "Mark as Complete"),
+          if (booking.status == "PROGRESS")
+            CustomButton(text: "Mark as Complete"),
+          if (booking.status == "PENDING")
+            CustomButton(text: "Make Payment", isSecondary: true),
         ],
       ),
     );

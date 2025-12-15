@@ -11,6 +11,7 @@ import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/home/post_location.dart';
+import 'package:jurnee/views/screens/post/booking_confirmation.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class ServiceBooking extends StatefulWidget {
@@ -23,15 +24,16 @@ class ServiceBooking extends StatefulWidget {
 
 class _ServiceBookingState extends State<ServiceBooking> {
   DateTime? date;
-  // Map<String, TimeSlot> selected = {};
-  List<String> selected = [];
+  // Map<String, TimeSlot> slotId = {};
+  String slotId = "";
+  String scheduleId = "";
+  DateTime? selectedDate;
 
   void _onDateSelected(DateTime? val) {
     setState(() {
       date = val;
     });
   }
-  // TODO: Add Logic for Booking
 
   @override
   Widget build(BuildContext context) {
@@ -105,11 +107,27 @@ class _ServiceBookingState extends State<ServiceBooking> {
                           GestureDetector(
                             onTap: () {
                               setState(() {
-                                if (selected.contains(i.id)) {
-                                  selected.remove(i.id);
-                                } else {
-                                  selected.add(i.id!);
-                                }
+                                setState(() {
+                                  slotId = i.id!;
+                                  final weeks = [
+                                    "mon",
+                                    "tue",
+                                    "wed",
+                                    "thu",
+                                    "fri",
+                                    "sat",
+                                    "sun",
+                                  ];
+                                  final schedule = widget.post.schedule
+                                      .firstWhere(
+                                        (val) =>
+                                            val.day == weeks[date!.weekday - 1],
+                                      );
+
+                                  scheduleId = schedule.id!;
+
+                                  selectedDate = date;
+                                });
                               });
                             },
                             child: Container(
@@ -118,11 +136,11 @@ class _ServiceBookingState extends State<ServiceBooking> {
                                 horizontal: 12,
                               ),
                               decoration: BoxDecoration(
-                                color: selected.contains(i.id)
+                                color: slotId == i.id
                                     ? AppColors.green.shade100
                                     : null,
                                 border: Border.all(
-                                  color: selected.contains(i.id)
+                                  color: slotId == i.id
                                       ? AppColors.green.shade600
                                       : AppColors.gray.shade300,
                                 ),
@@ -199,7 +217,28 @@ class _ServiceBookingState extends State<ServiceBooking> {
             left: 24,
             right: 24,
             bottom: 12,
-            child: SafeArea(child: CustomButton(text: "Continue")),
+            child: SafeArea(
+              child: CustomButton(
+                onTap: () {
+                  Get.to(
+                    () => BookingConfirmation(
+                      post: widget.post,
+                      schedule: widget.post.schedule.firstWhere(
+                        (val) => val.id! == scheduleId,
+                      ),
+                      timeSlot: widget.post.schedule
+                          .firstWhere((val) => val.id! == scheduleId)
+                          .timeSlots
+                          .firstWhere((val) => val.id == slotId),
+                      date: selectedDate!,
+                    ),
+                  );
+                },
+                isDisabled:
+                    slotId == "" || scheduleId == "" || selectedDate == null,
+                text: "Continue",
+              ),
+            ),
           ),
         ],
       ),
