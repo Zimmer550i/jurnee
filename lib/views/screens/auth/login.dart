@@ -8,6 +8,7 @@ import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/utils/get_location.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_checkbox.dart';
+import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/auth/cant_access_app.dart';
 import 'package:jurnee/views/screens/auth/forgot_password.dart';
@@ -191,9 +192,29 @@ class _LoginState extends State<Login> {
                   spacing: 20,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: CustomSvg(asset: "assets/icons/google.svg"),
+                    Obx(
+                      () => GestureDetector(
+                        onTap: () {
+                          if (!agreedTerms) {
+                            customSnackBar(
+                              "You must accept the Terms and Conditions and Privacy Policy to proceed",
+                            );
+                            return;
+                          }
+                          Get.find<AuthController>().googleSignin().then((
+                            message,
+                          ) {
+                            if (message == "success") {
+                              Get.offAll(() => Home(), routeName: "/app");
+                            } else {
+                              customSnackBar(message);
+                            }
+                          });
+                        },
+                        child: Get.find<AuthController>().googleLoading.value
+                            ? CustomLoading()
+                            : CustomSvg(asset: "assets/icons/google.svg"),
+                      ),
                     ),
                     GestureDetector(
                       onTap: () {},

@@ -1,4 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:jurnee/firebase_options.dart';
 import 'package:jurnee/themes/light_theme.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_constants.dart';
@@ -14,6 +16,7 @@ import 'helpers/route.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: ".env");
   Map<String, Map<String, String>> languages = await di.init();
   SystemChrome.setSystemUIOverlayStyle(

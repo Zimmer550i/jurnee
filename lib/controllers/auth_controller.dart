@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/user.dart';
 import 'package:jurnee/services/api_service.dart';
@@ -9,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends GetxController {
   RxBool isLoading = RxBool(false);
+  RxBool googleLoading = RxBool(false);
+  RxBool appleLoading = RxBool(false);
 
   final api = ApiService();
   late SharedPreferences prefs;
@@ -157,6 +160,41 @@ class AuthController extends GetxController {
       return e.toString();
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<String> googleSignin() async {
+    googleLoading(true);
+    try {
+      final google = GoogleSignIn();
+      final signinAccount = await google.signIn();
+
+      if (signinAccount != null) {
+        final res = await api.post("/auth/google-login", {
+          "email": signinAccount.email,
+          "name": signinAccount.displayName,
+          "image": signinAccount.photoUrl,
+          "uid": signinAccount.id,
+        });
+        final body = jsonDecode(res.body);
+
+        if (res.statusCode == 200) {
+          final data = body['data'];
+
+          Get.find<UserController>().userData = User.fromJson(data['user']);
+          api.setToken(data['accessToken']);
+          
+          return "success";
+        } else {
+          return body['message'] ?? "Something went wrong";
+        }
+      } else {
+        return "Couldn't complete Google Singin";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      googleLoading(false);
     }
   }
 
