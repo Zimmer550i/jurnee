@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -210,6 +211,7 @@ class AuthController extends GetxController {
       );
 
       if (credential.identityToken != null) {
+        debugPrint(credential.identityToken);
         final response = await api.post("/auth/apple-login", {
           "token": credential.identityToken,
         });

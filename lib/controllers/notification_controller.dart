@@ -19,12 +19,6 @@ class NotificationController extends GetxController {
   RxBool isMoreLoading = false.obs;
   RxBool isLoading = RxBool(false);
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchNotifications();
-  }
-
   Future<String> fetchNotifications({bool loadMore = false}) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 

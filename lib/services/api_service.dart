@@ -8,10 +8,10 @@ import 'package:jurnee/services/shared_prefs_service.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 
 class ApiService {
-  final String devUrl = "https://api.joinjurnee.com/api/v1";
-  final String prodUrl = "";
+  final String devUrl = "http://10.10.12.54:3001/api/v1";
+  final String prodUrl = "https://api.joinjurnee.com/api/v1";
   static final String imgUrl = "";
-  final bool inDevelopment = true;
+  final bool inDevelopment = false;
   final bool showAPICalls = true;
 
   late final String baseUrl;
