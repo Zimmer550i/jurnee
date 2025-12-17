@@ -7,6 +7,7 @@ import 'package:jurnee/models/user.dart';
 import 'package:jurnee/services/api_service.dart';
 import 'package:jurnee/views/screens/auth/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthController extends GetxController {
   RxBool isLoading = RxBool(false);
@@ -183,7 +184,7 @@ class AuthController extends GetxController {
 
           Get.find<UserController>().userData = User.fromJson(data['user']);
           api.setToken(data['accessToken']);
-          
+
           return "success";
         } else {
           return body['message'] ?? "Something went wrong";
@@ -195,6 +196,43 @@ class AuthController extends GetxController {
       return e.toString();
     } finally {
       googleLoading(false);
+    }
+  }
+
+  Future<String> appleLogin() async {
+    appleLoading(true);
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      if (credential.identityToken != null) {
+        final response = await api.post("/auth/apple-login", {
+          "token": credential.identityToken,
+        });
+
+        var body = jsonDecode(response.body);
+
+        if (response.statusCode == 200) {
+          final data = body['data'];
+
+          Get.find<UserController>().userData = User.fromJson(data['user']);
+          api.setToken(data['accessToken']);
+
+          return "success";
+        } else {
+          return body['message'] ?? "Connection Error";
+        }
+      } else {
+        return "Apple Sign in failed.";
+      }
+    } catch (e) {
+      return "Unexpected error: ${e.toString()}";
+    } finally {
+      appleLoading(false);
     }
   }
 

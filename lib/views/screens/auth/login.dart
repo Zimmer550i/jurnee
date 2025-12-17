@@ -212,15 +212,35 @@ class _LoginState extends State<Login> {
                           });
                         },
                         child: Get.find<AuthController>().googleLoading.value
-                            ? CustomLoading()
+                            ? CustomLoading(
+                              color: AppColors.red.shade300,
+                            )
                             : CustomSvg(asset: "assets/icons/google.svg"),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        customSnackBar("Apple Signin not implemented");
-                      },
-                      child: CustomSvg(asset: "assets/icons/apple.svg"),
+                    Obx(
+                      () => GestureDetector(
+                        onTap: () {
+                          if (!agreedTerms) {
+                            customSnackBar(
+                              "You must accept the Terms and Conditions and Privacy Policy to proceed",
+                            );
+                            return;
+                          }
+                          Get.find<AuthController>().appleLogin().then((
+                            message,
+                          ) {
+                            if (message == "success") {
+                              Get.offAll(() => Home(), routeName: "/app");
+                            } else {
+                              customSnackBar(message);
+                            }
+                          });
+                        },
+                        child: Get.find<AuthController>().appleLoading.value
+                            ? CustomLoading(color: Colors.black)
+                            : CustomSvg(asset: "assets/icons/apple.svg"),
+                      ),
                     ),
                   ],
                 ),
