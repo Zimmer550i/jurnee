@@ -26,10 +26,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -54,9 +51,21 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBmwuiUS2JS0yiQI8P4tngFZc41NSXh09g',
-    appId: '1:634424633336:android:b578a06819abf8ef84d80d',
+    appId: '1:634424633336:android:ff1d864e718ce89284d80d',
     messagingSenderId: '634424633336',
     projectId: 'jurnee-f0ef7',
     storageBucket: 'jurnee-f0ef7.firebasestorage.app',
   );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCJFSKSX3GRyQ2huUYB7Cxft0Q3IXH-rD8',
+    appId: '1:634424633336:ios:1f051525828a3d0684d80d',
+    messagingSenderId: '634424633336',
+    projectId: 'jurnee-f0ef7',
+    storageBucket: 'jurnee-f0ef7.firebasestorage.app',
+    androidClientId: '634424633336-lqf5bt0k5pq6u7h60tp93k6o9l74o3f2.apps.googleusercontent.com',
+    iosClientId: '634424633336-iafq9emvgsdqss0k6js8aggd4bn2jt5e.apps.googleusercontent.com',
+    iosBundleId: 'com.joinjurnee.jurnee',
+  );
+
 }

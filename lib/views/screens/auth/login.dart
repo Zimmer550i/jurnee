@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
@@ -197,12 +195,6 @@ class _LoginState extends State<Login> {
                     Obx(
                       () => GestureDetector(
                         onTap: () {
-                          if (!Platform.isAndroid) {
-                            customSnackBar(
-                              "Google Singin not implemented in iOS",
-                            );
-                            return;
-                          }
                           if (!agreedTerms) {
                             customSnackBar(
                               "You must accept the Terms and Conditions and Privacy Policy to proceed",
