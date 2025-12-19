@@ -114,7 +114,7 @@ class _LocationMapState extends State<LocationMap> {
   }
 
   void loadMarkers() async {
-    for (var i in post.postMap[PostType.defaultPosts] ?? <PostModel>[]) {
+    for (var i in post.posts) {
       final latlng = LatLng(
         i.location.coordinates[1],
         i.location.coordinates[0],

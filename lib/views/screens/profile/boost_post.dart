@@ -10,6 +10,7 @@ import 'package:jurnee/views/base/post_card_small.dart';
 class BoostPost extends StatelessWidget {
   final PostModel post;
   const BoostPost({super.key, required this.post});
+  // TODO: Add API
 
   @override
   Widget build(BuildContext context) {

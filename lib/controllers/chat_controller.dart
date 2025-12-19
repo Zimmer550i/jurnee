@@ -14,7 +14,7 @@ class ChatController extends GetxController {
 
   RxBool isConnected = RxBool(false);
   IO.Socket? socket;
-  final _socketUrl = "http://10.10.12.54:3001";
+  final _socketUrl = "https://api.joinjurnee.com/";
 
   final RxList<ChatModel> chats = RxList.empty();
   final RxList<MessageModel> messages = RxList.empty();

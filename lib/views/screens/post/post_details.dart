@@ -19,7 +19,10 @@ import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/rating_widget.dart';
 import 'package:jurnee/views/screens/home/post_location.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
+import 'package:jurnee/views/screens/post/post_deal.dart';
+import 'package:jurnee/views/screens/post/post_event.dart';
 import 'package:jurnee/views/screens/post/service_booking.dart';
+import 'package:jurnee/views/screens/profile/boost_post.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -39,7 +42,7 @@ class PostDetails extends StatelessWidget {
 
           SharePlus.instance.share(
             ShareParams(
-              text: "Check out this post on Jurnee:\n$deepLink",
+              text: "Check out ${post.title} on Jurnee:\n$deepLink",
               subject: "Jurnee Post",
             ),
           );
@@ -514,28 +517,28 @@ class PostDetails extends StatelessWidget {
   }
 
   Widget getButton(bool isOwner) {
-    // if (isOwner) {
-    //   return Column(
-    //     spacing: 8,
-    //     children: [
-    //       CustomButton(
-    //         onTap: () {
-    //           if (post.category == "Event") {
-    //             Get.to(() => PostEvent(post: post));
-    //           } else if (post.category == "Deal") {
-    //             Get.to(() => PostDeal(post: post));
-    //           }
-    //         },
-    //         text: "Edit Post",
-    //         isSecondary: true,
-    //       ),
-    //       CustomButton(
-    //         onTap: () => Get.to(() => BoostPost(post: post)),
-    //         text: "Boost Post",
-    //       ),
-    //     ],
-    //   );
-    // }
+    if (isOwner) {
+      return Column(
+        spacing: 8,
+        children: [
+          CustomButton(
+            onTap: () {
+              if (post.category == "Event") {
+                Get.to(() => PostEvent(post: post));
+              } else if (post.category == "Deal") {
+                Get.to(() => PostDeal(post: post));
+              }
+            },
+            text: "Edit Post",
+            isSecondary: true,
+          ),
+          CustomButton(
+            onTap: () => Get.to(() => BoostPost(post: post)),
+            text: "Boost Post",
+          ),
+        ],
+      );
+    }
 
     if (post.schedule.isEmpty) {
       return CustomButton(onTap: () {}, text: "Contact Owner");

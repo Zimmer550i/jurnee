@@ -124,8 +124,7 @@ class HomepageState extends State<Homepage> {
                           child: Column(
                             children: [
                               const SizedBox(height: 12),
-                              for (var i
-                                  in post.postMap[PostType.defaultPosts]!)
+                              for (var i in post.posts)
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 20),
                                   child: PostCard(i),

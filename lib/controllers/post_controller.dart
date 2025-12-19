@@ -12,9 +12,7 @@ enum PostType { defaultPosts }
 
 class PostController extends GetxController {
   final api = ApiService();
-  RxMap<PostType, RxList<PostModel>> postMap = <PostType, RxList<PostModel>>{
-    for (var e in PostType.values) e: <PostModel>[].obs,
-  }.obs;
+  RxList<PostModel> posts = RxList.empty();
   Rxn<Position> userLocation = Rxn();
   RxBool isLoading = RxBool(false);
 
@@ -109,7 +107,7 @@ class PostController extends GetxController {
 
       if (res.statusCode == 200) {
         if (!loadMore) {
-          postMap[PostType.defaultPosts]!.clear();
+          posts.clear();
         }
         final meta = PaginationMeta.fromJson(body['meta']);
         totalPages(meta.totalPage);
@@ -117,7 +115,7 @@ class PostController extends GetxController {
         final List<dynamic> dataList = body['data'];
         final newItems = dataList.map((e) => PostModel.fromJson(e)).toList();
 
-        postMap[PostType.defaultPosts]!.addAll(newItems);
+        posts.addAll(newItems);
 
         return "success";
       } else {
@@ -161,17 +159,15 @@ class PostController extends GetxController {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        // final data = body['data'];
+        final data = body['data'];
 
-        // final post = PostModel.fromJson(data);
+        final post = PostModel.fromJson(data);
 
-        // int? index = postMap[PostType.defaultPosts]?.indexWhere(
-        //   (val) => val.id == id,
-        // );
+        int? index = posts.indexWhere((val) => val.id == id);
 
-        // if (index != null && index != -1) {
-        //   postMap[PostType.defaultPosts]![index] = post;
-        // }
+        if (index != -1) {
+          posts[index] = post;
+        }
 
         return "success";
       } else {

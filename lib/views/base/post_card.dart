@@ -68,15 +68,15 @@ class PostCard extends StatelessWidget {
                             ),
                           ),
                           Container(),
-                          CustomSvg(asset: "assets/icons/star.svg"),
-                          Text(
-                            post.averageRating == null
-                                ? "N/A"
-                                : post.averageRating!.toString(),
-                            style: AppTexts.tsmm.copyWith(
-                              color: AppColors.gray.shade600,
+                          if (post.averageRating != null)
+                            CustomSvg(asset: "assets/icons/star.svg"),
+                          if (post.averageRating != null)
+                            Text(
+                              post.averageRating!.toString(),
+                              style: AppTexts.tsmm.copyWith(
+                                color: AppColors.gray.shade600,
+                              ),
                             ),
-                          ),
                         ],
                       ),
 
