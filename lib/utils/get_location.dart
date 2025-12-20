@@ -6,17 +6,17 @@ import 'package:jurnee/utils/custom_snackbar.dart';
 
 /// 1. getLocation with caching logic and override parameter
 Future<Position?> getLocation({
-  bool forceRefresh = false,
+  // bool forceRefresh = false,
   Duration cacheDuration = const Duration(hours: 1),
 }) async {
-  // Check cache if we aren't forcing a refresh
-  if (!forceRefresh) {
-    final cachedPos = await _getCachedPosition(cacheDuration);
-    if (cachedPos != null) {
-      debugPrint("📍 Returning cached location");
-      return cachedPos;
-    }
-  }
+  // // Check cache if we aren't forcing a refresh
+  // if (!forceRefresh) {
+  //   final cachedPos = await _getCachedPosition(cacheDuration);
+  //   if (cachedPos != null) {
+  //     debugPrint("📍 Returning cached location");
+  //     return cachedPos;
+  //   }
+  // }
 
   // Request permissions
   final permission = await _handlePermission();
@@ -63,66 +63,61 @@ void _savePosition(Position pos) {
   SharedPrefsService.set("latitude", pos.latitude);
   SharedPrefsService.set("longitude", pos.longitude);
   // Save the current time as an ISO string
-  SharedPrefsService.set("location_timestamp", DateTime.now().toIso8601String()); 
-  
-  debugPrint("📍 Location Saved: ${pos.latitude}, ${pos.longitude} at ${DateTime.now()}");
+  SharedPrefsService.set(
+    "location_timestamp",
+    DateTime.now().toIso8601String(),
+  );
+
+  debugPrint(
+    "📍 Location Saved: ${pos.latitude}, ${pos.longitude} at ${DateTime.now()}",
+  );
 }
 
 /// Helper to retrieve cached position
-Future<Position?> _getCachedPosition(Duration threshold) async {
-  try {
-    // Assuming SharedPrefsService has getters. Adjust types if your service is different.
-    final String? timestampStr = await SharedPrefsService.get("location_timestamp");
-    final double? lat = await SharedPrefsService.getDouble("latitude");
-    final double? lng = await SharedPrefsService.getDouble("longitude");
+// Future<Position?> _getCachedPosition(Duration threshold) async {
+//   try {
+//     // Assuming SharedPrefsService has getters. Adjust types if your service is different.
+//     final String? timestampStr = await SharedPrefsService.get(
+//       "location_timestamp",
+//     );
+//     final double? lat = await SharedPrefsService.getDouble("latitude");
+//     final double? lng = await SharedPrefsService.getDouble("longitude");
 
-    if (timestampStr != null && lat != null && lng != null) {
-      final DateTime savedTime = DateTime.parse(timestampStr);
-      final DateTime now = DateTime.now();
+//     if (timestampStr != null && lat != null && lng != null) {
+//       final DateTime savedTime = DateTime.parse(timestampStr);
+//       final DateTime now = DateTime.now();
 
-      // Check if the saved time is within the threshold
-      if (now.difference(savedTime) < threshold) {
-        // Reconstruct a Position object
-        return Position(
-          longitude: lng,
-          latitude: lat,
-          timestamp: savedTime,
-          accuracy: 0.0,
-          altitude: 0.0,
-          altitudeAccuracy: 0.0,
-          heading: 0.0,
-          headingAccuracy: 0.0,
-          speed: 0.0,
-          speedAccuracy: 0.0,
-          isMocked: false, // Assuming cached isn't mocked
-        );
-      }
-    }
-  } catch (e) {
-    debugPrint("⚠️ Error reading cached location: $e");
-  }
-  return null;
-}
+//       // Check if the saved time is within the threshold
+//       if (now.difference(savedTime) < threshold) {
+//         // Reconstruct a Position object
+//         return Position(
+//           longitude: lng,
+//           latitude: lat,
+//           timestamp: savedTime,
+//           accuracy: 0.0,
+//           altitude: 0.0,
+//           altitudeAccuracy: 0.0,
+//           heading: 0.0,
+//           headingAccuracy: 0.0,
+//           speed: 0.0,
+//           speedAccuracy: 0.0,
+//           isMocked: false, // Assuming cached isn't mocked
+//         );
+//       }
+//     }
+//   } catch (e) {
+//     debugPrint("⚠️ Error reading cached location: $e");
+//   }
+//   return null;
+// }
 
 Future<bool> isUserInCalifornia() async {
   // You can pass forceRefresh: true here if you want to ensure fresh data
   Position? pos = await getLocation();
 
-  // NOTE: The block below overrides the logic with hardcoded data 
-  // as per your original code snippet.
-  pos = Position(
-    latitude: 44.7749,
-    longitude: -122.4194,
-    timestamp: DateTime.now(),
-    accuracy: 5.0,
-    altitude: 10.0,
-    altitudeAccuracy: 5.0,
-    heading: 0.0,
-    headingAccuracy: 0.0,
-    speed: 0.0,
-    speedAccuracy: 0.0,
-    isMocked: true,
-  );
+  if (pos == null) {
+    return true;
+  }
 
   try {
     final placemarks = await placemarkFromCoordinates(

@@ -2,9 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jurnee/controllers/maps_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
-import 'package:jurnee/utils/get_location.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_drop_down.dart';
@@ -13,7 +14,8 @@ import 'package:jurnee/views/screens/post/location_picker.dart';
 import 'package:jurnee/views/screens/post/post_base_widget.dart';
 
 class PostAlert extends StatefulWidget {
-  const PostAlert({super.key});
+  final PostModel? post;
+  const PostAlert({super.key, this.post});
 
   @override
   State<PostAlert> createState() => _PostAlertState();
@@ -21,6 +23,7 @@ class PostAlert extends StatefulWidget {
 
 class _PostAlertState extends State<PostAlert> {
   final GlobalKey<PostBaseWidgetState> _baseKey = GlobalKey();
+  final map = Get.find<MapsController>();
   final hashtagCtrl = TextEditingController();
   final contactCtrl = TextEditingController();
   final nameCtrl = TextEditingController();
@@ -38,12 +41,54 @@ class _PostAlertState extends State<PostAlert> {
   String expiry = "7 Days";
   DateTime? date;
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.post != null) populateFields();
+  }
+
+  void populateFields() {
+    // Base Widget
+    WidgetsBinding.instance.addPostFrameCallback((val) {
+      setState(() {
+        _baseKey.currentState!.titleCtrl.text = widget.post!.title;
+        _baseKey.currentState!.descriptionCtrl.text = widget.post!.description;
+        _baseKey.currentState!.locationCtrl.text = widget.post!.address;
+        _baseKey.currentState!.coverImgUrl = widget.post!.image;
+        _baseKey.currentState!.imageUrls =
+            widget.post!.media ?? List.generate(5, (_) => null);
+      });
+    });
+
+    // Others
+    category = widget.post!.subcategory;
+    hashtagCtrl.text = widget.post!.hasTag?.join(" ") ?? "";
+
+    if (category == "Missing Person") {
+      nameCtrl.text = widget.post!.missingName ?? "";
+      ageCtrl.text = widget.post!.missingAge?.toString() ?? "";
+      clothCtrl.text = widget.post!.clothingDescription ?? "";
+      date = widget.post!.lastSeenDate;
+    }
+  }
+
   void publish() async {
     if (!isValid()) {
       return;
     }
 
-    final pos = await getLocation();
+    late Map<String, dynamic> pos;
+
+    if (widget.post == null) {
+      pos = await map.getPlacePosition(map.selected.value!.placeId) ?? {};
+    } else {
+      pos =
+          await map.getPlacePosition(map.selected.value?.placeId) ??
+          {
+            "lng": widget.post!.location.coordinates[0],
+            "lat": widget.post!.location.coordinates[1],
+          };
+    }
 
     Map<String, dynamic> payload = {
       "data": {
@@ -54,7 +99,7 @@ class _PostAlertState extends State<PostAlert> {
         "address": _baseKey.currentState?.locationCtrl.text.trim(),
         "location": {
           "type": "Point",
-          "coordinates": [pos!.longitude, pos.latitude],
+          "coordinates": [pos['lng'], pos['lat']],
         },
         "hasTag": hashtagCtrl.text.split(" "),
         "contactInfo": contactCtrl.text,
@@ -72,7 +117,7 @@ class _PostAlertState extends State<PostAlert> {
         "lastSeenDate": date!.toIso8601String(),
         "lastSeenLocation": {
           "type": "Point",
-          "coordinates": [pos.longitude, pos.latitude],
+          "coordinates": [pos['lng'], pos['lat']],
         },
       });
     }
@@ -139,6 +184,15 @@ class _PostAlertState extends State<PostAlert> {
               CustomDropDown(
                 title: "Category",
                 hintText: "Choose alert category",
+                initialPick: category != null
+                    ? [
+                        "Community Update",
+                        "Safety Alert",
+                        "Lost & Found",
+                        "Weather / Hazard",
+                        "Missing Person",
+                      ].indexOf(category!)
+                    : null,
                 options: [
                   "Community Update",
                   "Safety Alert",

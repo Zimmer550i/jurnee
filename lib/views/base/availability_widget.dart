@@ -7,7 +7,8 @@ import 'package:jurnee/views/base/custom_checkbox.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 
 class AvailabilityWidget extends StatefulWidget {
-  const AvailabilityWidget({super.key});
+  final List<Schedule>? initialSchedule;
+  const AvailabilityWidget({super.key, this.initialSchedule});
 
   @override
   State<AvailabilityWidget> createState() => AvailabilityWidgetState();
@@ -25,6 +26,18 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
   ];
   bool repeat = false;
   int index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialSchedule != null) {
+      for (var i in widget.initialSchedule!) {
+        var index = schedule.indexWhere((val) => val.day == i.day);
+        schedule.removeAt(index);
+        schedule.insert(index, i);
+      }
+    }
+  }
 
   List<Map<String, dynamic>> getSchedule() {
     List<Map<String, dynamic>> rtn = [];

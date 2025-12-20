@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/maps_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
-import 'package:jurnee/utils/get_location.dart';
 import 'package:jurnee/views/base/availability_widget.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
@@ -24,6 +24,7 @@ class PostService extends StatefulWidget {
 class _PostServiceState extends State<PostService> {
   final GlobalKey<AvailabilityWidgetState> _availabilityKey = GlobalKey();
   final GlobalKey<PostBaseWidgetState> _baseKey = GlobalKey();
+  final map = Get.find<MapsController>();
   final hashtagCtrl = TextEditingController();
   final priceCtrl = TextEditingController();
   final serviceTypeCtrl = TextEditingController();
@@ -38,12 +39,66 @@ class _PostServiceState extends State<PostService> {
   TimeOfDay? time;
   String? subCategory;
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.post != null) populateFields();
+  }
+
+  void populateFields() {
+    // Base Widget
+    WidgetsBinding.instance.addPostFrameCallback((val) {
+      setState(() {
+        _baseKey.currentState!.titleCtrl.text = widget.post!.title;
+        _baseKey.currentState!.descriptionCtrl.text = widget.post!.description;
+        _baseKey.currentState!.locationCtrl.text = widget.post!.address;
+        _baseKey.currentState!.coverImgUrl = widget.post!.image;
+        _baseKey.currentState!.imageUrls =
+            widget.post!.media ?? List.generate(5, (_) => null);
+      });
+    });
+
+    // Others
+    subCategory = widget.post!.subcategory;
+    hashtagCtrl.text = widget.post!.hasTag?.join(" ") ?? "";
+
+    // Populate category-specific fields
+    switch (subCategory) {
+      case "Food & Beverage":
+        priceCtrl.text = widget.post!.price?.toString() ?? "";
+        break;
+      case "Entertainment":
+        priceCtrl.text = widget.post!.price?.toString() ?? "";
+        break;
+      case "Personal/Home Services":
+        priceCtrl.text = widget.post!.price?.toString() ?? "";
+        serviceTypeCtrl.text = widget.post!.serviceType ?? "";
+        break;
+      case "Venues":
+        priceCtrl.text = widget.post!.price?.toString() ?? "";
+        capacityCtrl.text = widget.post!.capacity?.toString() ?? "";
+        amenitiesCtrl.text = widget.post!.amenities?.join(", ") ?? "";
+        break;
+    }
+  }
+
   void publish() async {
     if (!isValid()) {
       return;
     }
 
-    final pos = await getLocation();
+    late Map<String, dynamic> pos;
+
+    if (widget.post == null) {
+      pos = await map.getPlacePosition(map.selected.value!.placeId) ?? {};
+    } else {
+      pos =
+          await map.getPlacePosition(map.selected.value?.placeId) ??
+          {
+            "lng": widget.post!.location.coordinates[0],
+            "lat": widget.post!.location.coordinates[1],
+          };
+    }
 
     Map<String, dynamic> payload = {
       "data": {
@@ -54,7 +109,7 @@ class _PostServiceState extends State<PostService> {
         "address": _baseKey.currentState?.locationCtrl.text.trim(),
         "location": {
           "type": "Point",
-          "coordinates": [pos!.longitude, pos.latitude],
+          "coordinates": [pos['lng'], pos['lat']],
         },
         "hasTag": hashtagCtrl.text.split(" "),
 
@@ -145,7 +200,10 @@ class _PostServiceState extends State<PostService> {
           child: Column(
             children: [
               PostBaseWidget(key: _baseKey),
-              AvailabilityWidget(key: _availabilityKey),
+              AvailabilityWidget(
+                key: _availabilityKey,
+                initialSchedule: widget.post?.schedule,
+              ),
 
               const SizedBox(height: 16),
               CustomTextField(
@@ -156,6 +214,14 @@ class _PostServiceState extends State<PostService> {
               const SizedBox(height: 16),
               CustomDropDown(
                 title: "Category",
+                initialPick: subCategory != null
+                    ? [
+                        "Food & Beverage",
+                        "Entertainment",
+                        "Personal/Home Services",
+                        "Venues",
+                      ].indexOf(subCategory!)
+                    : null,
                 onChanged: (val) {
                   setState(() {
                     subCategory = val;

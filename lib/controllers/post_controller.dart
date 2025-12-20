@@ -31,19 +31,21 @@ class PostController extends GetxController {
   Rxn<LatLng> customLocation = Rxn();
   Rxn<DateTime> date = Rxn<DateTime>();
 
-  void fetchLocation() {
-    getLocation().then((val) {
+  Future<void> fetchLocation() async {
+    await getLocation().then((val) {
       userLocation.value = val;
     });
-    getLocation(forceRefresh: true).then((val) {
-      userLocation.value = val;
-      Get.find<UserController>().updateUserData({
+    if (userLocation.value != null) {
+      await Get.find<UserController>().updateUserData({
         "location": {
           "type": "Point",
-          "coordinates": [val!.longitude, val.latitude],
+          "coordinates": [
+            userLocation.value!.longitude,
+            userLocation.value!.latitude,
+          ],
         },
       });
-    });
+    }
   }
 
   String getDistance(double targetLong, double targetLat) {
@@ -71,7 +73,10 @@ class PostController extends GetxController {
     return cleaned;
   }
 
-  Future<String> fetchPosts({bool loadMore = false, String? category}) async {
+  Future<String> fetchPosts({
+    bool loadMore = false,
+    String? category,
+  }) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 
     if (!loadMore) {

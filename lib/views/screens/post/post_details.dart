@@ -19,8 +19,10 @@ import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/rating_widget.dart';
 import 'package:jurnee/views/screens/home/post_location.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
+import 'package:jurnee/views/screens/post/post_alert.dart';
 import 'package:jurnee/views/screens/post/post_deal.dart';
 import 'package:jurnee/views/screens/post/post_event.dart';
+import 'package:jurnee/views/screens/post/post_service.dart';
 import 'package:jurnee/views/screens/post/service_booking.dart';
 import 'package:jurnee/views/screens/profile/boost_post.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
@@ -523,10 +525,14 @@ class PostDetails extends StatelessWidget {
         children: [
           CustomButton(
             onTap: () {
-              if (post.category == "Event") {
+              if (post.category.toLowerCase() == "event") {
                 Get.to(() => PostEvent(post: post));
-              } else if (post.category == "Deal") {
+              } else if (post.category.toLowerCase() == "deal") {
                 Get.to(() => PostDeal(post: post));
+              } else if (post.category.toLowerCase() == "alert") {
+                Get.to(() => PostAlert(post: post));
+              } else if (post.category.toLowerCase() == "service") {
+                Get.to(() => PostService(post: post));
               }
             },
             text: "Edit Post",
