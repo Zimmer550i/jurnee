@@ -29,6 +29,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int index = 0;
   bool showOverlay = false;
+  bool showNavBar = false;
 
   @override
   void initState() {
@@ -275,6 +276,9 @@ class _HomeState extends State<Home> {
                   state.setState(() {
                     state.showMap = !state.showMap;
                   });
+                  setState(() {
+                    showNavBar = !state.showMap;
+                  });
                 }
                 // Get.to(
                 //   () => Homepage(showMap: true),
@@ -291,20 +295,22 @@ class _HomeState extends State<Home> {
                 child: Center(child: CustomSvg(asset: "assets/icons/map.svg")),
               ),
             ),
-      bottomNavigationBar: CustomBottomNavbar(
-        index: index,
-        showOverlay: showOverlay,
-        onChanged: (val) {
-          setState(() {
-            index = val;
-          });
-        },
-        onShowOverlay: () {
-          setState(() {
-            showOverlay = !showOverlay;
-          });
-        },
-      ),
+      bottomNavigationBar: showNavBar
+          ? CustomBottomNavbar(
+              index: index,
+              showOverlay: showOverlay,
+              onChanged: (val) {
+                setState(() {
+                  index = val;
+                });
+              },
+              onShowOverlay: () {
+                setState(() {
+                  showOverlay = !showOverlay;
+                });
+              },
+            )
+          : null,
     );
   }
 }

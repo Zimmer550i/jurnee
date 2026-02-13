@@ -36,6 +36,7 @@ class _SearchWidgetState extends State<SearchWidget> {
   double? distance;
   String? placeId;
 
+  //TODO: Fix Search Enabled
   @override
   Widget build(BuildContext context) {
     return Container(
