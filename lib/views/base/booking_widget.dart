@@ -7,6 +7,7 @@ import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 
+
 class BookingWidget extends StatelessWidget {
   final BookingModel booking;
   const BookingWidget({super.key, required this.booking});
@@ -49,7 +50,14 @@ class BookingWidget extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: AppColors.gray.shade100,
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  offset: Offset(0, 3),
+                  blurRadius: 9.8,
+                  color: Colors.black.withValues(alpha: 0.1),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -58,21 +66,12 @@ class BookingWidget extends StatelessWidget {
                   style: AppTexts.tmdm.copyWith(color: AppColors.gray.shade700),
                 ),
                 Spacer(),
-                GestureDetector(
-                  // onTap: () => Get.to(()=> PostDetails(post)),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.green.shade200,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      "See Post",
-                      style: AppTexts.tsms.copyWith(
-                        color: AppColors.green.shade900,
-                      ),
-                    ),
-                  ),
+                CustomButton(
+                  text: "See Post",
+                  width: null,
+                  padding: 12,
+                  height: 36,
+                  radius: 8,
                 ),
               ],
             ),
@@ -81,7 +80,14 @@ class BookingWidget extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: AppColors.gray.shade100,
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  offset: Offset(0, 3),
+                  blurRadius: 9.8,
+                  color: Colors.black.withValues(alpha: 0.1),
+                ),
+              ],
             ),
             child: Row(
               children: [
