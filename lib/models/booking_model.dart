@@ -1,3 +1,31 @@
+enum BookingStatus { progress, completed, cancelled, unknown }
+
+BookingStatus parseBookingStatus(String status) {
+  switch (status.toUpperCase()) {
+    case "PROGRESS":
+      return BookingStatus.progress;
+    case "COMPLETED":
+      return BookingStatus.completed;
+    case "CANCELLED":
+      return BookingStatus.cancelled;
+    default:
+      return BookingStatus.unknown;
+  }
+}
+
+String bookingStatusToString(BookingStatus status) {
+  switch (status) {
+    case BookingStatus.progress:
+      return "PROGRESS";
+    case BookingStatus.completed:
+      return "COMPLETED";
+    case BookingStatus.cancelled:
+      return "CANCELLED";
+    default:
+      return "UNKNOWN";
+  }
+}
+
 class BookingService {
   final String id;
   final String title;
@@ -72,7 +100,7 @@ class BookingModel {
   final String slotStart;
   final String slotEnd;
   final DateTime serviceDate;
-  final String status;
+  final BookingStatus status;
   final num amount;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -106,7 +134,7 @@ class BookingModel {
       slotStart: json['slotStart'] as String,
       slotEnd: json['slotEnd'] as String,
       serviceDate: DateTime.parse(json['serviceDate']),
-      status: json['status'] as String,
+      status: parseBookingStatus(json['status'] as String),
       amount: json['amount'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
@@ -125,7 +153,7 @@ class BookingModel {
       'slotStart': slotStart,
       'slotEnd': slotEnd,
       'serviceDate': serviceDate.toIso8601String(),
-      'status': status,
+      'status': bookingStatusToString(status),
       'amount': amount,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
@@ -143,7 +171,7 @@ class BookingModel {
     String? slotStart,
     String? slotEnd,
     DateTime? serviceDate,
-    String? status,
+    BookingStatus? status,
     num? amount,
     DateTime? createdAt,
     DateTime? updatedAt,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jurnee/models/booking_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
@@ -6,7 +7,7 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
-
+import 'package:jurnee/views/screens/profile/mark_as_complete.dart';
 
 class BookingWidget extends StatelessWidget {
   final BookingModel booking;
@@ -129,9 +130,12 @@ class BookingWidget extends StatelessWidget {
             ),
           ),
 
-          if (booking.status == "PROGRESS")
-            CustomButton(text: "Mark as Complete"),
-          if (booking.status == "PENDING")
+          if (booking.status == BookingStatus.progress)
+            CustomButton(
+              onTap: () => Get.to(() => MarkAsComplete(booking: booking)),
+              text: "Mark as Complete",
+            ),
+          if (booking.status == BookingStatus.completed)
             CustomButton(text: "Make Payment", isSecondary: true),
         ],
       ),
