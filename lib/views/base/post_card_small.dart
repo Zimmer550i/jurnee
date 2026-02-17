@@ -10,28 +10,35 @@ import 'package:jurnee/views/screens/post/post_details.dart';
 
 class PostCardSmall extends StatelessWidget {
   final PostModel post;
-  final double multiplier;
-  const PostCardSmall({super.key, required this.post, this.multiplier = 1});
+  final double witdth;
+  const PostCardSmall({super.key, required this.post, this.witdth = 350});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => Get.to(() => PostDetails(post)),
       child: Container(
-        height: 126,
-        width: 350,
+        // height: 126,
+        width: witdth,
         padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.green, width: 0.5),
+          boxShadow: [
+            BoxShadow(
+              offset: Offset(0, 3),
+              blurRadius: 9.8,
+              color: Colors.black12,
+            ),
+          ],
         ),
         child: Row(
-          spacing: 20,
+          spacing: 8,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CustomNetworkedImage(
               url: post.image,
-              radius: 10,
+              radius: 8,
               height: 102,
               width: 102,
             ),
@@ -39,21 +46,33 @@ class PostCardSmall extends StatelessWidget {
               child: Column(
                 spacing: 8,
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Text(
+                      post.category,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontFamily: "Lato",
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.gray.shade700,
+                      ),
+                    ),
+                  ),
                   Text(
                     post.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: AppTexts.dxss.copyWith(
-                      color: AppColors.gray.shade600,
+                    style: AppTexts.tmds.copyWith(
+                      color: AppColors.gray.shade700,
                     ),
                   ),
-                  
                   Row(
                     spacing: 4,
                     children: [
-                      CustomSvg(asset: "assets/icons/location.svg"),
+                      CustomSvg(asset: "assets/icons/location.svg", size: 16),
                       Text(
                         Get.find<PostController>().getDistance(
                           post.location.coordinates[0],
@@ -64,13 +83,15 @@ class PostCardSmall extends StatelessWidget {
                         ),
                       ),
                       Container(),
-                      CustomSvg(asset: "assets/icons/star.svg"),
-                      Text(
-                        (post.averageRating ?? "N/A").toString(),
-                        style: AppTexts.tsmm.copyWith(
-                          color: AppColors.gray.shade600,
+                      if (post.averageRating != null)
+                        CustomSvg(asset: "assets/icons/star.svg"),
+                      if (post.averageRating != null)
+                        Text(
+                          (post.averageRating).toString(),
+                          style: AppTexts.tsmm.copyWith(
+                            color: AppColors.gray.shade600,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ],

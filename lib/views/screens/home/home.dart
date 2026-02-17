@@ -29,7 +29,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int index = 0;
   bool showOverlay = false;
-  bool showNavBar = false;
+  bool showNavBar = true;
 
   @override
   void initState() {

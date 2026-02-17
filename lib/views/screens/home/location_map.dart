@@ -88,51 +88,64 @@ class _LocationMapState extends State<LocationMap> {
             child: PostCardSmall(post: cardPost!),
           ),
 
-        DraggableScrollableSheet(
-          initialChildSize: 0.3,
-          minChildSize: 0.3,
-          maxChildSize: 1,
-          snap: true,
-          snapSizes: [0.3, 0.6, 1],
-          builder: (context, controller) => ListView(
-            physics: ClampingScrollPhysics(),
-            controller: controller,
-            children: [
-              Container(
-                padding: EdgeInsets.only(top: 12, left: 16, right: 16),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 38,
-                      height: 3,
-                      decoration: BoxDecoration(
-                        color: AppColors.gray.shade200,
-                        borderRadius: BorderRadius.circular(99),
-                      ),
+        // TODO: Fix the ditached scroll
+        Positioned.fill(
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.2,
+            minChildSize: 0.2,
+            maxChildSize: 1,
+            snap: true,
+            snapSizes: [0.2, 0.6, 1],
+            builder: (context, controller) => ListView(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+              controller: controller,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(top: 12, left: 16, right: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(25),
                     ),
-                    const SizedBox(height: 16),
-                    for (var i in post.posts)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: PostCardSmall(post: i),
-                      ),
-                    if (post.isMoreLoading.value) CustomLoading(),
-                    if (!post.isMoreLoading.value)
-                      Text(
-                        "End of list",
-                        style: AppTexts.tsmr.copyWith(
-                          color: AppColors.gray.shade300,
+                  ),
+                  child: Obx(
+                    () => Column(
+                      children: [
+                        Container(
+                          width: 38,
+                          height: 3,
+                          decoration: BoxDecoration(
+                            color: AppColors.gray.shade200,
+                            borderRadius: BorderRadius.circular(99),
+                          ),
                         ),
-                      ),
-                    const SizedBox(height: 24),
-                  ],
+                        const SizedBox(height: 16),
+                        if (post.isFirstLoad.value) CustomLoading(),
+                        for (var i in post.posts)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: PostCardSmall(
+                              post: i,
+                              witdth: double.infinity,
+                            ),
+                          ),
+                        if (post.isMoreLoading.value) CustomLoading(),
+                        if (!post.isMoreLoading.value)
+                          Text(
+                            "End of list",
+                            style: AppTexts.tsmr.copyWith(
+                              color: AppColors.gray.shade300,
+                            ),
+                          ),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
