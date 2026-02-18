@@ -8,7 +8,9 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_list_handler.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
+import 'package:jurnee/views/base/offer_widget.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
+import 'package:jurnee/views/screens/messages/create_offer.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
 class Chat extends StatefulWidget {
@@ -65,18 +67,30 @@ class _ChatState extends State<Chat> {
         surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.white,
         elevation: 0,
-        title: GestureDetector(
-          onTap: () => Get.to(() => Profile(userId: widget.chatMember.id)),
-          child: Row(
-            spacing: 12,
-            children: [
-              ProfilePicture(image: widget.chatMember.image, size: 40),
-              Text(
-                widget.chatMember.name,
-                style: AppTexts.tlgb.copyWith(color: AppColors.gray),
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () => Get.to(() => Profile(userId: widget.chatMember.id)),
+              child: Row(
+                spacing: 12,
+                children: [
+                  ProfilePicture(image: widget.chatMember.image, size: 40),
+                  Text(
+                    widget.chatMember.name,
+                    style: AppTexts.tlgb.copyWith(color: AppColors.gray),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Spacer(),
+            GestureDetector(
+              onTap: () {
+                Get.to(() => CreateOffer());
+              },
+              child: CustomSvg(asset: "assets/icons/offer.svg", size: 24),
+            ),
+            const SizedBox(width: 20),
+          ],
         ),
       ),
       body: Stack(
@@ -107,6 +121,10 @@ class _ChatState extends State<Chat> {
                           ),
                         ),
                       ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: OfferWidget(),
+                    ),
                     const SizedBox(height: 70),
                   ],
                 ),

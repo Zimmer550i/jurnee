@@ -6,6 +6,7 @@ import 'package:jurnee/utils/app_texts.dart';
 
 class CustomTextField extends StatefulWidget {
   final String? title;
+  final bool isOptional;
   final String? hintText;
   final String? errorText;
   final String? leading;
@@ -29,6 +30,7 @@ class CustomTextField extends StatefulWidget {
     this.trailing,
     this.isPassword = false,
     this.isDisabled = false,
+    this.isOptional = false,
     this.radius = 12,
     this.lines = 1,
     this.focusColor = AppColors.green,
@@ -72,11 +74,20 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (widget.title != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Text(widget.title!, style: AppTexts.txsb),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Row(
+            spacing: 8,
+            children: [
+              Text(widget.title!, style: AppTexts.txsb),
+              if (widget.isOptional)
+                Text(
+                  "(Optional)",
+                  style: AppTexts.txsb.copyWith(color: AppColors.gray),
+                ),
+            ],
           ),
+        ),
         GestureDetector(
           onTap: () {
             if (widget.onTap != null) {
