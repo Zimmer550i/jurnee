@@ -11,6 +11,7 @@ class CustomTextField extends StatefulWidget {
   final String? errorText;
   final String? leading;
   final String? trailing;
+  final Widget? trailingWidget;
   final TextInputType? textInputType;
   final bool isDisabled;
   final double radius;
@@ -25,6 +26,7 @@ class CustomTextField extends StatefulWidget {
   const CustomTextField({
     super.key,
     this.title,
+    this.trailingWidget,
     this.hintText,
     this.leading,
     this.trailing,
@@ -74,20 +76,21 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Row(
-            spacing: 8,
-            children: [
-              Text(widget.title!, style: AppTexts.txsb),
-              if (widget.isOptional)
-                Text(
-                  "(Optional)",
-                  style: AppTexts.txsb.copyWith(color: AppColors.gray),
-                ),
-            ],
+        if (widget.title != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              spacing: 8,
+              children: [
+                Text(widget.title!, style: AppTexts.txsb),
+                if (widget.isOptional)
+                  Text(
+                    "(Optional)",
+                    style: AppTexts.txsb.copyWith(color: AppColors.gray),
+                  ),
+              ],
+            ),
           ),
-        ),
         GestureDetector(
           onTap: () {
             if (widget.onTap != null) {
@@ -156,6 +159,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     ),
                   ),
                 ),
+                if(widget.trailingWidget != null)
+                  widget.trailingWidget!,
                 if (widget.trailing != null)
                   SvgPicture.asset(
                     widget.trailing!,

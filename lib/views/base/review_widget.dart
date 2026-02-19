@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
-import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
+import 'package:jurnee/views/base/rating_widget.dart';
 
 class ReviewWidget extends StatelessWidget {
   const ReviewWidget({super.key});
@@ -19,10 +20,13 @@ class ReviewWidget extends StatelessWidget {
         spacing: 8,
         children: [
           Row(
-            spacing: 4,
             children: [
-              for (int i = 0; i < 5; i++)
-                CustomSvg(asset: "assets/icons/star.svg", size: 24),
+              RatingWidget(averageRating: 4.5, isSmall: true, showText: false),
+              const SizedBox(width: 4),
+              Text(
+                DateFormat("MMM dd, yyyy").format(DateTime.now()),
+                style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade400),
+              ),
             ],
           ),
           Text(
@@ -38,7 +42,7 @@ class ReviewWidget extends StatelessWidget {
               ),
               Text(
                 "Sample Name",
-                style: AppTexts.tsmb.copyWith(color: AppColors.gray.shade400),
+                style: AppTexts.tmdb.copyWith(color: AppColors.gray.shade400),
               ),
             ],
           ),

@@ -58,7 +58,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         trailingAction!();
                       }
                     },
-                    child: CustomSvg(asset: trailing!),
+                    child: CustomSvg(
+                      asset: trailing!,
+                      color: AppColors.gray.shade700,
+                    ),
                   )
                 : SizedBox(width: 32),
             SizedBox(width: 12),

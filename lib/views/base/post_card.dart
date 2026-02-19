@@ -77,6 +77,29 @@ class PostCard extends StatelessWidget {
                                 color: AppColors.gray.shade600,
                               ),
                             ),
+
+                          // const SizedBox(width: 8),
+                          // Container(
+                          //   padding: EdgeInsets.symmetric(
+                          //     vertical: 4,
+                          //     horizontal: 8,
+                          //   ),
+                          //   decoration: BoxDecoration(
+                          //     color: AppColors.gray[50],
+                          //     borderRadius: BorderRadius.circular(6),
+                          //   ),
+                          //   child: Row(
+                          //     spacing: 4,
+                          //     children: [
+                          //       CustomSvg(
+                          //         asset:
+                          //             "assets/icons/${post.category.toLowerCase()}.svg",
+                          //         size: 16,
+                          //       ),
+                          //       Text(post.category),
+                          //     ],
+                          //   ),
+                          // ),
                         ],
                       ),
 

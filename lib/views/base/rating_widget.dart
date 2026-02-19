@@ -6,10 +6,12 @@ import 'package:jurnee/utils/custom_svg.dart';
 class RatingWidget extends StatelessWidget {
   final num? averageRating;
   final bool isSmall;
+  final bool showText;
   const RatingWidget({
     super.key,
     required this.averageRating,
-    this.isSmall = false,
+    this.isSmall = true,
+    this.showText = true,
   });
 
   @override
@@ -23,11 +25,12 @@ class RatingWidget extends StatelessWidget {
           for (int i = 0; i < 5; i++)
             CustomSvg(asset: "assets/icons/star.svg", size: isSmall ? 16 : 24),
           const SizedBox(width: 4),
-          Text(
-            averageRating == null ? "N/A" : averageRating.toString(),
-            style: AppTexts.tlgm.copyWith(color: AppColors.gray.shade400),
-          ),
-          const SizedBox(width: 12),
+          if (showText)
+            Text(
+              averageRating == null ? "N/A" : averageRating.toString(),
+              style: AppTexts.tlgm.copyWith(color: AppColors.gray.shade400),
+            ),
+          // const SizedBox(width: 12),
           // Text(
           //   "See All",
           //   style: AppTexts.tsmr.copyWith(
