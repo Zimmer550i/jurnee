@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,7 @@ import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/post_card_small.dart';
 
@@ -28,6 +30,8 @@ class _LocationMapState extends State<LocationMap> {
   LatLng? cardPosition;
   PostModel? cardPost;
 
+  LatLng? lastFetchedLocation;
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +45,16 @@ class _LocationMapState extends State<LocationMap> {
         cardPost!.location.coordinates[1],
         cardPost!.location.coordinates[0],
       );
+    }
+
+    try {
+      lastFetchedLocation = LatLng(
+        post.userLocation.value!.latitude,
+        post.userLocation.value!.longitude,
+      );
+    } catch (e) {
+      String dustbin = e.toString();
+      dustbin.split("s");
     }
   }
 
@@ -78,6 +92,19 @@ class _LocationMapState extends State<LocationMap> {
           },
           onCameraMove: (position) async {
             updateOverlayPosition();
+
+            if (lastFetchedLocation != null &&
+                distanceInMeters(position.target, lastFetchedLocation!) >
+                    10000 &&
+                !post.isFirstLoad.value) {
+              lastFetchedLocation = position.target;
+              post.customLocation.value = position.target;
+              post.fetchPosts().then((val) {
+                if (val != "success") {
+                  customSnackBar(val);
+                }
+              });
+            }
           },
           markers: markers,
         ),
@@ -98,8 +125,6 @@ class _LocationMapState extends State<LocationMap> {
             snapSizes: [0.2, 0.6, 1],
             builder: (context, controller) => ListView(
               padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
               controller: controller,
               children: [
                 Container(
@@ -197,5 +222,25 @@ class _LocationMapState extends State<LocationMap> {
         ),
       );
     }
+  }
+
+  double distanceInMeters(LatLng p1, LatLng p2) {
+    double degToRad(double deg) => deg * pi / 180;
+
+    const R = 6371000;
+
+    double dLat = degToRad(p2.latitude - p1.latitude);
+    double dLng = degToRad(p2.longitude - p1.longitude);
+
+    double a =
+        sin(dLat / 2) * sin(dLat / 2) +
+        cos(degToRad(p1.latitude)) *
+            cos(degToRad(p2.latitude)) *
+            sin(dLng / 2) *
+            sin(dLng / 2);
+
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return R * c;
   }
 }
