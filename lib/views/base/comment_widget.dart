@@ -14,7 +14,7 @@ class CommentWidget extends StatefulWidget {
 }
 
 class _CommentWidgetState extends State<CommentWidget> {
-  bool isReplying = true;
+  bool isReplying = false;
 
   @override
   Widget build(BuildContext context) {
@@ -59,44 +59,55 @@ class _CommentWidgetState extends State<CommentWidget> {
                     ),
                   ),
                   const SizedBox(width: 24),
-                  CustomSvg(
-                    asset: "assets/icons/message.svg",
-                    size: 16,
-                    color: AppColors.black,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    "Reply",
-                    style: AppTexts.tsms.copyWith(
-                      color: AppColors.gray.shade600,
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isReplying = !isReplying;
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        CustomSvg(
+                          asset: "assets/icons/message.svg",
+                          size: 16,
+                          color: AppColors.black,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "Reply",
+                          style: AppTexts.tsms.copyWith(
+                            color: AppColors.gray.shade600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-    
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField(
-                      hintText: "Add a reply",
-                      height: 36,
-                      trailingWidget: GestureDetector(
-                        onTap: () {},
-                        child: CustomSvg(asset: "assets/icons/add_image.svg"),
+              if (isReplying)
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextField(
+                        hintText: "Add a reply",
+                        height: 36,
+                        trailingWidget: GestureDetector(
+                          onTap: () {},
+                          child: CustomSvg(asset: "assets/icons/add_image.svg"),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  CustomButton(
-                    onTap: () {},
-                    text: "Reply",
-                    width: null,
-                    padding: 20,
-                    height: 36,
-                    fontSize: 14,
-                  ),
-                ],
-              ),
+                    const SizedBox(width: 12),
+                    CustomButton(
+                      onTap: () {},
+                      text: "Reply",
+                      width: null,
+                      padding: 20,
+                      height: 36,
+                      fontSize: 14,
+                    ),
+                  ],
+                ),
             ],
           ),
         ),

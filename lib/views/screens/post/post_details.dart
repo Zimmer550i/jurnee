@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -46,8 +47,8 @@ class _PostDetailsState extends State<PostDetails> {
 
   @override
   Widget build(BuildContext context) {
-    // var isOwner =
-    //     widget.post.author.id == Get.find<UserController>().userData!.id;
+    var isOwner =
+        widget.post.author.id == Get.find<UserController>().userData!.id;
     return Scaffold(
       backgroundColor: AppColors.gray[50],
       appBar: CustomAppBar(
@@ -68,349 +69,362 @@ class _PostDetailsState extends State<PostDetails> {
         child: SafeArea(
           child: Column(
             children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.width / 1.57,
-                width: MediaQuery.of(context).size.width,
-                child: Stack(
-                  children: [
-                    PageView(
-                      scrollDirection: Axis.horizontal,
-                      controller: _controller,
-                      children: [
-                        for (var i in [
-                          widget.post.image,
-                          if (widget.post.media != null) ...widget.post.media!,
-                        ])
-                          GestureDetector(
-                            onTap: () {
-                              Get.to(
-                                () => MediaPlayer(
-                                  postData: widget.post,
-                                  preferedStart: i,
-                                  mediaList: [
-                                    widget.post.image,
-                                    ...widget.post.media ?? [],
-                                  ],
-                                ),
-                                transition: Transition.noTransition,
-                              );
-                            },
-                            child: MediaThumbnail(path: i),
-                          ),
-                      ],
-                    ),
-                    Positioned(
-                      bottom: 12,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: PageIndicator(
-                            controller: _controller,
-                            size: 6,
-                            activeColor: AppColors.green.shade700,
-                            count: (widget.post.media?.length ?? 0) + 1,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              postCover(context),
 
               Column(
                 spacing: 8,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(24),
-                    child: Column(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.post.title.toString(),
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.gray.shade700,
-                                    ),
-                                  ),
-                                  Text(
-                                    widget.post.subcategory ??
-                                        widget.post.category,
-                                    style: AppTexts.txsr.copyWith(
-                                      color: AppColors.gray.shade700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            reportPost(context),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        if (widget.post.category == "service")
-                          Row(
-                            children: [
-                              RatingWidget(
-                                averageRating: widget.post.averageRating,
-                                isSmall: true,
-                              ),
-                              GestureDetector(
-                                onTap: () {},
-                                child: Text(
-                                  "See All",
-                                  style: AppTexts.tsms.copyWith(
-                                    color: AppColors.green.shade700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        if (widget.post.category != "service")
-                          Row(
-                            spacing: 4,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 2),
-                                child: CustomSvg(
-                                  asset: "assets/icons/message.svg",
-                                  color: AppColors.green.shade700,
-                                  size: 16,
-                                ),
-                              ),
-                              Text(
-                                "112 Comments • ",
-                                style: AppTexts.tsmm.copyWith(
-                                  color: AppColors.gray.shade700,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {},
-                                child: Text(
-                                  "See All",
-                                  style: AppTexts.tsms.copyWith(
-                                    color: AppColors.green.shade700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        const SizedBox(height: 12),
-                        GestureDetector(
-                          onTap: () {
-                            Get.to(() => PostLocation(post: widget.post));
-                          },
-                          child: Row(
-                            spacing: 4,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 2),
-                                child: CustomSvg(
-                                  asset: "assets/icons/location.svg",
-                                  color: AppColors.green.shade700,
-                                  size: 16,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  "${Get.find<PostController>().getDistance(widget.post.location.coordinates[0], widget.post.location.coordinates[1])} • ${widget.post.address}",
-                                  style: AppTexts.tsmm.copyWith(
-                                    color: AppColors.gray.shade700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (widget.post.startDate != null)
-                          const SizedBox(height: 12),
-                        if (widget.post.startDate != null)
-                          Row(
-                            spacing: 4,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 2),
-                                child: CustomSvg(
-                                  asset: "assets/icons/calendar.svg",
-                                  color: AppColors.green.shade700,
-                                  size: 16,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  widget.post.startDate != null
-                                      ? DateFormat(
-                                          "dd MMM, hh:mm a",
-                                        ).format(widget.post.startDate!)
-                                      : "",
-                                  style: AppTexts.tsmm.copyWith(
-                                    color: AppColors.gray.shade700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(24),
-                    color: Colors.white,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (widget.post.subcategory != null &&
-                            widget.post.subcategory == "Missing Person")
-                          missingPersonInfo(),
-
-                        RichText(
-                          text: TextSpan(
-                            text:
-                                widget.post.description.length > 100 &&
-                                    !showFullDescription
-                                ? "${widget.post.description.substring(0, 100)}..."
-                                : widget.post.description,
-                            style: AppTexts.tsmr.copyWith(
-                              color: AppColors.gray.shade600,
-                            ),
-                            children: [
-                              if (widget.post.description.length > 100)
-                                TextSpan(
-                                  text: showFullDescription
-                                      ? " Show Less"
-                                      : "Read More",
-                                  style: AppTexts.tsmb.copyWith(
-                                    color: AppColors.green.shade700,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      setState(() {
-                                        showFullDescription =
-                                            !showFullDescription;
-                                      });
-                                    },
-                                ),
-                            ],
-                          ),
-                        ),
-                        if (widget.post.price != null)
-                          const SizedBox(height: 32),
-                        if (widget.post.price != null)
-                          Row(
-                            children: [
-                              Text("Entry: ", style: AppTexts.tsmr),
-                              Text(
-                                widget.post.price.toString(),
-                                style: AppTexts.tlgb,
-                              ),
-                            ],
-                          ),
-                        const SizedBox(height: 32),
-                        getButton(),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(24),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Get.to(
-                              () => Profile(userId: widget.post.author.id),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Post by:",
-                                style: AppTexts.tsmr.copyWith(
-                                  color: AppColors.gray.shade600,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  ProfilePicture(
-                                    image: widget.post.author.image,
-                                    size: 32,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    widget.post.author.name,
-                                    style: AppTexts.tmdb.copyWith(
-                                      color: AppColors.gray.shade700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Spacer(),
-                        CustomSvg(asset: "assets/icons/view.svg"),
-                        const SizedBox(width: 4),
-                        Text(
-                          widget.post.views.toString(),
-                          style: AppTexts.tsmr,
-                        ),
-                        const SizedBox(width: 12),
-                        CustomSvg(
-                          asset:
-                              "assets/icons/${widget.post.isSaved ? "saved" : "save"}.svg",
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          widget.post.totalSaved.toString(),
-                          style: AppTexts.tsmr,
-                        ),
-                        const SizedBox(width: 12),
-                        CustomSvg(
-                          asset:
-                              "assets/icons/${widget.post.isSaved ? "loved" : "love"}.svg",
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          widget.post.likes.toString(),
-                          style: AppTexts.tsmr,
-                        ),
-                      ],
-                    ),
-                  ),
-                  // if (isOwner) postEarnings(),
+                  postInformation(context),
+                  if (isOwner) postEarnings(),
+                  postDescriptions(isOwner),
+                  postMetaData(),
                   attendingUsers(),
                   if (widget.post.media != null) postMedia(),
 
-                  // if (widget.post.category != "service")
-                  postComments(),
-                  // if (widget.post.category == "service")
-                  postReviews(),
+                  if (isOwner) ownerActionButtons(),
+
+                  if (widget.post.category != "service") postComments(),
+                  if (widget.post.category == "service") postReviews(),
                 ],
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Container ownerActionButtons() {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.all(24),
+      child: Column(
+        spacing: 16,
+        children: [
+          CustomButton(
+            onTap: () => Get.to(() => BoostPost(post: widget.post)),
+            text: "Boost Post",
+          ),
+          CustomButton(
+            onTap: () {
+              if (widget.post.category.toLowerCase() == "event") {
+                Get.to(() => PostEvent(post: widget.post));
+              } else if (widget.post.category.toLowerCase() == "deal") {
+                Get.to(() => PostDeal(post: widget.post));
+              } else if (widget.post.category.toLowerCase() == "alert") {
+                Get.to(() => PostAlert(post: widget.post));
+              } else if (widget.post.category.toLowerCase() == "service") {
+                Get.to(() => PostService(post: widget.post));
+              }
+            },
+            text: "Edit Post",
+            isSecondary: true,
+          ),
+          CustomButton(text: "Delete Post", isSecondary: true),
+        ],
+      ),
+    );
+  }
+
+  Container postMetaData() {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.all(24),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              Get.to(() => Profile(userId: widget.post.author.id));
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Post by:",
+                  style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade600),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    ProfilePicture(image: widget.post.author.image, size: 32),
+                    const SizedBox(width: 8),
+                    Text(
+                      widget.post.author.name,
+                      style: AppTexts.tmdb.copyWith(
+                        color: AppColors.gray.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Spacer(),
+          CustomSvg(asset: "assets/icons/view.svg"),
+          const SizedBox(width: 4),
+          Text(widget.post.views.toString(), style: AppTexts.tsmr),
+          const SizedBox(width: 12),
+          CustomSvg(
+            asset: "assets/icons/${widget.post.isSaved ? "saved" : "save"}.svg",
+          ),
+          const SizedBox(width: 4),
+          Text(widget.post.totalSaved.toString(), style: AppTexts.tsmr),
+          const SizedBox(width: 12),
+          CustomSvg(
+            asset: "assets/icons/${widget.post.isSaved ? "loved" : "love"}.svg",
+          ),
+          const SizedBox(width: 4),
+          Text(widget.post.likes.toString(), style: AppTexts.tsmr),
+        ],
+      ),
+    );
+  }
+
+  Container postDescriptions(bool isOwner) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(24),
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.post.subcategory != null &&
+              widget.post.subcategory == "Missing Person")
+            missingPersonInfo(),
+
+          RichText(
+            text: TextSpan(
+              text: widget.post.description.length > 100 && !showFullDescription
+                  ? "${widget.post.description.substring(0, 100)}..."
+                  : widget.post.description,
+              style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade600),
+              children: [
+                if (widget.post.description.length > 100)
+                  TextSpan(
+                    text: showFullDescription ? " Show Less" : "Read More",
+                    style: AppTexts.tsmb.copyWith(
+                      color: AppColors.green.shade700,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        setState(() {
+                          showFullDescription = !showFullDescription;
+                        });
+                      },
+                  ),
+              ],
+            ),
+          ),
+          if (widget.post.price != null) const SizedBox(height: 32),
+          if (widget.post.price != null)
+            Row(
+              children: [
+                Text("Entry: ", style: AppTexts.tsmr),
+                Text(widget.post.price.toString(), style: AppTexts.tlgb),
+              ],
+            ),
+            if(!isOwner)
+          const SizedBox(height: 32),
+          if (!isOwner) getButton(),
+        ],
+      ),
+    );
+  }
+
+  Container postInformation(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.post.title.toString(),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.gray.shade700,
+                      ),
+                    ),
+                    Text(
+                      widget.post.subcategory ?? widget.post.category,
+                      style: AppTexts.txsr.copyWith(
+                        color: AppColors.gray.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              reportPost(context),
+            ],
+          ),
+          const SizedBox(height: 20),
+          if (widget.post.category == "service")
+            Row(
+              children: [
+                RatingWidget(
+                  averageRating: widget.post.averageRating,
+                  isSmall: true,
+                ),
+                GestureDetector(
+                  onTap: () {},
+                  child: Text(
+                    "See All",
+                    style: AppTexts.tsms.copyWith(
+                      color: AppColors.green.shade700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          if (widget.post.category != "service")
+            Row(
+              spacing: 4,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: CustomSvg(
+                    asset: "assets/icons/message.svg",
+                    color: AppColors.green.shade700,
+                    size: 16,
+                  ),
+                ),
+                Text(
+                  "112 Comments • ",
+                  style: AppTexts.tsmm.copyWith(color: AppColors.gray.shade700),
+                ),
+                GestureDetector(
+                  onTap: () {},
+                  child: Text(
+                    "See All",
+                    style: AppTexts.tsms.copyWith(
+                      color: AppColors.green.shade700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: () {
+              Get.to(() => PostLocation(post: widget.post));
+            },
+            child: Row(
+              spacing: 4,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: CustomSvg(
+                    asset: "assets/icons/location.svg",
+                    color: AppColors.green.shade700,
+                    size: 16,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    "${Get.find<PostController>().getDistance(widget.post.location.coordinates[0], widget.post.location.coordinates[1])} • ${widget.post.address}",
+                    style: AppTexts.tsmm.copyWith(
+                      color: AppColors.gray.shade700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (widget.post.startDate != null) const SizedBox(height: 12),
+          if (widget.post.startDate != null)
+            Row(
+              spacing: 4,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: CustomSvg(
+                    asset: "assets/icons/calendar.svg",
+                    color: AppColors.green.shade700,
+                    size: 16,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    widget.post.startDate != null
+                        ? DateFormat(
+                            "dd MMM, hh:mm a",
+                          ).format(widget.post.startDate!)
+                        : "",
+                    style: AppTexts.tsmm.copyWith(
+                      color: AppColors.gray.shade700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  SizedBox postCover(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.width / 1.57,
+      width: MediaQuery.of(context).size.width,
+      child: Stack(
+        children: [
+          PageView(
+            scrollDirection: Axis.horizontal,
+            controller: _controller,
+            children: [
+              for (var i in [
+                widget.post.image,
+                if (widget.post.media != null) ...widget.post.media!,
+              ])
+                GestureDetector(
+                  onTap: () {
+                    Get.to(
+                      () => MediaPlayer(
+                        postData: widget.post,
+                        preferedStart: i,
+                        mediaList: [
+                          widget.post.image,
+                          ...widget.post.media ?? [],
+                        ],
+                      ),
+                      transition: Transition.noTransition,
+                    );
+                  },
+                  child: MediaThumbnail(path: i),
+                ),
+            ],
+          ),
+          Positioned(
+            bottom: 12,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: PageIndicator(
+                  controller: _controller,
+                  size: 6,
+                  activeColor: AppColors.green.shade700,
+                  count: (widget.post.media?.length ?? 0) + 1,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -763,54 +777,6 @@ class _PostDetailsState extends State<PostDetails> {
     );
   }
 
-  Column postEarnings() {
-    return Column(
-      spacing: 24,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Total Earnings",
-              style: AppTexts.tlgm.copyWith(color: AppColors.gray),
-            ),
-            Text(
-              "\$500",
-              style: AppTexts.txlb.copyWith(color: AppColors.gray.shade700),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Units Sold",
-              style: AppTexts.tlgm.copyWith(color: AppColors.gray),
-            ),
-            Text(
-              "10/40",
-              style: AppTexts.txlb.copyWith(color: AppColors.gray.shade700),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Unit Price",
-              style: AppTexts.tlgm.copyWith(color: AppColors.gray),
-            ),
-            Text(
-              "\$50",
-              style: AppTexts.txlb.copyWith(color: AppColors.gray.shade700),
-            ),
-          ],
-        ),
-        const SizedBox(height: 0),
-      ],
-    );
-  }
-
   Widget getButton({bool isOwner = false}) {
     if (isOwner) {
       return Column(
@@ -879,6 +845,69 @@ class _PostDetailsState extends State<PostDetails> {
         ],
       );
     }
+  }
+
+  Widget postEarnings() {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.all(24),
+      child: Row(
+        spacing: 12,
+        children: [
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(8),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.gray.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  CustomSvg(asset: "assets/icons/booking.svg", size: 20),
+                  Text("Booking", style: AppTexts.tmdr),
+                  Text("6", style: AppTexts.tmdb),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(8),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.gray.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  CustomSvg(asset: "assets/icons/unit_price.svg", size: 20),
+                  Text("Unit Price", style: AppTexts.tmdr),
+                  Text("\$66", style: AppTexts.tmdb),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(8),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.gray.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  CustomSvg(asset: "assets/icons/earning.svg", size: 20),
+                  Text("Earning", style: AppTexts.tmdr),
+                  Text("\$120", style: AppTexts.tmdb),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget tabs(String title, String? icon, int index) {
