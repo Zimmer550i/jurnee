@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jurnee/controllers/user_controller.dart';
+import 'package:jurnee/models/comment_model.dart';
 import 'package:jurnee/models/pagination_meta.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/services/api_service.dart';
@@ -13,6 +15,7 @@ enum PostType { defaultPosts }
 class PostController extends GetxController {
   final api = ApiService();
   RxList<PostModel> posts = RxList.empty();
+  RxList<CommentModel> comments = RxList.empty();
   Rxn<Position> userLocation = Rxn();
   RxBool isLoading = RxBool(false);
 
@@ -21,6 +24,7 @@ class PostController extends GetxController {
   RxInt totalPages = 1.obs;
   RxBool isFirstLoad = true.obs;
   RxBool isMoreLoading = false.obs;
+  RxString commentLoading = RxString("");
 
   RxBool highlyRated = RxBool(false);
   RxList<String> categoryList = RxList.empty();
@@ -73,10 +77,7 @@ class PostController extends GetxController {
     return cleaned;
   }
 
-  Future<String> fetchPosts({
-    bool loadMore = false,
-    String? category,
-  }) async {
+  Future<String> fetchPosts({bool loadMore = false, String? category}) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 
     if (!loadMore) {
@@ -134,6 +135,51 @@ class PostController extends GetxController {
     }
   }
 
+  Future<String> fetchComments(String id, {bool loadMore = false}) async {
+    if (loadMore && currentPage.value >= totalPages.value) return "success";
+
+    if (!loadMore) {
+      isFirstLoad(true);
+      currentPage(1);
+      comments.clear();
+    } else {
+      isMoreLoading(true);
+      currentPage.value++;
+    }
+
+    try {
+      final res = await api.get(
+        "/comments/$id",
+        queryParams: {
+          "page": currentPage.value.toString(),
+          "limit": limit.toString(),
+        },
+        authReq: true,
+      );
+
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200) {
+        final meta = PaginationMeta.fromJson(body['meta']);
+        totalPages(meta.totalPage);
+
+        final List<dynamic> dataList = body['data'];
+        final newItems = dataList.map((e) => CommentModel.fromJson(e)).toList();
+
+        comments.addAll(newItems);
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isFirstLoad(false);
+      isMoreLoading(false);
+    }
+  }
+
   Future<String> createPost(String type, Map<String, dynamic> data) async {
     isLoading(true);
     try {
@@ -154,6 +200,175 @@ class PostController extends GetxController {
       return e.toString();
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<String> createComment(
+    String id,
+    String content,
+    File? image,
+    File? video,
+  ) async {
+    commentLoading(id);
+    try {
+      final data = {
+        "data": {"postId": id, "content": content},
+        "image": image,
+        "video": video,
+      };
+
+      final res = await api.post(
+        "/comments",
+        data,
+        isMultiPart: true,
+        authReq: true,
+      );
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        comments.insert(0, CommentModel.fromJson(body['data']));
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      commentLoading("");
+    }
+  }
+
+  Future<String> createReply(
+    String id,
+    String content,
+    File? image,
+    File? video,
+  ) async {
+    commentLoading(id);
+    try {
+      final data = {
+        "data": {"commentId": id, "content": content},
+        "image": image,
+        "video": video,
+      };
+
+      final res = await api.post(
+        "/replies",
+        data,
+        isMultiPart: true,
+        authReq: true,
+      );
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        var reply = CommentModel.fromJson(body['data']);
+        comments
+            .firstWhere((val) => reply.commentId == val.id)
+            .reply
+            .insert(0, reply);
+
+        comments.refresh();
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      commentLoading("");
+    }
+  }
+
+  Future<String> likeToggle(String id, String postCommentOrReply) async {
+    try {
+      final res = await api.post(
+        "/like/${postCommentOrReply == "post" ? "like-toggle" : postCommentOrReply}",
+        {"${postCommentOrReply}Id": id},
+        authReq: true,
+      );
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        bool isLiked = true;
+        if (body['data'] == "disliked") isLiked = false;
+
+        if (postCommentOrReply == "post") {
+          posts.firstWhere((val) => val.id == id).likes += isLiked ? 1 : -1;
+          posts.refresh();
+        } else if (postCommentOrReply == "comment") {
+          comments.firstWhere((val) => val.id == id).like += isLiked ? 1 : -1;
+          comments.firstWhere((val) => val.id == id).liked = isLiked
+              ? true
+              : false;
+          comments.refresh();
+        } else if (postCommentOrReply == "reply") {
+          final parentComment = comments.firstWhere(
+            (c) => c.reply.any((r) => r.id == id),
+          );
+
+          final replyIndex = parentComment.reply.indexWhere((r) => r.id == id);
+
+          if (replyIndex != -1) {
+            parentComment.reply[replyIndex].like += isLiked ? 1 : -1;
+            parentComment.reply[replyIndex].liked = isLiked;
+          }
+
+          comments.refresh();
+        }
+
+        return "liked";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future<String> saveToggle(String id) async {
+    try {
+      final res = await api.post("/save/save-toggle", {
+        "postId": id,
+      }, authReq: true);
+
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        bool isSaved = true;
+        if (body['data'] == "unsaved") isSaved = false;
+
+        final postIndex = posts.indexWhere((val) => val.id == id);
+
+        if (postIndex != -1) {
+          posts[postIndex].isSaved = isSaved;
+        }
+
+        posts.refresh();
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future<String> addViewCount(String id) async {
+    try {
+      final res = await api.get("/post/details/$id", authReq: true);
+
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
     }
   }
 

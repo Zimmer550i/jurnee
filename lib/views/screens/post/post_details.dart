@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
@@ -9,6 +11,7 @@ import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/comment_widget.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
@@ -18,7 +21,6 @@ import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
-import 'package:jurnee/views/base/rating_widget.dart';
 import 'package:jurnee/views/base/review_widget.dart';
 import 'package:jurnee/views/screens/home/post_location.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
@@ -41,9 +43,28 @@ class PostDetails extends StatefulWidget {
 }
 
 class _PostDetailsState extends State<PostDetails> {
+  final post = Get.find<PostController>();
+
   final _controller = PageController();
+  final commentController = TextEditingController();
+  File? commentImage;
+  File? commentVideo;
+
   bool showFullDescription = false;
   int momentsIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      post.fetchComments(widget.post.id).then((message) {
+        if (message != "success") {
+          customSnackBar(message);
+        }
+      });
+      post.addViewCount(widget.post.id);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +87,7 @@ class _PostDetailsState extends State<PostDetails> {
         },
       ),
       body: SingleChildScrollView(
+        physics: ClampingScrollPhysics(),
         child: SafeArea(
           child: Column(
             children: [
@@ -165,17 +187,35 @@ class _PostDetailsState extends State<PostDetails> {
           const SizedBox(width: 4),
           Text(widget.post.views.toString(), style: AppTexts.tsmr),
           const SizedBox(width: 12),
-          CustomSvg(
-            asset: "assets/icons/${widget.post.isSaved ? "saved" : "save"}.svg",
+          GestureDetector(
+            onTap: () => post.saveToggle(widget.post.id),
+            child: Row(
+              children: [
+                CustomSvg(
+                  asset:
+                      "assets/icons/${widget.post.isSaved ? "saved" : "save"}.svg",
+                ),
+                const SizedBox(width: 4),
+                Text(widget.post.totalSaved.toString(), style: AppTexts.tsmr),
+              ],
+            ),
           ),
-          const SizedBox(width: 4),
-          Text(widget.post.totalSaved.toString(), style: AppTexts.tsmr),
           const SizedBox(width: 12),
-          CustomSvg(
-            asset: "assets/icons/${widget.post.isSaved ? "loved" : "love"}.svg",
+          GestureDetector(
+            onTap: () {
+              post.likeToggle(widget.post.id, "post").then((message) {});
+            },
+            child: Row(
+              children: [
+                CustomSvg(
+                  asset:
+                      "assets/icons/${widget.post.isSaved ? "loved" : "love"}.svg",
+                ),
+                const SizedBox(width: 4),
+                Text(widget.post.likes.toString(), style: AppTexts.tsmr),
+              ],
+            ),
           ),
-          const SizedBox(width: 4),
-          Text(widget.post.likes.toString(), style: AppTexts.tsmr),
         ],
       ),
     );
@@ -224,9 +264,9 @@ class _PostDetailsState extends State<PostDetails> {
                 Text(widget.post.price.toString(), style: AppTexts.tlgb),
               ],
             ),
-            if(!isOwner)
-          const SizedBox(height: 32),
-          if (!isOwner) getButton(),
+          if (!isOwner) const SizedBox(height: 32),
+          // if (!isOwner)
+          getButton(),
         ],
       ),
     );
@@ -266,53 +306,53 @@ class _PostDetailsState extends State<PostDetails> {
             ],
           ),
           const SizedBox(height: 20),
-          if (widget.post.category == "service")
-            Row(
-              children: [
-                RatingWidget(
-                  averageRating: widget.post.averageRating,
-                  isSmall: true,
-                ),
-                GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    "See All",
-                    style: AppTexts.tsms.copyWith(
-                      color: AppColors.green.shade700,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          if (widget.post.category != "service")
-            Row(
-              spacing: 4,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: CustomSvg(
-                    asset: "assets/icons/message.svg",
-                    color: AppColors.green.shade700,
-                    size: 16,
-                  ),
-                ),
-                Text(
-                  "112 Comments • ",
-                  style: AppTexts.tsmm.copyWith(color: AppColors.gray.shade700),
-                ),
-                GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    "See All",
-                    style: AppTexts.tsms.copyWith(
-                      color: AppColors.green.shade700,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          const SizedBox(height: 12),
+          // if (widget.post.category == "service")
+          //   Row(
+          //     children: [
+          //       RatingWidget(
+          //         averageRating: widget.post.averageRating,
+          //         isSmall: true,
+          //       ),
+          //       GestureDetector(
+          //         onTap: () {},
+          //         child: Text(
+          //           "See All",
+          //           style: AppTexts.tsms.copyWith(
+          //             color: AppColors.green.shade700,
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // if (widget.post.category != "service")
+          //   Row(
+          //     spacing: 4,
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       Padding(
+          //         padding: const EdgeInsets.only(top: 2),
+          //         child: CustomSvg(
+          //           asset: "assets/icons/message.svg",
+          //           color: AppColors.green.shade700,
+          //           size: 16,
+          //         ),
+          //       ),
+          //       Text(
+          //         "112 Comments • ",
+          //         style: AppTexts.tsmm.copyWith(color: AppColors.gray.shade700),
+          //       ),
+          //       GestureDetector(
+          //         onTap: () {},
+          //         child: Text(
+          //           "See All",
+          //           style: AppTexts.tsms.copyWith(
+          //             color: AppColors.green.shade700,
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // const SizedBox(height: 12),
           GestureDetector(
             onTap: () {
               Get.to(() => PostLocation(post: widget.post));
@@ -455,44 +495,103 @@ class _PostDetailsState extends State<PostDetails> {
     return Container(
       color: Colors.white,
       padding: EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Comments (3)", style: AppTexts.tmdb),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: CustomTextField(
-                  hintText: "Add a comment",
-                  trailingWidget: GestureDetector(
-                    onTap: () {},
-                    child: CustomSvg(asset: "assets/icons/add_image.svg"),
-                  ),
-                ),
+      child: Obx(
+        () => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Comments", style: AppTexts.tmdb),
+            const SizedBox(height: 16),
+            if (post.isFirstLoad.value)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CustomLoading(),
               ),
-              const SizedBox(width: 12),
-              CustomButton(
-                onTap: () {},
-                text: "Post",
-                width: null,
-                padding: 20,
-                height: 36,
-                fontSize: 14,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
 
-          ListView.separated(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) => CommentWidget(),
-            separatorBuilder: (context, index) =>
-                Divider(height: 32, color: AppColors.gray.shade100),
-            itemCount: 5,
-          ),
-        ],
+            if (!post.isFirstLoad.value)
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField(
+                      hintText: "Add a comment",
+                      controller: commentController,
+                      trailingWidget: GestureDetector(
+                        onTap: () async {
+                          final file = await ImagePicker().pickMedia();
+                          if (file != null) {
+                            setState(() {
+                              final pickedFile = File(file.path);
+                              if (file.mimeType?.startsWith('video/') ??
+                                  false) {
+                                commentVideo = pickedFile;
+                                commentImage = null;
+                              } else {
+                                commentImage = pickedFile;
+                                commentVideo = null;
+                              }
+                            });
+                          }
+                        },
+                        child: commentImage == null && commentVideo == null
+                            ? CustomSvg(asset: "assets/icons/add_image.svg")
+                            : ClipRRect(
+                                borderRadius: BorderRadiusGeometry.circular(4),
+                                child: SizedBox(
+                                  height: 36,
+                                  child: MediaThumbnail(
+                                    path:
+                                        commentImage?.path ??
+                                        commentVideo?.path,
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  post.commentLoading.value == widget.post.id
+                      ? CustomLoading()
+                      : CustomButton(
+                          onTap: () {
+                            post
+                                .createComment(
+                                  widget.post.id,
+                                  commentController.text,
+                                  commentImage,
+                                  commentVideo,
+                                )
+                                .then((message) {
+                                  if (message != "success") {
+                                    customSnackBar(message);
+                                  } else {
+                                    setState(() {
+                                      commentController.clear();
+                                      commentImage = null;
+                                      commentVideo = null;
+                                    });
+                                  }
+                                });
+                          },
+                          text: "Post",
+                          width: null,
+                          padding: 20,
+                          height: 36,
+                          fontSize: 14,
+                        ),
+                ],
+              ),
+            const SizedBox(height: 16),
+
+            ListView.separated(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) =>
+                  CommentWidget(comment: post.comments.elementAt(index)),
+              separatorBuilder: (context, index) =>
+                  Divider(height: 32, color: AppColors.gray.shade100),
+              itemCount: post.comments.length,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -777,74 +876,64 @@ class _PostDetailsState extends State<PostDetails> {
     );
   }
 
-  Widget getButton({bool isOwner = false}) {
-    if (isOwner) {
-      return Column(
-        spacing: 8,
-        children: [
-          CustomButton(
-            onTap: () {
-              if (widget.post.category.toLowerCase() == "event") {
-                Get.to(() => PostEvent(post: widget.post));
-              } else if (widget.post.category.toLowerCase() == "deal") {
-                Get.to(() => PostDeal(post: widget.post));
-              } else if (widget.post.category.toLowerCase() == "alert") {
-                Get.to(() => PostAlert(post: widget.post));
-              } else if (widget.post.category.toLowerCase() == "service") {
-                Get.to(() => PostService(post: widget.post));
-              }
-            },
-            text: "Edit Post",
-            isSecondary: true,
-          ),
-          CustomButton(
-            onTap: () => Get.to(() => BoostPost(post: widget.post)),
-            text: "Boost Post",
-          ),
-        ],
-      );
+  Widget getButton({bool isOwner = false}) { // TODO: No way to figgure out when joined
+    final category = widget.post.category.toLowerCase();
+    String buttonText = "Request Quote";
+    VoidCallback buttonAction = () {
+      Get.to(() => ServiceBooking(post: widget.post));
+    };
+
+    if (category == "event") {
+      buttonText = "Join Event";
+      buttonAction = () {
+        Get.find<ChatController>().createOrGetChat(widget.post.author.id);
+      };
+    } else if (category == "deal") {
+      buttonText = "Claim Deal";
+      buttonAction = () {
+        Get.find<ChatController>().createOrGetChat(widget.post.author.id);
+      };
+    } else if (category == "alert") {
+      buttonText = "I Can Help";
+      buttonAction = () {
+        Get.find<ChatController>().createOrGetChat(widget.post.author.id);
+      };
     }
 
-    if (widget.post.schedule.isEmpty) {
-      return CustomButton(onTap: () {}, text: "Contact Owner");
-    } else {
-      return Row(
-        spacing: 10,
-        children: [
-          Expanded(
-            child: CustomButton(
-              onTap: () {
-                Get.to(() => ServiceBooking(post: widget.post));
-              },
-              text: "Request Quote",
-            ),
+    return Row(
+      spacing: 10,
+      children: [
+        Expanded(
+          child: CustomButton(
+            onTap: buttonAction,
+            text: buttonText,
           ),
-          GestureDetector(
-            onTap: () {
-              Get.find<ChatController>().createOrGetChat(widget.post.author.id);
-            },
-            child: Obx(
-              () => Container(
-                height: 48,
-                width: 48,
-                decoration: BoxDecoration(
-                  color: AppColors.green[25],
-                  shape: BoxShape.circle,
-                  border: Border.all(width: 2, color: AppColors.green.shade600),
-                ),
-                child: Get.find<ChatController>().isLoading.value
-                    ? CustomLoading()
-                    : Center(
-                        child: CustomSvg(
-                          asset: "assets/icons/message_rounded.svg",
-                        ),
-                      ),
+        ),
+        GestureDetector(
+          onTap: () {
+            Get.find<ChatController>().createOrGetChat(widget.post.author.id);
+          },
+          child: Obx(
+            () => Container(
+              height: 48,
+              width: 48,
+              decoration: BoxDecoration(
+                color: AppColors.green[25],
+                shape: BoxShape.circle,
+                border: Border.all(width: 2, color: AppColors.green.shade600),
               ),
+              child: Get.find<ChatController>().isLoading.value
+                  ? CustomLoading()
+                  : Center(
+                      child: CustomSvg(
+                        asset: "assets/icons/message_rounded.svg",
+                      ),
+                    ),
             ),
           ),
-        ],
-      );
-    }
+        ),
+      ],
+    );
   }
 
   Widget postEarnings() {

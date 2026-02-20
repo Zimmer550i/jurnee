@@ -19,7 +19,7 @@ class PostModel {
   final Location location;
   final List<String>? hasTag;
   final int views;
-  final int likes;
+  int likes;
   final dynamic endDate;
   final double? price;
   final String category;
@@ -38,7 +38,7 @@ class PostModel {
   final String? status;
   final bool? boost;
   final List<Author> attenders;
-  final bool isSaved;
+  bool isSaved;
   final int totalSaved;
   final List<Schedule> schedule;
   final DateTime createdAt;
@@ -231,7 +231,9 @@ class PostModel {
     totalSaved: json["totalSaved"],
     schedule: json["schedule"] == null
         ? []
-        : List<Schedule>.from(json["schedule"].map((x) => Schedule.fromJson(x))),
+        : List<Schedule>.from(
+            json["schedule"].map((x) => Schedule.fromJson(x)),
+          ),
     createdAt: DateTime.parse(json["createdAt"]),
     updatedAt: DateTime.parse(json["updatedAt"]),
     distance: json["distance"]?.toDouble(),
