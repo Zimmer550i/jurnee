@@ -52,6 +52,7 @@ class _PostDetailsState extends State<PostDetails> {
 
   bool showFullDescription = false;
   int momentsIndex = 0;
+  final GlobalKey commentSectionKey = GlobalKey();
 
   @override
   void initState() {
@@ -97,7 +98,8 @@ class _PostDetailsState extends State<PostDetails> {
       body: NotificationListener<ScrollNotification>(
         onNotification: (scrollInfo) {
           if (scrollInfo.metrics.pixels >=
-              scrollInfo.metrics.maxScrollExtent - 200 && !post.isFirstLoad.value) {
+                  scrollInfo.metrics.maxScrollExtent - 200 &&
+              !post.isFirstLoad.value) {
             if (widget.post.category != "service") {
               post.fetchComments(widget.post.id, loadMore: true).then((
                 message,
@@ -133,7 +135,7 @@ class _PostDetailsState extends State<PostDetails> {
                     if (isOwner) postEarnings(),
                     postDescriptions(isOwner),
                     postMetaData(),
-                    attendingUsers(),
+                    if(widget.post.category == "event") attendingUsers(),
                     if (widget.post.media != null) postMedia(),
 
                     if (isOwner) ownerActionButtons(),
@@ -176,7 +178,11 @@ class _PostDetailsState extends State<PostDetails> {
             text: "Edit Post",
             isSecondary: true,
           ),
-          CustomButton(text: "Delete Post", isSecondary: true),
+          CustomButton(
+            onTap: () => postDeleteSheet(context),
+            text: "Delete Post",
+            isSecondary: true,
+          ),
         ],
       ),
     );
@@ -298,7 +304,7 @@ class _PostDetailsState extends State<PostDetails> {
               ],
             ),
           if (!isOwner) const SizedBox(height: 32),
-          // if (!isOwner)
+          if (!isOwner)
           getButton(),
         ],
       ),
@@ -504,6 +510,7 @@ class _PostDetailsState extends State<PostDetails> {
 
   Widget postReviews() {
     return Container(
+      key: commentSectionKey,
       color: Colors.white,
       padding: EdgeInsets.all(24),
       child: Obx(
@@ -540,6 +547,7 @@ class _PostDetailsState extends State<PostDetails> {
 
   Widget postComments() {
     return Container(
+      key: commentSectionKey,
       color: Colors.white,
       padding: EdgeInsets.all(24),
       child: Obx(
@@ -929,7 +937,6 @@ class _PostDetailsState extends State<PostDetails> {
   }
 
   Widget getButton() {
-    // TODO: No way to figgure out when joined
     final category = widget.post.category.toLowerCase();
     String buttonText = "Request Quote";
     VoidCallback buttonAction = () {
@@ -939,7 +946,14 @@ class _PostDetailsState extends State<PostDetails> {
     if (category == "event") {
       buttonText = "Attend";
       buttonAction = () {
-        // Get.find<ChatController>().createOrGetChat(widget.post.author.id);
+        final context = commentSectionKey.currentContext;
+        if (context != null) {
+          Scrollable.ensureVisible(
+            context,
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
       };
     } else if (category == "deal") {
       buttonText = "Get Deal";
@@ -949,7 +963,14 @@ class _PostDetailsState extends State<PostDetails> {
     } else if (category == "alert") {
       buttonText = "Add Comment";
       buttonAction = () {
-        // TODO: Scroll to the bottom
+        final context = commentSectionKey.currentContext;
+        if (context != null) {
+          Scrollable.ensureVisible(
+            context,
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
       };
     }
 
@@ -1076,6 +1097,84 @@ class _PostDetailsState extends State<PostDetails> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<dynamic> postDeleteSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: Color(0xffE0E0E0))),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 24),
+                Text(
+                  "Delete",
+                  style: AppTexts.tlgb.copyWith(color: AppColors.red),
+                ),
+                const SizedBox(height: 24),
+                Container(
+                  width: double.infinity,
+                  height: 1,
+                  color: AppColors.gray.shade100,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  "Are you sure you want to delete this Post?",
+                  style: AppTexts.tlgs.copyWith(color: AppColors.gray.shade400),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    const SizedBox(width: 40),
+                    Expanded(
+                      child: CustomButton(
+                        text: "Yes, Delete",
+                        padding: 0,
+                        isSecondary: true,
+                        onTap: () async {
+                          final message = await post.deletePost(widget.post.id);
+                          Get.back();
+
+                          if (message == "success") {
+                            customSnackBar(
+                              "${widget.post.title} has been deleted!",
+                              isError: false,
+                            );
+                          } else {
+                            customSnackBar(message);
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      child: CustomButton(
+                        text: "Cancel",
+                        onTap: () {
+                          Get.back();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 40),
+                  ],
+                ),
+                const SizedBox(height: 48),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

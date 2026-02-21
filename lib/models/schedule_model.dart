@@ -22,7 +22,7 @@ class Schedule {
     this.startTime,
     this.endTime,
     List<TimeSlot>? timeSlots, // nullable
-    this.availability = true,
+    this.availability = false,
   }) : timeSlots = timeSlots ?? []; // initialize here
 
   factory Schedule.fromJson(Map<String, dynamic> json) {

@@ -4,6 +4,8 @@ class ReviewModel {
   final String postId;
   final int rating;
   final String content;
+  final String? image;
+  final String? video;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -13,6 +15,8 @@ class ReviewModel {
     required this.postId,
     required this.rating,
     required this.content,
+    this.image,
+    this.video,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -24,6 +28,8 @@ class ReviewModel {
       postId: json['postId'] ?? '',
       rating: json['rating'] ?? 0,
       content: json['content'] ?? '',
+      image: json['image'],
+      video: json['video'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
     );
@@ -36,6 +42,8 @@ class ReviewModel {
       'postId': postId,
       'rating': rating,
       'content': content,
+      'image': image,
+      'video': video,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };

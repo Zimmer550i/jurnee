@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:jurnee/models/schedule_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
-import 'package:jurnee/views/base/custom_button.dart';
-import 'package:jurnee/views/base/custom_checkbox.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 
 class AvailabilityWidget extends StatefulWidget {
@@ -26,6 +24,8 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
   ];
   bool repeat = false;
   int index = 0;
+  DateTime? from;
+  DateTime? to;
 
   @override
   void initState() {
@@ -42,17 +42,14 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
   List<Map<String, dynamic>> getSchedule() {
     List<Map<String, dynamic>> rtn = [];
 
-    for (var day in schedule) {
-      if (day.endTime != null && day.startTime != null && day.availability) {
-        List slots = [];
+    if (from != null && to != null) {
+      for (var day in schedule) {
+        if (day.availability) {
+          day.startTime = "${from!.hour}:${from!.minute}";
+          day.endTime = "${to!.hour}:${to!.minute}";
 
-        for (var slot in day.timeSlots) {
-          if (slot.start != null && slot.end != null) {
-            slots.add(slot);
-          }
+          rtn.add(day.toJson());
         }
-
-        rtn.add(day.toJson());
       }
     }
 
@@ -80,7 +77,7 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text("Day", style: AppTexts.txsb),
+                child: Text("Mark Available Days", style: AppTexts.txsb),
               ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -89,26 +86,30 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
                   border: Border.all(color: Color(0xffe6e6e6)),
                 ),
                 child: Row(
+                  spacing: 5,
                   children: [
                     for (int i = 0; i < 7; i++)
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
-                              index = i;
+                              schedule[i].availability =
+                                  !schedule[i].availability;
                             });
                           },
                           child: Container(
-                            height: 44,
+                            padding: EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
-                              border: Border(
-                                bottom: index == i
-                                    ? BorderSide(
-                                        width: 4,
-                                        color: AppColors.green.shade600,
-                                      )
-                                    : BorderSide.none,
-                              ),
+                              border: schedule[i].availability
+                                  ? Border.all(
+                                      color: AppColors.green.shade600,
+                                      width: 2,
+                                    )
+                                  : null,
+                              borderRadius: BorderRadius.circular(8),
+                              color: schedule[i].availability
+                                  ? AppColors.green[50]
+                                  : null,
                             ),
                             child: Center(
                               child: Text(
@@ -119,10 +120,10 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
                                         .toUpperCase() +
                                     schedule.elementAt(i).day.substring(1),
                                 style: AppTexts.tsmb.copyWith(
-                                  fontWeight: index == i
+                                  fontWeight: schedule[i].availability
                                       ? FontWeight.w700
                                       : FontWeight.w400,
-                                  color: index == i
+                                  color: schedule[i].availability
                                       ? AppColors.gray.shade700
                                       : AppColors.gray.shade300,
                                 ),
@@ -133,62 +134,6 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
                       ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  if (index != 0)
-                    GestureDetector(
-                      onTap: () {
-                        Schedule prev = schedule[index - 1];
-                        setState(() {
-                          schedule[index] = prev.copyWith(
-                            day: schedule[index].day,
-                          );
-                        });
-                      },
-                      child: Container(
-                        height: 26,
-                        padding: EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.green.shade600,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Copy Previous",
-                            style: AppTexts.txsm.copyWith(
-                              color: AppColors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  Spacer(),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CustomCheckBox(
-                        value: !schedule[index].availability,
-                        size: 20,
-                        activeColor: AppColors.red.shade400,
-                        inactiveColor: Color(0xffe6e6e6),
-                        onChanged: (val) {
-                          setState(() {
-                            schedule[index].availability = !val;
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        "Unavailable",
-                        style: AppTexts.tsmm.copyWith(
-                          color: AppColors.red.shade400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ),
               const SizedBox(height: 8),
               Row(
@@ -222,88 +167,6 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
                       trailing: "assets/icons/clock.svg",
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text("Slots", style: AppTexts.txsb),
-              ),
-              for (var i in schedule.elementAt(index).timeSlots)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: CustomTextField(
-                          onTap: () async {
-                            i.start = await getTime();
-                            setState(() {});
-                          },
-                          controller: TextEditingController(text: i.start),
-                          hintText: "Start",
-                          trailing: "assets/icons/clock.svg",
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: CustomTextField(
-                          onTap: () async {
-                            i.end = await getTime();
-                            setState(() {});
-                          },
-                          controller: TextEditingController(text: i.end),
-                          hintText: "End",
-                          trailing: "assets/icons/clock.svg",
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            schedule
-                                .elementAt(index)
-                                .timeSlots
-                                .removeWhere((val) => val == i);
-                          });
-                        },
-                        child: Icon(
-                          Icons.close_rounded,
-                          color: AppColors.gray.shade200,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              if (schedule.elementAt(index).timeSlots.isEmpty)
-                Center(
-                  child: Text(
-                    "No slots available",
-                    style: AppTexts.tsmr.copyWith(
-                      color: AppColors.gray.shade200,
-                    ),
-                  ),
-                ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomButton(
-                      onTap: () {
-                        setState(() {
-                          schedule
-                              .elementAt(index)
-                              .timeSlots
-                              .add(TimeSlot(available: true));
-                        });
-                      },
-                      leading: "assets/icons/plus.svg",
-                      text: "Add Slot",
-                      isSecondary: true,
-                    ),
-                  ),
-                  // SizedBox(width: 12),
-                  // Expanded(child: CustomButton(text: "Apply")),
                 ],
               ),
             ],

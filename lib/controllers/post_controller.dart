@@ -446,4 +446,25 @@ class PostController extends GetxController {
       isLoading(false);
     }
   }
+
+  Future<String> deletePost(String id) async {
+    isLoading(true);
+    try {
+      final res = await api.delete("/post/$id", authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        int index = posts.indexWhere((val) => val.id == id);
+        posts.removeAt(index);
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
+    }
+  }
 }
