@@ -28,7 +28,6 @@ import 'package:jurnee/views/screens/post/post_alert.dart';
 import 'package:jurnee/views/screens/post/post_deal.dart';
 import 'package:jurnee/views/screens/post/post_event.dart';
 import 'package:jurnee/views/screens/post/post_service.dart';
-import 'package:jurnee/views/screens/post/service_booking.dart';
 import 'package:jurnee/views/screens/profile/boost_post.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 import 'package:page_indicator_plus/page_indicator_plus.dart';
@@ -45,6 +44,7 @@ class PostDetails extends StatefulWidget {
 class _PostDetailsState extends State<PostDetails> {
   final post = Get.find<PostController>();
 
+  final listController = ScrollController();
   final _controller = PageController();
   final commentController = TextEditingController();
   File? commentImage;
@@ -94,31 +94,56 @@ class _PostDetailsState extends State<PostDetails> {
           );
         },
       ),
-      body: SingleChildScrollView(
-        physics: ClampingScrollPhysics(),
-        child: SafeArea(
-          child: Column(
-            children: [
-              postCover(context),
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (scrollInfo) {
+          if (scrollInfo.metrics.pixels >=
+              scrollInfo.metrics.maxScrollExtent - 200 && !post.isFirstLoad.value) {
+            if (widget.post.category != "service") {
+              post.fetchComments(widget.post.id, loadMore: true).then((
+                message,
+              ) {
+                if (message != "success") {
+                  customSnackBar(message);
+                }
+              });
+            } else {
+              post.fetchReviews(widget.post.id, loadMore: true).then((message) {
+                if (message != "success") {
+                  customSnackBar(message);
+                }
+              });
+            }
+          }
 
-              Column(
-                spacing: 8,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  postInformation(context),
-                  if (isOwner) postEarnings(),
-                  postDescriptions(isOwner),
-                  postMetaData(),
-                  attendingUsers(),
-                  if (widget.post.media != null) postMedia(),
+          return false;
+        },
+        child: SingleChildScrollView(
+          controller: listController,
+          physics: ClampingScrollPhysics(),
+          child: SafeArea(
+            child: Column(
+              children: [
+                postCover(context),
 
-                  if (isOwner) ownerActionButtons(),
+                Column(
+                  spacing: 8,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    postInformation(context),
+                    if (isOwner) postEarnings(),
+                    postDescriptions(isOwner),
+                    postMetaData(),
+                    attendingUsers(),
+                    if (widget.post.media != null) postMedia(),
 
-                  if (widget.post.category != "service") postComments(),
-                  if (widget.post.category == "service") postReviews(),
-                ],
-              ),
-            ],
+                    if (isOwner) ownerActionButtons(),
+
+                    if (widget.post.category != "service") postComments(),
+                    if (widget.post.category == "service") postReviews(),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -501,6 +526,12 @@ class _PostDetailsState extends State<PostDetails> {
                   Divider(height: 32, color: AppColors.gray.shade100),
               itemCount: post.reviews.length,
             ),
+
+            if (post.isMoreLoading.value)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CustomLoading(),
+              ),
           ],
         ),
       ),
@@ -606,6 +637,11 @@ class _PostDetailsState extends State<PostDetails> {
                   Divider(height: 32, color: AppColors.gray.shade100),
               itemCount: post.comments.length,
             ),
+            if (post.isMoreLoading.value)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CustomLoading(),
+              ),
           ],
         ),
       ),
@@ -892,28 +928,28 @@ class _PostDetailsState extends State<PostDetails> {
     );
   }
 
-  Widget getButton({bool isOwner = false}) {
+  Widget getButton() {
     // TODO: No way to figgure out when joined
     final category = widget.post.category.toLowerCase();
     String buttonText = "Request Quote";
     VoidCallback buttonAction = () {
-      Get.to(() => ServiceBooking(post: widget.post));
+      Get.find<ChatController>().createOrGetChat(widget.post.author.id);
     };
 
     if (category == "event") {
-      buttonText = "Join Event";
+      buttonText = "Attend";
       buttonAction = () {
-        Get.find<ChatController>().createOrGetChat(widget.post.author.id);
+        // Get.find<ChatController>().createOrGetChat(widget.post.author.id);
       };
     } else if (category == "deal") {
-      buttonText = "Claim Deal";
+      buttonText = "Get Deal";
       buttonAction = () {
-        Get.find<ChatController>().createOrGetChat(widget.post.author.id);
+        // TODO: Create the modal here
       };
     } else if (category == "alert") {
-      buttonText = "I Can Help";
+      buttonText = "Add Comment";
       buttonAction = () {
-        Get.find<ChatController>().createOrGetChat(widget.post.author.id);
+        // TODO: Scroll to the bottom
       };
     }
 

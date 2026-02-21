@@ -188,7 +188,7 @@ class PostController extends GetxController {
     if (!loadMore) {
       isFirstLoad(true);
       currentPage(1);
-      comments.clear();
+      reviews.clear();
     } else {
       isMoreLoading(true);
       currentPage.value++;
