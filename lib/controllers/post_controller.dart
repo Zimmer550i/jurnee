@@ -7,6 +7,7 @@ import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/comment_model.dart';
 import 'package:jurnee/models/pagination_meta.dart';
 import 'package:jurnee/models/post_model.dart';
+import 'package:jurnee/models/reivew_model.dart';
 import 'package:jurnee/services/api_service.dart';
 import 'package:jurnee/utils/get_location.dart';
 
@@ -16,6 +17,7 @@ class PostController extends GetxController {
   final api = ApiService();
   RxList<PostModel> posts = RxList.empty();
   RxList<CommentModel> comments = RxList.empty();
+  RxList<ReviewModel> reviews = RxList.empty();
   Rxn<Position> userLocation = Rxn();
   RxBool isLoading = RxBool(false);
 
@@ -167,6 +169,51 @@ class PostController extends GetxController {
         final newItems = dataList.map((e) => CommentModel.fromJson(e)).toList();
 
         comments.addAll(newItems);
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isFirstLoad(false);
+      isMoreLoading(false);
+    }
+  }
+
+  Future<String> fetchReviews(String id, {bool loadMore = false}) async {
+    if (loadMore && currentPage.value >= totalPages.value) return "success";
+
+    if (!loadMore) {
+      isFirstLoad(true);
+      currentPage(1);
+      comments.clear();
+    } else {
+      isMoreLoading(true);
+      currentPage.value++;
+    }
+
+    try {
+      final res = await api.get(
+        "/review/post-reviews/$id",
+        queryParams: {
+          "page": currentPage.value.toString(),
+          "limit": limit.toString(),
+        },
+        authReq: true,
+      );
+
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200) {
+        final meta = PaginationMeta.fromJson(body['meta']);
+        totalPages(meta.totalPage);
+
+        final List<dynamic> dataList = body['data'];
+        final newItems = dataList.map((e) => ReviewModel.fromJson(e)).toList();
+
+        reviews.addAll(newItems);
 
         return "success";
       } else {

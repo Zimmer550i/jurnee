@@ -11,6 +11,7 @@ class CustomListHandler extends StatelessWidget {
   final bool reverse;
   final bool topPadding;
   final bool isLoading;
+  final bool shrinkWrap;
   const CustomListHandler({
     super.key,
     required this.child,
@@ -19,6 +20,7 @@ class CustomListHandler extends StatelessWidget {
     this.reverse = false,
     this.isLoading = false,
     this.topPadding = false,
+    this.shrinkWrap = false,
     this.scrollThreshold = 200,
     this.horizontalPadding = 24,
   });
@@ -46,7 +48,9 @@ class CustomListHandler extends StatelessWidget {
           ? SingleChildScrollView(
               clipBehavior: Clip.none,
               reverse: reverse,
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: shrinkWrap
+                  ? NeverScrollableScrollPhysics()
+                  : const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
               child: SafeArea(child: child),
             )
@@ -56,7 +60,9 @@ class CustomListHandler extends StatelessWidget {
               backgroundColor: AppColors.green[25],
               child: SingleChildScrollView(
                 reverse: reverse,
-                physics: const AlwaysScrollableScrollPhysics(),
+                physics: shrinkWrap
+                    ? NeverScrollableScrollPhysics()
+                    : const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                 child: SafeArea(top: topPadding, child: child),
               ),

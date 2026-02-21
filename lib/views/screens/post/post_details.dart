@@ -57,11 +57,19 @@ class _PostDetailsState extends State<PostDetails> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      post.fetchComments(widget.post.id).then((message) {
-        if (message != "success") {
-          customSnackBar(message);
-        }
-      });
+      if (widget.post.category != "service") {
+        post.fetchComments(widget.post.id).then((message) {
+          if (message != "success") {
+            customSnackBar(message);
+          }
+        });
+      } else {
+        post.fetchReviews(widget.post.id).then((message) {
+          if (message != "success") {
+            customSnackBar(message);
+          }
+        });
+      }
       post.addViewCount(widget.post.id);
     });
   }
@@ -473,20 +481,28 @@ class _PostDetailsState extends State<PostDetails> {
     return Container(
       color: Colors.white,
       padding: EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Reviews (25)", style: AppTexts.tmdb),
-          const SizedBox(height: 16),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) => ReviewWidget(),
-            separatorBuilder: (context, index) =>
-                Divider(height: 32, color: AppColors.gray.shade100),
-            itemCount: 5,
-          ),
-        ],
+      child: Obx(
+        () => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Reviews", style: AppTexts.tmdb),
+            const SizedBox(height: 16),
+            if (post.isFirstLoad.value)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CustomLoading(),
+              ),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) =>
+                  ReviewWidget(review: post.reviews.elementAt(index)),
+              separatorBuilder: (context, index) =>
+                  Divider(height: 32, color: AppColors.gray.shade100),
+              itemCount: post.reviews.length,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -876,7 +892,8 @@ class _PostDetailsState extends State<PostDetails> {
     );
   }
 
-  Widget getButton({bool isOwner = false}) { // TODO: No way to figgure out when joined
+  Widget getButton({bool isOwner = false}) {
+    // TODO: No way to figgure out when joined
     final category = widget.post.category.toLowerCase();
     String buttonText = "Request Quote";
     VoidCallback buttonAction = () {
@@ -904,10 +921,7 @@ class _PostDetailsState extends State<PostDetails> {
       spacing: 10,
       children: [
         Expanded(
-          child: CustomButton(
-            onTap: buttonAction,
-            text: buttonText,
-          ),
+          child: CustomButton(onTap: buttonAction, text: buttonText),
         ),
         GestureDetector(
           onTap: () {

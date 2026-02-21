@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jurnee/models/reivew_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/rating_widget.dart';
 
 class ReviewWidget extends StatelessWidget {
-  const ReviewWidget({super.key});
+  final ReviewModel review;
+  const ReviewWidget({super.key, required this.review});
 
   @override
   Widget build(BuildContext context) {
@@ -21,27 +23,28 @@ class ReviewWidget extends StatelessWidget {
         children: [
           Row(
             children: [
-              RatingWidget(averageRating: 4.5, isSmall: true, showText: false),
+              RatingWidget(
+                averageRating: review.rating,
+                isSmall: true,
+                showText: false,
+              ),
               const SizedBox(width: 4),
               Text(
-                DateFormat("MMM dd, yyyy").format(DateTime.now()),
+                DateFormat("MMM dd, yyyy").format(review.createdAt),
                 style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade400),
               ),
             ],
           ),
           Text(
-            "Amazing experience! The DJ kept the energy high all night long. We had a blast, and the venue was perfect for our group size. Highly recommend!",
+            review.content,
             style: AppTexts.tmdr.copyWith(color: AppColors.gray.shade700),
           ),
           Row(
             spacing: 8,
             children: [
-              ProfilePicture(
-                size: 32,
-                image: "https://thispersondoesnotexist.com",
-              ),
+              ProfilePicture(size: 32, image: review.user.image),
               Text(
-                "Sample Name",
+                review.user.name,
                 style: AppTexts.tmdb.copyWith(color: AppColors.gray.shade400),
               ),
             ],
