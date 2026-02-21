@@ -11,6 +11,7 @@ class CustomDropDown extends StatefulWidget {
   final double? height;
   final double? width;
   final double radius;
+  final bool isLoading;
   final void Function(String)? onChanged;
   const CustomDropDown({
     super.key,
@@ -19,6 +20,7 @@ class CustomDropDown extends StatefulWidget {
     this.hintText,
     required this.options,
     this.onChanged,
+    this.isLoading = false,
     this.radius = 12,
     this.height = 48,
     this.width,

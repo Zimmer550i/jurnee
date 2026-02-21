@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/chat_controller.dart';
+import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/utils/formatter.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
@@ -11,39 +15,86 @@ import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/messages/offer_preview.dart';
 
 class CreateOffer extends StatefulWidget {
-  const CreateOffer({super.key});
+  final String chatID;
+  final String userId;
+  const CreateOffer({super.key, required this.chatID, required this.userId});
 
   @override
   State<CreateOffer> createState() => _CreateOfferState();
 }
 
 class _CreateOfferState extends State<CreateOffer> {
+  final user = Get.find<UserController>();
+  final post = Get.find<PostController>();
   final TextEditingController _serviceDetailsController =
       TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _fromController = TextEditingController();
-  final TextEditingController _toController = TextEditingController();
   final TextEditingController _discountController = TextEditingController();
+  List<TextEditingController> titleController = [TextEditingController()];
+  List<TextEditingController> quantityController = [TextEditingController()];
+  List<TextEditingController> unitPriceController = [TextEditingController()];
   DateTime? date;
   TimeOfDay? start;
   TimeOfDay? end;
+  String? serviceId;
+
+  @override
+  void initState() {
+    super.initState();
+    user.getUserPosts(3, user.userData?.id).then((message) {
+      if (message != "success") {
+        customSnackBar(message);
+      }
+    });
+  }
 
   onSubmit() async {
-    Get.to(() => OfferPreview());
+    final offerData = {
+      "chat": widget.chatID,
+      "provider": user.userData!.id,
+      "customer": widget.userId,
+      "service": serviceId,
+      "description": _serviceDetailsController.text.trim(),
+      "date": date?.toUtc().toIso8601String(),
+      "from": "${start?.hour}:${start?.minute}",
+      "to": "${end?.hour}:${end?.minute}",
+      "items": [
+        for (int i = 0; i < titleController.length; i++)
+          {
+            "title": titleController.elementAt(i).text,
+            "quantity": double.tryParse(quantityController.elementAt(i).text),
+            "unitPrice": double.tryParse(unitPriceController.elementAt(i).text),
+          },
+      ],
+      "discount": int.tryParse(_discountController.text.trim()) ?? 0,
+    };
+
+    final message = await Get.find<ChatController>().createOffer(offerData);
+
+    if (message == "success") {
+      Get.to(() => OfferPreview());
+    } else {
+      customSnackBar(message);
+    }
   }
 
   @override
   void dispose() {
     _serviceDetailsController.dispose();
-    _dateController.dispose();
-    _fromController.dispose();
-    _toController.dispose();
     _discountController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    num sum = 0;
+
+    for (int i = 0; i < titleController.length; i++) {
+      var quantity = double.tryParse(quantityController.elementAt(i).text) ?? 1;
+      var price = double.tryParse(unitPriceController.elementAt(i).text) ?? 0;
+
+      sum += quantity * price;
+    }
+
     return Scaffold(
       appBar: CustomAppBar(title: "Create Offer"),
       body: SingleChildScrollView(
@@ -53,10 +104,19 @@ class _CreateOfferState extends State<CreateOffer> {
             spacing: 16,
             children: [
               const SizedBox(height: 4),
-              // TODO: Impl Loading logic from j4corp
-              CustomDropDown(
-                title: "Select Service",
-                options: ["Plumbing Service"],
+              Obx(
+                () => CustomDropDown(
+                  title: "Select Service",
+                  isLoading: user.isFirstLoad.value,
+                  onChanged: (val) {
+                    setState(() {
+                      serviceId = user.posts
+                          .firstWhere((temp) => temp.title == val)
+                          .id;
+                    });
+                  },
+                  options: [for (var i in user.posts) i.title],
+                ),
               ),
               CustomTextField(
                 title: "Service Details",
@@ -71,13 +131,14 @@ class _CreateOfferState extends State<CreateOffer> {
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2050),
                   );
-                  if (date != null) {
-                    _dateController.text = Formatter.dateFormatter(date!);
-                  }
                   setState(() {});
                 },
                 title: "Date",
-                controller: _dateController,
+                controller: date != null
+                    ? TextEditingController(
+                        text: Formatter.dateFormatter(date!),
+                      )
+                    : null,
                 hintText: "Pick date",
                 trailing: "assets/icons/calendar.svg",
               ),
@@ -92,15 +153,14 @@ class _CreateOfferState extends State<CreateOffer> {
                           context: context,
                           initialTime: TimeOfDay.now(),
                         );
-                        if (start != null) {
-                          _fromController.text = Formatter.timeFormatter(
-                            time: start,
-                          );
-                        }
                         setState(() {});
                       },
                       title: "From",
-                      controller: _fromController,
+                      controller: start != null
+                          ? TextEditingController(
+                              text: Formatter.timeFormatter(time: start),
+                            )
+                          : null,
                       hintText: "Pick time",
                       trailing: "assets/icons/clock.svg",
                     ),
@@ -112,15 +172,14 @@ class _CreateOfferState extends State<CreateOffer> {
                           context: context,
                           initialTime: TimeOfDay.now(),
                         );
-                        if (end != null) {
-                          _toController.text = Formatter.timeFormatter(
-                            time: end,
-                          );
-                        }
                         setState(() {});
                       },
                       title: "To",
-                      controller: _toController,
+                      controller: end != null
+                          ? TextEditingController(
+                              text: Formatter.timeFormatter(time: end),
+                            )
+                          : null,
                       hintText: "Pick time",
                       trailing: "assets/icons/clock.svg",
                     ),
@@ -133,13 +192,32 @@ class _CreateOfferState extends State<CreateOffer> {
                 isOptional: true,
                 hintText: "Set Discount",
                 controller: _discountController,
+                textInputType: TextInputType.number,
               ),
-              for (int i = 0; i < 2; i++) serviceItem(),
+              for (int i = 0; i < titleController.length; i++) serviceItem(i),
               const SizedBox(height: 8),
               CustomButton(
-                onTap: () {},
+                onTap: () {
+                  setState(() {
+                    titleController.add(TextEditingController());
+                    quantityController.add(TextEditingController());
+                    unitPriceController.add(TextEditingController());
+                  });
+                },
                 text: "Add New Item",
                 isSecondary: true,
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: CustomButton(
+                  onTap: () => setState(() {}),
+                  text: "Calculate",
+                  radius: 4,
+                  width: null,
+                  padding: 8,
+                  height: 36,
+                ),
               ),
               const SizedBox(height: 8),
               Column(
@@ -153,7 +231,7 @@ class _CreateOfferState extends State<CreateOffer> {
                       ),
                       Spacer(),
                       Text(
-                        "\$350",
+                        "\$$sum",
                         style: AppTexts.tsmm.copyWith(color: AppColors.gray),
                       ),
                     ],
@@ -166,7 +244,7 @@ class _CreateOfferState extends State<CreateOffer> {
                       ),
                       Spacer(),
                       Text(
-                        "\$50",
+                        "\$${_discountController.text}",
                         style: AppTexts.tsmm.copyWith(color: AppColors.gray),
                       ),
                     ],
@@ -176,13 +254,22 @@ class _CreateOfferState extends State<CreateOffer> {
                     children: [
                       Text("Total", style: AppTexts.tmdb),
                       Spacer(),
-                      Text("\$350", style: AppTexts.tmdb),
+                      Text(
+                        "\$${sum - (double.tryParse(_discountController.text) ?? 0)}",
+                        style: AppTexts.tmdb,
+                      ),
                     ],
                   ),
                 ],
               ),
               const SizedBox(height: 8),
-              CustomButton(onTap: onSubmit, text: "Preview Offer"),
+              Obx(
+                () => CustomButton(
+                  onTap: onSubmit,
+                  isLoading: Get.find<ChatController>().isLoading.value,
+                  text: "Preview Offer",
+                ),
+              ),
               const SizedBox(height: 24),
             ],
           ),
@@ -191,7 +278,7 @@ class _CreateOfferState extends State<CreateOffer> {
     );
   }
 
-  Widget serviceItem() {
+  Widget serviceItem(int index) {
     return Container(
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -202,19 +289,30 @@ class _CreateOfferState extends State<CreateOffer> {
         spacing: 16,
         children: [
           Text("Service Item", style: AppTexts.tmdb),
-          CustomTextField(title: "Name"),
+          CustomTextField(
+            title: "Name",
+            controller: titleController.elementAt(index),
+          ),
           CustomTextField(
             title: "Quantity",
             textInputType: TextInputType.number,
+            controller: quantityController.elementAt(index),
           ),
           CustomTextField(
             title: "Unit Price",
             textInputType: TextInputType.number,
+            controller: unitPriceController.elementAt(index),
           ),
           Align(
             alignment: Alignment.bottomRight,
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                setState(() {
+                  titleController.removeAt(index);
+                  quantityController.removeAt(index);
+                  unitPriceController.removeAt(index);
+                });
+              },
               child: CustomSvg(asset: "assets/icons/delete.svg"),
             ),
           ),

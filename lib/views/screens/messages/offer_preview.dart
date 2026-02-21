@@ -1,14 +1,25 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 
-class OfferPreview extends StatelessWidget {
+class OfferPreview extends StatefulWidget {
   const OfferPreview({super.key});
+
+  @override
+  State<OfferPreview> createState() => _OfferPreviewState();
+}
+
+class _OfferPreviewState extends State<OfferPreview> {
+  final chat = Get.find<ChatController>();
+  final offer = Get.find<ChatController>().lastOffer.value!;
+  bool showFullDescription = false;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +36,7 @@ class OfferPreview extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Plumbing Services", style: AppTexts.dxsb),
+                  Text("offer.service", style: AppTexts.dxsb),
                   Text(
                     "Personal/Home Services",
                     style: AppTexts.txsr.copyWith(
@@ -39,7 +50,7 @@ class OfferPreview extends StatelessWidget {
                       CustomSvg(asset: "assets/icons/offer.svg", size: 16),
                       Expanded(
                         child: Text(
-                          DateFormat("dd MMM, yyyy").format(DateTime.now()),
+                          DateFormat("dd MMM, yyyy").format(offer.date),
                           style: AppTexts.tsmr.copyWith(
                             color: AppColors.gray.shade700,
                           ),
@@ -58,7 +69,7 @@ class OfferPreview extends StatelessWidget {
                       ),
                       Expanded(
                         child: Text(
-                          DateFormat("hh:mm aa").format(DateTime.now()),
+                          "${offer.from}-${offer.to}",
                           style: AppTexts.tsmr.copyWith(
                             color: AppColors.gray.shade700,
                           ),
@@ -75,17 +86,24 @@ class OfferPreview extends StatelessWidget {
               color: Colors.white,
               child: RichText(
                 text: TextSpan(
-                  text:
-                      "Lorem ipsum dolor sit amet consectetur. Turpis montes euismod nunc odio ut imperdiet proin enim. Porttitor amet dolor nisi tempor amet dolor. Orci faucibus dui nunc diam....",
+                  text: offer.description.length > 100 && !showFullDescription
+                      ? "${offer.description.substring(0, 100)}..."
+                      : offer.description,
                   style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade600),
                   children: [
-                    TextSpan(
-                      text: "Read More",
-                      style: AppTexts.tsmb.copyWith(
-                        color: AppColors.green.shade700,
+                    if (offer.description.length > 100)
+                      TextSpan(
+                        text: showFullDescription ? " Show Less" : "Read More",
+                        style: AppTexts.tsmb.copyWith(
+                          color: AppColors.green.shade700,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            setState(() {
+                              showFullDescription = !showFullDescription;
+                            });
+                          },
                       ),
-                      recognizer: TapGestureRecognizer()..onTap = () {},
-                    ),
                   ],
                 ),
               ),
@@ -113,15 +131,17 @@ class OfferPreview extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Pipe Replacement",
+                            offer.items.elementAt(index).title,
                             style: AppTexts.tmdb.copyWith(
                               color: AppColors.gray.shade700,
                             ),
                           ),
                           for (var i in {
-                            "Quantity": "2",
-                            "Unit Price": "\$100",
-                            "Line Total": "\$200",
+                            "Quantity": offer.items.elementAt(index).quantity,
+                            "Unit Price":
+                                "\$${offer.items.elementAt(index).unitPrice}",
+                            "Line Total":
+                                "\$${offer.items.elementAt(index).quantity * offer.items.elementAt(index).unitPrice}",
                           }.entries)
                             RichText(
                               text: TextSpan(
@@ -131,7 +151,7 @@ class OfferPreview extends StatelessWidget {
                                 ),
                                 children: [
                                   TextSpan(
-                                    text: i.value,
+                                    text: i.value.toString(),
                                     style: AppTexts.tsmr.copyWith(
                                       color: AppColors.gray.shade700,
                                     ),
@@ -146,7 +166,7 @@ class OfferPreview extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       child: Divider(),
                     ),
-                    itemCount: 2,
+                    itemCount: offer.items.length,
                     physics: NeverScrollableScrollPhysics(),
                   ),
                 ],
@@ -171,7 +191,7 @@ class OfferPreview extends StatelessWidget {
                           ),
                           Spacer(),
                           Text(
-                            "\$350",
+                            "\$$calculateServiceCharge",
                             style: AppTexts.tsmm.copyWith(
                               color: AppColors.gray,
                             ),
@@ -188,7 +208,7 @@ class OfferPreview extends StatelessWidget {
                           ),
                           Spacer(),
                           Text(
-                            "\$50",
+                            "\$${offer.discount}",
                             style: AppTexts.tsmm.copyWith(
                               color: AppColors.gray,
                             ),
@@ -200,7 +220,10 @@ class OfferPreview extends StatelessWidget {
                         children: [
                           Text("Total", style: AppTexts.tmdb),
                           Spacer(),
-                          Text("\$350", style: AppTexts.tmdb),
+                          Text(
+                            "\$${calculateServiceCharge - offer.discount}",
+                            style: AppTexts.tmdb,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -209,11 +232,20 @@ class OfferPreview extends StatelessWidget {
                         children: [
                           Expanded(
                             child: CustomButton(
+                              onTap: () => Get.back(),
                               text: "Edit Offer",
                               isSecondary: true,
                             ),
                           ),
-                          Expanded(child: CustomButton(text: "Send Offer")),
+                          Expanded(
+                            child: Obx(
+                              () => CustomButton(
+                                onTap: () {},
+                                isLoading: chat.isLoading.value,
+                                text: "Send Offer",
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -226,5 +258,13 @@ class OfferPreview extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  num get calculateServiceCharge {
+    num sum = 0;
+    for (var i in offer.items) {
+      sum += i.quantity * i.unitPrice;
+    }
+    return sum;
   }
 }

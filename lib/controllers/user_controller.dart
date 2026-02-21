@@ -126,6 +126,7 @@ class UserController extends GetxController {
           "/post/user-post/$id",
           "/post/user-join-event/$id",
           "/save/my-saved-post",
+          "/post/my-service"
         ][index],
         queryParams: {
           "page": currentPage.value.toString(),

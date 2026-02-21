@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
+import 'package:jurnee/models/offer_model.dart';
 import 'package:jurnee/views/screens/messages/chat.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/models/chat_model.dart';
@@ -18,6 +19,7 @@ class ChatController extends GetxController {
 
   final RxList<ChatModel> chats = RxList.empty();
   final RxList<MessageModel> messages = RxList.empty();
+  final Rxn<OfferModel> lastOffer = Rxn();
 
   RxInt currentPage = 1.obs;
   int limit = 20;
@@ -239,6 +241,26 @@ class ChatController extends GetxController {
     } finally {
       isFirstLoad(false);
       isMoreLoading(false);
+    }
+  }
+
+  Future<String> createOffer(Map<String, dynamic> data) async {
+    isLoading(true);
+    try {
+      final res = await api.post("/offer", data, authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        lastOffer.value = OfferModel.fromJson(body['data']);
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
     }
   }
 }

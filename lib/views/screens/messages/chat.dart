@@ -85,7 +85,12 @@ class _ChatState extends State<Chat> {
             Spacer(),
             GestureDetector(
               onTap: () {
-                Get.to(() => CreateOffer());
+                Get.to(
+                  () => CreateOffer(
+                    chatID: widget.inboxId,
+                    userId: widget.chatMember.id,
+                  ),
+                );
               },
               child: CustomSvg(asset: "assets/icons/offer.svg", size: 24),
             ),
