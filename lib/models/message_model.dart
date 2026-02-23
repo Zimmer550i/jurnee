@@ -1,8 +1,14 @@
+import 'offer_model.dart';
+
+enum MessageType { message, offer }
+
 class MessageModel {
   final String? id;
   final String? chat;
   final SenderModel? sender;
   final String? message;
+  final OfferModel? offer;
+  final MessageType? type;
   final bool? read;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -12,6 +18,8 @@ class MessageModel {
     this.chat,
     this.sender,
     this.message,
+    this.offer,
+    this.type = MessageType.message,
     this.read,
     this.createdAt,
     this.updatedAt,
@@ -25,6 +33,12 @@ class MessageModel {
           ? SenderModel.fromJson(json['sender'])
           : null,
       message: json['message'] as String?,
+      offer: json['offer'] != null
+          ? OfferModel.fromJson(json['offer'] as Map<String, dynamic>)
+          : null,
+      type: (json['type'] as String?) == 'offer'
+          ? MessageType.offer
+          : MessageType.message,
       read: json['read'] as bool?,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'])
@@ -41,6 +55,8 @@ class MessageModel {
       "chat": chat,
       "sender": sender?.toJson(),
       "message": message,
+      "offer": offer?.toJson(),
+      "type": type == MessageType.offer ? 'offer' : 'message',
       "read": read,
       "createdAt": createdAt?.toIso8601String(),
       "updatedAt": updatedAt?.toIso8601String(),

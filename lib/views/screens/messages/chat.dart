@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/chat_model.dart';
+import 'package:jurnee/models/message_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_list_handler.dart';
@@ -126,10 +127,6 @@ class _ChatState extends State<Chat> {
                           ),
                         ),
                       ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: OfferWidget(),
-                    ),
                     const SizedBox(height: 70),
                   ],
                 ),
@@ -189,12 +186,40 @@ class _ChatState extends State<Chat> {
   }
 
   Widget getMessage(int index) {
-    String message = chat.messages[index].message ?? "____";
+    if (chat.messages[index].type == MessageType.offer) {
+      if (chat.messages[index].offer?.status == "rejected" ||
+          chat.rejectedOfferId.value == chat.messages[index].offer?.id) {
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Text(
+            "Offer Rejected!",
+            style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade400),
+          ),
+        );
+      }
+      try {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: OfferWidget(offer: chat.messages[index].offer!),
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Text(
+            "Error Loading Offer!",
+            style: AppTexts.tsmr.copyWith(color: AppColors.red),
+          ),
+        );
+      }
+    }
+
+    String text = chat.messages[index].message ?? "____";
     bool isRecieving = widget.chatMember.id == chat.messages[index].sender?.id;
 
     if (isRecieving) {
       return recieveMessage(
-        message,
+        text,
         hasPrev:
             index != chat.messages.length - 1 &&
             widget.chatMember.id == chat.messages[index + 1].sender?.id,
@@ -204,7 +229,7 @@ class _ChatState extends State<Chat> {
       );
     } else {
       return sendMessage(
-        message,
+        text,
         hasPrev:
             index != chat.messages.length - 1 &&
             widget.chatMember.id != chat.messages[index + 1].sender?.id,

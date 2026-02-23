@@ -15,11 +15,12 @@ class ChatController extends GetxController {
 
   RxBool isConnected = RxBool(false);
   IO.Socket? socket;
-  final _socketUrl = "https://api.joinjurnee.com/";
+  final _socketUrl = "http://10.10.12.98:3001/";
 
   final RxList<ChatModel> chats = RxList.empty();
   final RxList<MessageModel> messages = RxList.empty();
   final Rxn<OfferModel> lastOffer = Rxn();
+  final RxnString rejectedOfferId = RxnString();
 
   RxInt currentPage = 1.obs;
   int limit = 20;
@@ -101,6 +102,7 @@ class ChatController extends GetxController {
     required String chatId,
     required String senderId,
     required String message,
+    bool isOffer = false,
   }) {
     // Check if socket is null or disconnected before attempting to send
     if (socket == null || !socket!.connected) {
@@ -116,7 +118,10 @@ class ChatController extends GetxController {
       MessageModel(id: "demo", chat: chatId, message: message),
     );
     messages.refresh();
-    final payload = {"chat": chatId, "sender": senderId, "message": message};
+    var payload = {"chat": chatId, "sender": senderId, "message": message};
+    if (isOffer) {
+      payload.addAll({"offer": message, "type": "offer"});
+    }
 
     socket!.emit("send-message", payload);
   }
@@ -263,4 +268,48 @@ class ChatController extends GetxController {
       isLoading(false);
     }
   }
+
+  Future<String> rejectOffer(OfferModel offer) async {
+    isLoading(true);
+    try {
+      final res = await api.post("/offer/reject", {
+        "offerId": offer.id,
+        "customerId": offer.customer,
+      }, authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        rejectedOfferId.value = offer.id;
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // Future<String> acceptOffer(OfferModel offer) async {
+  //   isLoading(true);
+  //   try {
+  //     final res = await api.post("/offer/completed", {
+  //       "offerId": offer.id,
+  //       "customerId": offer.customer,
+  //     }, authReq: true);
+  //     final body = jsonDecode(res.body);
+
+  //     if (res.statusCode == 200 || res.statusCode == 201) {
+  //       return "success";
+  //     } else {
+  //       return body['message'] ?? "Something went wrong";
+  //     }
+  //   } catch (e) {
+  //     return e.toString();
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
 }

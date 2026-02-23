@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
+import 'package:jurnee/models/offer_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 
 class OfferPreview extends StatefulWidget {
-  const OfferPreview({super.key});
+  final OfferModel? offer;
+  const OfferPreview({super.key, this.offer});
 
   @override
   State<OfferPreview> createState() => _OfferPreviewState();
@@ -18,8 +22,18 @@ class OfferPreview extends StatefulWidget {
 
 class _OfferPreviewState extends State<OfferPreview> {
   final chat = Get.find<ChatController>();
-  final offer = Get.find<ChatController>().lastOffer.value!;
+  late OfferModel offer;
   bool showFullDescription = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.offer != null) {
+      offer = widget.offer!;
+    } else {
+      offer = Get.find<ChatController>().lastOffer.value!;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +50,9 @@ class _OfferPreviewState extends State<OfferPreview> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("offer.service", style: AppTexts.dxsb),
+                  Text(offer.service.title, style: AppTexts.dxsb),
                   Text(
-                    "Personal/Home Services",
+                    offer.service.subcategory,
                     style: AppTexts.txsr.copyWith(
                       color: AppColors.gray.shade700,
                     ),
@@ -227,28 +241,16 @@ class _OfferPreviewState extends State<OfferPreview> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        spacing: 8,
-                        children: [
-                          Expanded(
-                            child: CustomButton(
-                              onTap: () => Get.back(),
-                              text: "Edit Offer",
-                              isSecondary: true,
-                            ),
-                          ),
-                          Expanded(
-                            child: Obx(
-                              () => CustomButton(
-                                onTap: () {},
-                                isLoading: chat.isLoading.value,
-                                text: "Send Offer",
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
+
+                      if (Get.find<UserController>().userData!.id ==
+                              offer.provider &&
+                          widget.offer == null)
+                        ownerActions(),
+                      if (Get.find<UserController>().userData!.id ==
+                          offer.customer)
+                        customerActions(),
+
+                      // const SizedBox(height: 16),
                     ],
                   ),
                 ],
@@ -257,6 +259,73 @@ class _OfferPreviewState extends State<OfferPreview> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget ownerActions() {
+    return Row(
+      spacing: 8,
+      children: [
+        // Expanded(
+        //   child: CustomButton(
+        //     onTap: () => Get.back(),
+        //     text: "",
+        //     isSecondary: true,
+        //   ),
+        // ),
+        Expanded(
+          child: Obx(
+            () => CustomButton(
+              onTap: () {
+                chat.sendMessage(
+                  chatId: chat.lastOffer.value!.chat,
+                  senderId: chat.lastOffer.value!.provider,
+                  message: chat.lastOffer.value!.id,
+                  isOffer: true,
+                );
+                Get.back();
+                Get.back();
+              },
+              isLoading: chat.isLoading.value,
+              text: "Send Offer",
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget customerActions() {
+    return Row(
+      spacing: 8,
+      children: [
+        Expanded(
+          child: CustomButton(
+            onTap: () async {
+              final message = await chat.rejectOffer(offer);
+
+              if (message == "success") {
+                customSnackBar("Offer has been rejected", isError: false);
+              } else {
+                customSnackBar(message);
+              }
+            },
+            text: "Reject",
+            isSecondary: true,
+          ),
+        ),
+        Expanded(
+          child: Obx(
+            () => CustomButton(
+              onTap: () async {
+                // final message = await chat.off
+              },
+              isLoading: chat.isLoading.value,
+              text: "Accept",
+            ),
+          ),
+        ),
+      ],
     );
   }
 

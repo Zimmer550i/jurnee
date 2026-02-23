@@ -2,6 +2,7 @@ import 'package:jurnee/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/views/base/custom_loading.dart';
 
 class CustomDropDown extends StatefulWidget {
   final String? title;
@@ -105,6 +106,16 @@ class _CustomDropDownState extends State<CustomDropDown> {
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            if (widget.isLoading) CustomLoading(),
+                            if (!widget.isLoading && widget.options.isEmpty)
+                              Center(
+                                child: Text(
+                                  "You have to service to offer",
+                                  style: AppTexts.tsmr.copyWith(
+                                    color: AppColors.gray.shade300,
+                                  ),
+                                ),
+                              ),
                             ...widget.options.map((e) {
                               return GestureDetector(
                                 behavior: HitTestBehavior.translucent,

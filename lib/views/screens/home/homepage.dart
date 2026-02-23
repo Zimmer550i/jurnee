@@ -95,7 +95,7 @@ class HomepageState extends State<Homepage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      tabs("All", null, 0),
+                      tabs("All", "assets/icons/icon.svg", 0),
                       tabs("Events", "assets/icons/calendar.svg", 1),
                       tabs("Deals", "assets/icons/price_tag.svg", 2),
                       tabs("Services", "assets/icons/info.svg", 3),
@@ -197,16 +197,12 @@ class HomepageState extends State<Homepage> {
             if (icon != null)
               CustomSvg(
                 asset: icon,
-                color: isSelected
-                    ? AppColors.gray.shade900
-                    : AppColors.gray.shade500,
+                color: isSelected ? Colors.white : AppColors.gray.shade500,
               ),
             Text(
               title,
               style: AppTexts.txsm.copyWith(
-                color: isSelected
-                    ? AppColors.gray.shade900
-                    : AppColors.gray.shade500,
+                color: isSelected ? Colors.white : AppColors.gray.shade500,
               ),
             ),
           ],
