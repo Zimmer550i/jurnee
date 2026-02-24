@@ -464,6 +464,10 @@ class _ProfileState extends State<Profile> {
                 Get.back();
                 Get.to(() => EditProfile());
               }),
+              // drawerButton("Orders", "order_history", () {
+              //   Get.back();
+              //   Get.to(() => EditProfile());
+              // }),
               drawerButton("My Bookings", "calendar", () {
                 Get.back();
                 Get.to(() => Bookings());
@@ -471,7 +475,10 @@ class _ProfileState extends State<Profile> {
               drawerButton("Client Bookings", "client", () {
                 Get.back();
                 Get.to(() => Bookings(showClientBooking: true));
-                // Get.to(() => EditProfile());
+              }),
+              drawerButton("Boosted Posts", "boost", () {
+                Get.back();
+                Get.to(() => Bookings(showClientBooking: true));
               }),
               drawerButton("Community Guidelines", "guidelines", () {
                 Get.back();

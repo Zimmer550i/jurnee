@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:jurnee/models/booking_model.dart';
+import 'package:jurnee/models/offer_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
+import 'package:jurnee/views/screens/messages/offer_preview.dart';
 import 'package:jurnee/views/screens/profile/mark_as_complete.dart';
 
 class BookingWidget extends StatelessWidget {
-  final BookingModel booking;
-  const BookingWidget({super.key, required this.booking});
+  final OfferModel offer;
+  const BookingWidget({super.key, required this.offer});
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +28,13 @@ class BookingWidget extends StatelessWidget {
         children: [
           Row(
             children: [
-              ProfilePicture(image: booking.provider.image, size: 40),
+              ProfilePicture(image: offer.provider.image, size: 40),
               const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    booking.provider.name,
+                    offer.provider.name,
                     style: AppTexts.tmdm.copyWith(
                       color: AppColors.gray.shade700,
                     ),
@@ -63,11 +64,12 @@ class BookingWidget extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  booking.service.title,
+                  offer.service.title,
                   style: AppTexts.tmdm.copyWith(color: AppColors.gray.shade700),
                 ),
                 Spacer(),
                 CustomButton(
+                  onTap: () => Get.to(()=> OfferPreview(offer: offer,)),
                   text: "See Post",
                   width: null,
                   padding: 12,
@@ -102,7 +104,7 @@ class BookingWidget extends StatelessWidget {
                         size: 16,
                       ),
                       Text(
-                        DateFormat("EEE, MMMM dd").format(booking.serviceDate),
+                        DateFormat("EEE, MMMM dd").format(offer.date),
                         style: AppTexts.tsmm.copyWith(color: AppColors.gray),
                       ),
                     ],
@@ -120,7 +122,7 @@ class BookingWidget extends StatelessWidget {
                         size: 16,
                       ),
                       Text(
-                        DateFormat("hh:mm a").format(booking.serviceDate),
+                        DateFormat("hh:mm a").format(offer.date),
                         style: AppTexts.tsmm.copyWith(color: AppColors.gray),
                       ),
                     ],
@@ -130,12 +132,12 @@ class BookingWidget extends StatelessWidget {
             ),
           ),
 
-          if (booking.status == BookingStatus.progress)
+          if (offer.status.toLowerCase() == "accepted")
             CustomButton(
-              onTap: () => Get.to(() => MarkAsComplete(booking: booking)),
+              onTap: () => Get.to(() => MarkAsComplete(booking: offer)),
               text: "Mark as Complete",
             ),
-          if (booking.status == BookingStatus.completed)
+          if (offer.status.toLowerCase() == "completed")
             CustomButton(text: "Make Payment", isSecondary: true),
         ],
       ),

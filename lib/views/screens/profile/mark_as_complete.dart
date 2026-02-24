@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:jurnee/models/booking_model.dart';
+import 'package:jurnee/models/offer_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_svg.dart';
@@ -9,7 +9,7 @@ import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 
 class MarkAsComplete extends StatelessWidget {
-  final BookingModel booking;
+  final OfferModel booking;
   const MarkAsComplete({super.key, required this.booking});
 
   @override
@@ -67,12 +67,12 @@ class MarkAsComplete extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      DateFormat().format(booking.serviceDate),
+                      DateFormat().format(booking.date),
                       style: AppTexts.tmdr,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "at ${DateFormat("hh:mm a").format(booking.serviceDate)}",
+                      "at ${DateFormat("hh:mm a").format(booking.date)}",
                       style: AppTexts.tmdr,
                     ),
                     const SizedBox(height: 16),

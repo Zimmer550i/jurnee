@@ -136,7 +136,7 @@ class _BookingsState extends State<Bookings> {
                     spacing: 20,
                     children: [
                       const SizedBox(height: 4),
-                      for (var i in booking.bookings) BookingWidget(booking: i),
+                      for (var i in booking.offers) BookingWidget(offer: i),
                       if (booking.isMoreLoading.value) CustomLoading(),
                       if (!booking.isMoreLoading.value)
                         Text(

@@ -243,7 +243,7 @@ class _OfferPreviewState extends State<OfferPreview> {
                       const SizedBox(height: 16),
 
                       if (Get.find<UserController>().userData!.id ==
-                              offer.provider &&
+                              offer.provider.id &&
                           widget.offer == null)
                         ownerActions(),
                       if (Get.find<UserController>().userData!.id ==
@@ -279,7 +279,7 @@ class _OfferPreviewState extends State<OfferPreview> {
               onTap: () {
                 chat.sendMessage(
                   chatId: chat.lastOffer.value!.chat,
-                  senderId: chat.lastOffer.value!.provider,
+                  senderId: chat.lastOffer.value!.provider.id,
                   message: chat.lastOffer.value!.id,
                   isOffer: true,
                 );

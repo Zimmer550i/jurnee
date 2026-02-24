@@ -1,7 +1,6 @@
 import 'dart:convert';
-
 import 'package:get/get.dart';
-import 'package:jurnee/models/booking_model.dart';
+import 'package:jurnee/models/offer_model.dart';
 import 'package:jurnee/models/pagination_meta.dart';
 import 'package:jurnee/services/api_service.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,8 +9,8 @@ class BookingController extends GetxController {
   final api = ApiService();
 
   RxBool isLoading = RxBool(false);
-  Rxn<BookingModel> current = Rxn();
-  RxList<BookingModel> bookings = RxList();
+  Rxn<OfferModel> current = Rxn();
+  RxList<OfferModel> offers = RxList();
 
   RxInt currentPage = 1.obs;
   int limit = 10;
@@ -34,7 +33,7 @@ class BookingController extends GetxController {
 
     try {
       final res = await api.get(
-        "/bookings/$type",
+        "/offer/$type",
         queryParams: {
           "page": currentPage.value.toString(),
           "limit": limit.toString(),
@@ -46,15 +45,15 @@ class BookingController extends GetxController {
 
       if (res.statusCode == 200) {
         if (!loadMore) {
-          bookings.clear();
+          offers.clear();
         }
         final meta = PaginationMeta.fromJson(body['meta']);
         totalPages(meta.totalPage);
 
         final List<dynamic> dataList = body['data'];
-        final newItems = dataList.map((e) => BookingModel.fromJson(e)).toList();
+        final newItems = dataList.map((e) => OfferModel.fromJson(e)).toList();
 
-        bookings.addAll(newItems);
+        offers.addAll(newItems);
 
         return "success";
       } else {
@@ -90,13 +89,13 @@ class BookingController extends GetxController {
         "amount": amount,
       };
 
-      final res = await api.post("/bookings", data, authReq: true);
+      final res = await api.post("/offer", data, authReq: true);
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         final data = body['data'];
 
-        current.value = BookingModel.fromJson(data);
+        current.value = OfferModel.fromJson(data);
 
         return "success";
       } else {

@@ -1,7 +1,7 @@
 class OfferModel {
   final String id;
   final String chat;
-  final String provider;
+  final ProviderModel provider;
   final String customer;
   final ServiceModel service;
   final String description;
@@ -35,18 +35,19 @@ class OfferModel {
     return OfferModel(
       id: json['_id'] ?? '',
       chat: json['chat'] ?? '',
-      provider: json['provider'] ?? '',
+      provider: ProviderModel.fromJson(json['provider'] as Map<String, dynamic>)
+  ,
       customer: json['customer'] ?? '',
-      service: ServiceModel.fromJson(json['service'] as Map<String, dynamic>),
+      service: json['service'] != null ? ServiceModel.fromJson(json['service'] as Map<String, dynamic>) : ServiceModel(id: ''),
       description: json['description'] ?? '',
-      date: DateTime.parse(json['date']),
+      date: json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
       from: json['from'] ?? '',
       to: json['to'] ?? '',
-      items: (json['items'] as List).map((e) => OfferItem.fromJson(e)).toList(),
+      items: (json['items'] as List?)?.map((e) => OfferItem.fromJson(e)).toList() ?? [],
       discount: (json['discount'] ?? 0).toDouble(),
       status: json['status'] ?? '',
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
+      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : DateTime.now(),
     );
   }
 
@@ -54,7 +55,7 @@ class OfferModel {
     return {
       '_id': id,
       'chat': chat,
-      'provider': provider,
+      'provider': provider.toJson(),
       'customer': customer,
       'service': service.toJson(),
       'description': description,
@@ -67,6 +68,13 @@ class OfferModel {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
+  }
+  double get amount {
+    double total = 0;
+    for (final item in items) {
+      total += item.unitPrice * item.quantity;
+    }
+    return total;
   }
 }
 
@@ -171,4 +179,40 @@ class ServiceLocation {
 
   double? get longitude => coordinates.isNotEmpty ? coordinates[0] : null;
   double? get latitude => coordinates.length > 1 ? coordinates[1] : null;
+}
+
+class ProviderModel {
+  final String id;
+  final String name;
+  final String email;
+  final String address;
+  final String? image;
+
+  ProviderModel({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.address,
+    required this.image,
+  });
+
+  factory ProviderModel.fromJson(Map<String, dynamic> json) {
+    return ProviderModel(
+      id: json['_id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      address: json['address']?.toString() ?? '',
+      image: json['image']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'name': name,
+      'email': email,
+      'address': address,
+      'image': image,
+    };
+  }
 }
