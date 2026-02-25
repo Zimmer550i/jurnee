@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,6 +15,7 @@ import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
+import 'package:jurnee/views/base/video_widget.dart';
 
 class CommentWidget extends StatefulWidget {
   final CommentModel comment;
@@ -85,7 +85,12 @@ class _CommentWidgetState extends State<CommentWidget> {
                   borderRadius: BorderRadiusGeometry.circular(12),
                   child: SizedBox(
                     height: 200,
-                    child: MediaThumbnail(path: widget.comment.video),
+                    child: GestureDetector(
+                      onTap: () => Get.to(
+                        () => VideoWidget(widget.comment.video),
+                      ),
+                      child: MediaThumbnail(path: widget.comment.video),
+                    ),
                   ),
                 ),
               Row(

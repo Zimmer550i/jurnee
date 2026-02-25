@@ -13,12 +13,12 @@ import 'package:video_player/video_player.dart';
 class VideoWidget extends StatefulWidget {
   final String? url;
   final VideoPlayerController? controller;
-  final PostModel postData;
+  final PostModel? postData;
   const VideoWidget(
     this.url, {
     super.key,
     this.controller,
-    required this.postData,
+    this.postData,
   });
 
   @override
@@ -153,56 +153,61 @@ class _VideoWidgetState extends State<VideoWidget> {
                       //   ),
                       // ),
                       // const SizedBox(height: 12),
-                      Text(
-                        widget.postData.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTexts.dxsm.copyWith(
-                          color: AppColors.gray[25],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
+                      if(widget.postData != null)
+                      Column(
                         children: [
                           Text(
-                            Get.find<PostController>().getDistance(
-                              widget.postData.location.coordinates[0],
-                              widget.postData.location.coordinates[1],
-                            ),
-                            style: AppTexts.tmdm.copyWith(
+                            widget.postData!.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTexts.dxsm.copyWith(
                               color: AppColors.gray[25],
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          for (int i = 0; i < 4; i++)
-                            CustomSvg(asset: "assets/icons/star.svg"),
-                          for (int i = 0; i < 1; i++)
-                            CustomSvg(
-                              asset: "assets/icons/star.svg",
-                              color: Colors.white,
-                            ),
-                          const SizedBox(width: 4),
-                          Text(
-                            widget.postData.averageRating.toString(),
-                            style: AppTexts.tmdm.copyWith(
-                              color: AppColors.gray[25],
-                            ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
+                                Get.find<PostController>().getDistance(
+                                  widget.postData!.location.coordinates[0],
+                                  widget.postData!.location.coordinates[1],
+                                ),
+                                style: AppTexts.tmdm.copyWith(
+                                  color: AppColors.gray[25],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              for (int i = 0; i < 4; i++)
+                                CustomSvg(asset: "assets/icons/star.svg"),
+                              for (int i = 0; i < 1; i++)
+                                CustomSvg(
+                                  asset: "assets/icons/star.svg",
+                                  color: Colors.white,
+                                ),
+                              const SizedBox(width: 4),
+                              Text(
+                                widget.postData!.averageRating.toString(),
+                                style: AppTexts.tmdm.copyWith(
+                                  color: AppColors.gray[25],
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          ProfilePicture(
-                            image: widget.postData.author.image,
-                            size: 52,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            widget.postData.author.name,
-                            style: AppTexts.txlm.copyWith(
-                              color: AppColors.gray[25],
-                            ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              ProfilePicture(
+                                image: widget.postData!.author.image,
+                                size: 52,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                widget.postData!.author.name,
+                                style: AppTexts.txlm.copyWith(
+                                  color: AppColors.gray[25],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

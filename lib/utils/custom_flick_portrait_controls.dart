@@ -11,7 +11,7 @@ import 'package:jurnee/views/base/profile_picture.dart';
 /// Default portrait controls.
 class CustomFlickPortraitControls extends StatelessWidget {
   final bool hasBackButton;
-  final PostModel postData;
+  final PostModel? postData;
   const CustomFlickPortraitControls({
     super.key,
     this.iconSize = 20,
@@ -113,59 +113,64 @@ class CustomFlickPortraitControls extends StatelessWidget {
                       //   ),
                       // ),
                       // const SizedBox(height: 12),
-                      Text(
-                        postData.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTexts.dxsm.copyWith(
-                          color: AppColors.gray[25],
+                      if (postData != null)
+                        Column(
+                          children: [
+                            Text(
+                              postData!.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTexts.dxsm.copyWith(
+                                color: AppColors.gray[25],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Text(
+                                  Get.find<PostController>().getDistance(
+                                    postData!.location.coordinates[0],
+                                    postData!.location.coordinates[1],
+                                  ),
+                                  style: AppTexts.tmdm.copyWith(
+                                    color: AppColors.gray[25],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                for (int i = 0; i < 4; i++)
+                                  CustomSvg(asset: "assets/icons/star.svg"),
+                                for (int i = 0; i < 1; i++)
+                                  CustomSvg(
+                                    asset: "assets/icons/star.svg",
+                                    color: Colors.white,
+                                  ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  postData!.averageRating.toString(),
+                                  style: AppTexts.tmdm.copyWith(
+                                    color: AppColors.gray[25],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                ProfilePicture(
+                                  image: postData!.author.image,
+                                  size: 52,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  postData!.author.name,
+                                  style: AppTexts.txlm.copyWith(
+                                    color: AppColors.gray[25],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(
-                            Get.find<PostController>().getDistance(
-                              postData.location.coordinates[0],
-                              postData.location.coordinates[1],
-                            ),
-                            style: AppTexts.tmdm.copyWith(
-                              color: AppColors.gray[25],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          for (int i = 0; i < 4; i++)
-                            CustomSvg(asset: "assets/icons/star.svg"),
-                          for (int i = 0; i < 1; i++)
-                            CustomSvg(
-                              asset: "assets/icons/star.svg",
-                              color: Colors.white,
-                            ),
-                          const SizedBox(width: 4),
-                          Text(
-                            postData.averageRating.toString(),
-                            style: AppTexts.tmdm.copyWith(
-                              color: AppColors.gray[25],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          ProfilePicture(
-                            image: postData.author.image,
-                            size: 52,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            postData.author.name,
-                            style: AppTexts.txlm.copyWith(
-                              color: AppColors.gray[25],
-                            ),
-                          ),
-                        ],
-                      ),
                       FlickVideoProgressBar(
                         flickProgressBarSettings: FlickProgressBarSettings(
                           playedColor: AppColors.green,
