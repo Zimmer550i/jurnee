@@ -478,6 +478,7 @@ class _ProfileState extends State<Profile> {
               }),
               drawerButton("Boosted Posts", "boost", () {
                 Get.back();
+                // TODO: Add Boosted Posts Page
                 Get.to(() => Bookings(showClientBooking: true));
               }),
               drawerButton("Community Guidelines", "guidelines", () {

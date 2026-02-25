@@ -18,105 +18,131 @@ class PostCard extends StatelessWidget {
       onTap: () {
         Get.to(() => PostDetails(post));
       },
-      child: ClipRRect(
-        borderRadius: BorderRadiusGeometry.circular(16),
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(color: AppColors.white),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CustomNetworkedImage(
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              offset: Offset(0, 3),
+              blurRadius: 9.8,
+              color: Colors.black.withValues(alpha: 0.1),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadiusGeometry.vertical(
+                top: Radius.circular(16),
+              ),
+              child: CustomNetworkedImage(
                 height: 184,
                 width: double.infinity,
                 url: post.image,
                 fit: BoxFit.cover,
                 radius: 0,
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: 184, minHeight: 100),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  child: Column(
-                    spacing: 8,
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        post.title.toString(),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTexts.dxss.copyWith(
-                          color: AppColors.gray.shade600,
-                        ),
+            ),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: 184, minHeight: 100),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                child: Column(
+                  spacing: 6,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      post.title.toString(),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTexts.tlgs.copyWith(
+                        color: AppColors.gray.shade600,
                       ),
+                    ),
 
-                      Row(
-                        spacing: 4,
-                        children: [
-                          CustomSvg(asset: "assets/icons/location.svg"),
+                    Row(
+                      spacing: 4,
+                      children: [
+                        CustomSvg(
+                          asset: "assets/icons/location.svg",
+                          size: 16,
+                          color: AppColors.green.shade700,
+                        ),
+                        Text(
+                          Get.find<PostController>().getDistance(
+                            post.location.coordinates[0],
+                            post.location.coordinates[1],
+                          ),
+                          style: AppTexts.tsmm.copyWith(
+                            color: AppColors.gray.shade600,
+                          ),
+                        ),
+                        Container(),
+                        if (post.averageRating != null)
+                          CustomSvg(
+                            asset: "assets/icons/star.svg",
+                            size: 16,
+                            color: AppColors.green.shade700,
+                          ),
+                        if (post.averageRating != null)
                           Text(
-                            Get.find<PostController>().getDistance(
-                              post.location.coordinates[0],
-                              post.location.coordinates[1],
-                            ),
+                            post.averageRating!.toString(),
                             style: AppTexts.tsmm.copyWith(
                               color: AppColors.gray.shade600,
                             ),
                           ),
-                          Container(),
-                          if (post.averageRating != null)
-                            CustomSvg(asset: "assets/icons/star.svg"),
-                          if (post.averageRating != null)
-                            Text(
-                              post.averageRating!.toString(),
-                              style: AppTexts.tsmm.copyWith(
-                                color: AppColors.gray.shade600,
+
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.gray[50],
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            spacing: 4,
+                            children: [
+                              CustomSvg(
+                                asset:
+                                    "assets/icons/${post.category.toLowerCase()}.svg",
+                                size: 16,
                               ),
-                            ),
-
-                          // const SizedBox(width: 8),
-                          // Container(
-                          //   padding: EdgeInsets.symmetric(
-                          //     vertical: 4,
-                          //     horizontal: 8,
-                          //   ),
-                          //   decoration: BoxDecoration(
-                          //     color: AppColors.gray[50],
-                          //     borderRadius: BorderRadius.circular(6),
-                          //   ),
-                          //   child: Row(
-                          //     spacing: 4,
-                          //     children: [
-                          //       CustomSvg(
-                          //         asset:
-                          //             "assets/icons/${post.category.toLowerCase()}.svg",
-                          //         size: 16,
-                          //       ),
-                          //       Text(post.category),
-                          //     ],
-                          //   ),
-                          // ),
-                        ],
-                      ),
-
-                      Text(
-                        post.description.toString(),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTexts.tsmr.copyWith(
-                          color: AppColors.gray.shade600,
+                              Text(
+                                post.category.substring(0, 1).toUpperCase() +
+                                    post.category.substring(1),
+                                style: AppTexts.txsm.copyWith(
+                                  color: AppColors.gray.shade900,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                      ],
+                    ),
+
+                    Text(
+                      post.description.toString(),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTexts.tsmr.copyWith(
+                        color: AppColors.gray.shade600,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -52,13 +52,9 @@ class PostCardSmall extends StatelessWidget {
                   Align(
                     alignment: Alignment.topRight,
                     child: Text(
-                      post.category,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontFamily: "Lato",
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.gray.shade700,
-                      ),
+                      post.category.substring(0, 1).toUpperCase() +
+                          post.category.substring(1),
+                      style: AppTexts.txsb,
                     ),
                   ),
                   Text(
@@ -72,7 +68,11 @@ class PostCardSmall extends StatelessWidget {
                   Row(
                     spacing: 4,
                     children: [
-                      CustomSvg(asset: "assets/icons/location.svg", size: 16),
+                      CustomSvg(
+                        asset: "assets/icons/location.svg",
+                        size: 16,
+                        color: AppColors.green.shade700,
+                      ),
                       Text(
                         Get.find<PostController>().getDistance(
                           post.location.coordinates[0],

@@ -102,10 +102,10 @@ class CustomBottomNavbar extends StatelessWidget {
                 : SizedBox(width: 48, height: 18),
             CustomSvg(
               asset: icon,
-              size: 32,
+              size: 24,
               color: isSelected
                   ? AppColors.green.shade700
-                  : AppColors.gray.shade300,
+                  : AppColors.gray.shade700,
             ),
             SafeArea(
               child: FittedBox(
@@ -113,9 +113,10 @@ class CustomBottomNavbar extends StatelessWidget {
                 child: Text(
                   name,
                   style: AppTexts.txsr.copyWith(
+                    height: 1.5,
                     color: isSelected
                         ? AppColors.green.shade700
-                        : AppColors.gray.shade300,
+                        : AppColors.gray.shade500,
                   ),
                 ),
               ),

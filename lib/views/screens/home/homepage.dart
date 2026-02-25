@@ -46,6 +46,7 @@ class HomepageState extends State<Homepage> {
           Column(
             children: [
               AppBar(
+                toolbarHeight: 50,
                 automaticallyImplyLeading: false,
                 backgroundColor: AppColors.scaffoldBG,
                 surfaceTintColor: Colors.transparent,
@@ -53,7 +54,7 @@ class HomepageState extends State<Homepage> {
                 title: Row(
                   children: [
                     const SizedBox(width: 24),
-                    CustomSvg(asset: "assets/icons/logo.svg"),
+                    CustomSvg(asset: "assets/icons/logo.svg", height: 24),
                     Spacer(),
                     InkWell(
                       onTap: () {
@@ -96,10 +97,10 @@ class HomepageState extends State<Homepage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       tabs("All", "assets/icons/icon.svg", 0),
-                      tabs("Events", "assets/icons/calendar.svg", 1),
-                      tabs("Deals", "assets/icons/price_tag.svg", 2),
-                      tabs("Services", "assets/icons/info.svg", 3),
-                      tabs("Alerts", "assets/icons/wrench.svg", 4),
+                      tabs("Events", "assets/icons/event.svg", 1),
+                      tabs("Deals", "assets/icons/deal.svg", 2),
+                      tabs("Services", "assets/icons/service.svg", 3),
+                      tabs("Alerts", "assets/icons/alert.svg", 4),
                     ],
                   ),
                 ),
@@ -197,6 +198,7 @@ class HomepageState extends State<Homepage> {
             if (icon != null)
               CustomSvg(
                 asset: icon,
+                size: 16,
                 color: isSelected ? Colors.white : AppColors.gray.shade500,
               ),
             Text(
