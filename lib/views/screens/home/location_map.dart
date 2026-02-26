@@ -114,62 +114,89 @@ class _LocationMapState extends State<LocationMap> {
             top: overlayPos!.dy - 180,
             child: PostCardSmall(post: cardPost!),
           ),
-
-        // TODO: Fix the ditached scroll
-        Positioned.fill(
-          child: DraggableScrollableSheet(
-            initialChildSize: 0.2,
-            minChildSize: 0.2,
-            maxChildSize: 1,
-            snap: true,
-            snapSizes: [0.2, 0.6, 1],
-            builder: (context, controller) => ListView(
-              padding: EdgeInsets.zero,
-              controller: controller,
-              children: [
-                Container(
-                  padding: EdgeInsets.only(top: 12, left: 16, right: 16),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 0),
+            child: DraggableScrollableSheet(
+              initialChildSize: 0.2,
+              minChildSize: 0.2,
+              maxChildSize: 1,
+              snap: true,
+              shouldCloseOnMinExtent: false,
+              snapSizes: const [0.2, 0.6, 1],
+              builder: (context, scrollController) {
+                return Container(
                   decoration: BoxDecoration(
                     color: AppColors.white,
-                    borderRadius: BorderRadius.vertical(
+                    borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(25),
                     ),
                   ),
+                  // child: Obx(() {
+                  //   if (post.isFirstLoad.value) {
+                  //     return const Center(child: CustomLoading());
+                  //   }
+
+                  //   return ListView.builder(
+                  //     controller: controller,
+                  //     itemCount: post.posts.length,
+                  //     itemBuilder: (context, index) {
+                  //       final item = post.posts[index];
+
+                  //       return Padding(
+                  //         padding: const EdgeInsets.only(bottom: 8.0),
+                  //         child: PostCardSmall(
+                  //           post: item,
+                  //           witdth: double.infinity,
+                  //         ),
+                  //       );
+                  //     },
+                  //   );
+                  // }),
                   child: Obx(
-                    () => Column(
-                      children: [
-                        Container(
-                          width: 38,
-                          height: 3,
-                          decoration: BoxDecoration(
-                            color: AppColors.gray.shade200,
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        if (post.isFirstLoad.value) CustomLoading(),
-                        for (var i in post.posts)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: PostCardSmall(
-                              post: i,
-                              witdth: double.infinity,
+                    () => SingleChildScrollView(
+                      controller: scrollController,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 12),
+                          Container(
+                            width: 38,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: AppColors.gray.shade200,
+                              borderRadius: BorderRadius.circular(99),
                             ),
                           ),
-                        if (post.isMoreLoading.value) CustomLoading(),
-                        if (!post.isMoreLoading.value)
-                          Text(
-                            "End of list",
-                            style: AppTexts.tsmr.copyWith(
-                              color: AppColors.gray.shade300,
+                          const SizedBox(height: 16),
+                          if (post.isFirstLoad.value) CustomLoading(),
+                          for (var i in post.posts)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: 20,
+                                left: 24,
+                                right: 24,
+                              ),
+                              child: PostCardSmall(
+                                post: i,
+                                witdth: double.infinity,
+                              ),
                             ),
-                          ),
-                        const SizedBox(height: 24),
-                      ],
+                          if (post.isMoreLoading.value) CustomLoading(),
+                          if (!post.isMoreLoading.value)
+                            Text(
+                              "End of list",
+                              style: AppTexts.tsmr.copyWith(
+                                color: AppColors.gray.shade300,
+                              ),
+                            ),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
           ),
         ),
