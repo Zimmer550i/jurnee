@@ -20,6 +20,7 @@ class SearchWidget extends StatefulWidget {
   State<SearchWidget> createState() => _SearchWidgetState();
 }
 
+// TODO: Many problems in searching
 class _SearchWidgetState extends State<SearchWidget> {
   final post = Get.find<PostController>();
   final mapCtrl = Get.put(MapsController());

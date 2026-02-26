@@ -102,6 +102,8 @@ class _LocationMapState extends State<LocationMap> {
               post.fetchPosts().then((val) {
                 if (val != "success") {
                   customSnackBar(val);
+                } else {
+                  loadMarkers();
                 }
               });
             }
