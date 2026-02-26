@@ -20,7 +20,7 @@ class PostService extends StatefulWidget {
   @override
   State<PostService> createState() => _PostServiceState();
 }
-// TODO: Edit Logic
+
 class _PostServiceState extends State<PostService> {
   final GlobalKey<AvailabilityWidgetState> _availabilityKey = GlobalKey();
   final GlobalKey<PostBaseWidgetState> _baseKey = GlobalKey();
@@ -115,7 +115,8 @@ class _PostServiceState extends State<PostService> {
 
         "schedule": _availabilityKey.currentState?.getSchedule(),
       },
-      "image": _baseKey.currentState?.cover,
+      if (widget.post == null || _baseKey.currentState!.cover != null)
+        "image": _baseKey.currentState?.cover,
       "media": _baseKey.currentState?.images,
     };
 
@@ -146,11 +147,21 @@ class _PostServiceState extends State<PostService> {
         break;
     }
 
-    final message = await Get.find<PostController>().createPost(
-      // Create api endpoint according to the subcategory. It's messy but working. Don't touch!!!
-      "/service/${{"Food & Beverage": "food-beverage", "Entertainment": "entertainment", "Personal/Home Services": "home", "Venues": "venue"}[subCategory]}",
-      payload,
-    );
+    late String message;
+
+    if (widget.post == null) {
+      message = await Get.find<PostController>().createPost(
+        // Create api endpoint according to the subcategory. It's messy but working. Don't touch!!!
+        "/service/${{"Food & Beverage": "food-beverage", "Entertainment": "entertainment", "Personal/Home Services": "home", "Venues": "venue"}[subCategory]}",
+        payload,
+      );
+    } else {
+      message = await Get.find<PostController>().updatePost(
+        widget.post!.id,
+        payload,
+      );
+    }
+
     if (message == "success") {
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
@@ -178,7 +189,7 @@ class _PostServiceState extends State<PostService> {
       customSnackBar("Address is required");
       return false;
     }
-    if (_baseKey.currentState?.cover == null) {
+    if (_baseKey.currentState?.cover == null && widget.post == null) {
       customSnackBar("Cover image is required");
       return false;
     }

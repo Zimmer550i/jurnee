@@ -54,7 +54,7 @@ class HomepageState extends State<Homepage> {
                 title: Row(
                   children: [
                     const SizedBox(width: 24),
-                    CustomSvg(asset: "assets/icons/logo.svg", height: 24),
+                    CustomSvg(asset: "assets/icons/logo.svg", height: 22),
                     Spacer(),
                     InkWell(
                       onTap: () {
@@ -87,6 +87,7 @@ class HomepageState extends State<Homepage> {
                   ],
                 ),
               ),
+              // const SizedBox(height: 12 ,),
               if (!isFiltering())
                 Padding(
                   padding: const EdgeInsets.symmetric(

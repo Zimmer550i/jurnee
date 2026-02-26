@@ -21,7 +21,6 @@ class PostAlert extends StatefulWidget {
   State<PostAlert> createState() => _PostAlertState();
 }
 
-// TODO: Edit Logic
 class _PostAlertState extends State<PostAlert> {
   final GlobalKey<PostBaseWidgetState> _baseKey = GlobalKey();
   final map = Get.find<MapsController>();
@@ -106,7 +105,8 @@ class _PostAlertState extends State<PostAlert> {
         "contactInfo": contactCtrl.text,
         "expireLimit": num.tryParse(expiry.split(" ").first),
       },
-      "image": _baseKey.currentState?.cover,
+      if (widget.post == null || _baseKey.currentState!.cover != null)
+        "image": _baseKey.currentState?.cover,
       "media": _baseKey.currentState?.images,
     };
 
@@ -123,15 +123,29 @@ class _PostAlertState extends State<PostAlert> {
       });
     }
 
-    final message = await Get.find<PostController>().createPost(
-      "alert/${category == "Missing Person" ? "missing-person" : "others"}",
-      payload,
-    );
+    // TODO: Investigate weither missing person belongs to category
+    late String message;
+
+    if (widget.post == null) {
+      message = await Get.find<PostController>().createPost(
+        "alert/${category == "Missing Person" ? "missing-person" : "others"}",
+        payload,
+      );
+    } else {
+      message = await Get.find<PostController>().updatePost(
+        widget.post!.id,
+        payload,
+      );
+    }
+
     if (message == "success") {
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
       }
-      customSnackBar("Post created successfully", isError: false);
+      customSnackBar(
+        "Alert ${widget.post == null ? "created" : "updated"} successfully",
+        isError: false,
+      );
     } else {
       customSnackBar(message);
     }
@@ -154,7 +168,7 @@ class _PostAlertState extends State<PostAlert> {
       customSnackBar("Address is required");
       return false;
     }
-    if (_baseKey.currentState?.cover == null) {
+    if (_baseKey.currentState?.cover == null && widget.post == null) {
       customSnackBar("Cover image is required");
       return false;
     }

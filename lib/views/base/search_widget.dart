@@ -36,7 +36,6 @@ class _SearchWidgetState extends State<SearchWidget> {
   double? distance;
   String? placeId;
 
-  //TODO: Fix Search Enabled
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -144,7 +143,7 @@ class _SearchWidgetState extends State<SearchWidget> {
                         post.categoryList.add('alert');
                       }
                     },
-                    leading: "assets/icons/alerts.svg",
+                    leading: "assets/icons/alert.svg",
                   ),
                   tab("Price", showPrice, (val) {
                     setState(() {

@@ -5,6 +5,7 @@ import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_bottom_navbar.dart';
 import 'package:jurnee/views/screens/auth/user_interests.dart';
@@ -280,10 +281,25 @@ class _HomeState extends State<Home> {
                     showNavBar = !state.showMap;
                   });
                 }
-                // Get.to(
-                //   () => Homepage(showMap: true),
-                //   transition: Transition.noTransition,
-                // );
+
+                final post = Get.find<PostController>();
+
+                post.customLocation.value = null;
+                post.date.value = null;
+                post.distance.value = null;
+                post.maxPrice.value = null;
+                post.minPrice.value = null;
+                post.search.value = null;
+                post.highlyRated.value = false;
+                post.categoryList.clear();
+                homeKey.currentState?.setState(() {
+                  homeKey.currentState?.searchEnabled = false;
+                });
+                post.fetchPosts().then((message) {
+                  if (message != "success") {
+                    customSnackBar(message);
+                  }
+                });
               },
               child: Container(
                 height: 60,

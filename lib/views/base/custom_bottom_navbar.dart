@@ -31,6 +31,7 @@ class CustomBottomNavbar extends StatelessWidget {
         ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           item("Home", "assets/icons/home.svg", 0),
           item("Messages", "assets/icons/chat.svg", 1),
@@ -39,8 +40,9 @@ class CustomBottomNavbar extends StatelessWidget {
               child: GestureDetector(
                 onTap: onShowOverlay,
                 child: Container(
-                  height: 46,
-                  width: 46,
+                  margin: EdgeInsets.only(top: 4, bottom: 4),
+                  height: 60,
+                  width: 60,
                   decoration: BoxDecoration(
                     color: AppColors.green.shade700,
                     shape: BoxShape.circle,
@@ -56,7 +58,10 @@ class CustomBottomNavbar extends StatelessWidget {
                     child: AnimatedRotation(
                       duration: Duration(milliseconds: 100),
                       turns: showOverlay ? -0.125 : 0,
-                      child: CustomSvg(asset: "assets/icons/plus.svg"),
+                      child: CustomSvg(
+                        asset: "assets/icons/plus.svg",
+                        size: 48,
+                      ),
                     ),
                   ),
                 ),
@@ -83,6 +88,7 @@ class CustomBottomNavbar extends StatelessWidget {
         },
         behavior: HitTestBehavior.translucent,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             (isSelected)
