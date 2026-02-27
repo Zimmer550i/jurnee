@@ -11,7 +11,7 @@ class ApiService {
   final String devUrl = "http://10.10.12.98:3001/api/v1";
   final String prodUrl = "https://api.joinjurnee.com/api/v1";
   static final String imgUrl = "";
-  final bool inDevelopment = true;
+  final bool inDevelopment = false;
   final bool showAPICalls = true;
 
   late final String baseUrl;

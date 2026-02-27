@@ -20,7 +20,6 @@ class SearchWidget extends StatefulWidget {
   State<SearchWidget> createState() => _SearchWidgetState();
 }
 
-// TODO: Many problems in searching
 class _SearchWidgetState extends State<SearchWidget> {
   final post = Get.find<PostController>();
   final mapCtrl = Get.put(MapsController());
@@ -30,12 +29,20 @@ class _SearchWidgetState extends State<SearchWidget> {
   final minPriceCtrl = TextEditingController();
   final maxPriceCtrl = TextEditingController();
 
-  bool showPrice = false;
   int expanded = -1;
-  DateTime? start;
-  DateTime? end;
-  double? distance;
-  String? placeId;
+
+  @override
+  void initState() {
+    super.initState();
+    searchCtrl.text = post.search.value ?? "";
+    placeCtrl.text = mapCtrl.selected.value?.description ?? "";
+    minPriceCtrl.text = post.minPrice.value != null
+        ? post.minPrice.value.toString()
+        : "";
+    maxPriceCtrl.text = post.maxPrice.value != null
+        ? post.maxPrice.value.toString()
+        : "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,16 +153,17 @@ class _SearchWidgetState extends State<SearchWidget> {
                     },
                     leading: "assets/icons/alert.svg",
                   ),
-                  tab("Price", showPrice, (val) {
-                    setState(() {
-                      showPrice = val;
-                    });
-                  }, leading: "assets/icons/price.svg"),
+                  dropDown(
+                    "Price",
+                    3,
+                    post.maxPrice.value != null && post.minPrice.value != null,
+                    leading: "assets/icons/price.svg",
+                  ),
                 ],
               ),
             ),
           ),
-          if (showPrice)
+          if (expanded == 3)
             Row(
               children: [
                 Expanded(
@@ -164,6 +172,8 @@ class _SearchWidgetState extends State<SearchWidget> {
                     controller: minPriceCtrl,
                     hintText: "Enter minimum price",
                     textInputType: TextInputType.number,
+                    onChanged: (val) =>
+                        post.minPrice.value = int.tryParse(minPriceCtrl.text),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -173,6 +183,8 @@ class _SearchWidgetState extends State<SearchWidget> {
                     controller: maxPriceCtrl,
                     hintText: "Enter maximum price",
                     textInputType: TextInputType.number,
+                    onChanged: (val) =>
+                        post.maxPrice.value = int.tryParse(maxPriceCtrl.text),
                   ),
                 ),
               ],
@@ -191,7 +203,7 @@ class _SearchWidgetState extends State<SearchWidget> {
                 alignment: WrapAlignment.spaceBetween,
                 children: [
                   dropDown("City", 0, post.customLocation.value != null),
-                  dropDown("Dates", 1, start != null),
+                  dropDown("Dates", 1, post.date.value != null),
                   dropDown("Distance", 2, post.distance.value != null),
                 ],
               ),
@@ -271,11 +283,11 @@ class _SearchWidgetState extends State<SearchWidget> {
                       ),
                     for (var i in mapCtrl.predictions)
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           mapCtrl.selectPrediction(i, placeCtrl);
-                          setState(() {
-                            expanded = -1;
-                          });
+                          // setState(() {
+                          //   expanded = -1;
+                          // });
                         },
                         child: Container(
                           padding: EdgeInsets.all(2),
@@ -299,21 +311,16 @@ class _SearchWidgetState extends State<SearchWidget> {
               ),
               todayHighlightColor: AppColors.green.shade600,
               backgroundColor: AppColors.white,
-              selectionColor: AppColors.green[50],
-              rangeSelectionColor: AppColors.green[50],
-              endRangeSelectionColor: AppColors.green.shade600,
-              startRangeSelectionColor: AppColors.green.shade600,
-              selectionMode: DateRangePickerSelectionMode.range,
+              selectionColor: AppColors.green[700],
+              selectionMode: DateRangePickerSelectionMode.single,
               onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
                 setState(() {
-                  if (args.value is PickerDateRange) {
-                    final PickerDateRange range = args.value;
-                    start = range.startDate;
-                    end = range.endDate;
+                  if (args.value is DateTime) {
+                    post.date.value = args.value;
                   }
                 });
               },
-              initialSelectedRange: PickerDateRange(start, end),
+              initialSelectedDate: post.date.value,
             ),
           if (expanded == 2)
             Obx(
@@ -436,7 +443,7 @@ class _SearchWidgetState extends State<SearchWidget> {
     );
   }
 
-  Widget dropDown(String title, int index, bool isActive) {
+  Widget dropDown(String title, int index, bool isActive, {String? leading}) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -458,6 +465,14 @@ class _SearchWidgetState extends State<SearchWidget> {
           spacing: 4,
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (leading != null)
+              CustomSvg(
+                asset: leading,
+                height: 16,
+                color: isActive
+                    ? AppColors.green[25]
+                    : AppColors.green.shade600,
+              ),
             Text(
               title,
               style: AppTexts.tsmr.copyWith(
@@ -468,7 +483,7 @@ class _SearchWidgetState extends State<SearchWidget> {
               turns: index == expanded ? 0.5 : 0,
               duration: Duration(milliseconds: 300),
               child: CustomSvg(
-                asset: "assets/icons/dropdown.svg",
+                asset: "assets/icons/dropdown.svg", size: 16,
                 color: isActive ? AppColors.white : AppColors.gray.shade700,
               ),
             ),
