@@ -14,6 +14,15 @@
 	</dict>
 	</array>
 
+	<key>GIDClientID</key>
+	<string>634424633336-iafq9emvgsdqss0k6js8aggd4bn2jt5e.apps.googleusercontent.com</string>
+
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+	<string>google</string>
+	<string>comgooglemaps</string>
+	</array>
+
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
