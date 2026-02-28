@@ -124,7 +124,6 @@ class _PostAlertState extends State<PostAlert> {
       });
     }
 
-    // TODO: Investigate weither missing person belongs to category
     late String message;
 
     if (widget.post == null) {
@@ -271,7 +270,7 @@ class _PostAlertState extends State<PostAlert> {
               const SizedBox(height: 16),
               CustomTextField(
                 controller: contactCtrl,
-                title: "Contact Info",
+                title: "Contact Info (optional)",
                 hintText: "Share contact information",
               ),
               const SizedBox(height: 16),

@@ -107,9 +107,8 @@ class PostController extends GetxController {
           "minPrice": minPrice.value,
           "maxPrice": maxPrice.value,
           "category": category ?? categoryList.join(","),
-          // TODO: Make these date key match with backend
-          "fromDate": fromDate.value?.toIso8601String(),
-          "toDate": toDate.value?.toIso8601String(),
+          "dateFrom": fromDate.value?.toIso8601String(),
+          "dateTo": toDate.value?.toIso8601String(),
           "search": search.value,
         }),
         authReq: true,

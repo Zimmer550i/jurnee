@@ -25,6 +25,7 @@ class PostModel {
   final String category;
   final dynamic subcategory;
   final String? serviceType;
+  final String? serviceArea;
   final String? missingName;
   final int? missingAge;
   final String? clothingDescription;
@@ -47,6 +48,8 @@ class PostModel {
   final int? boostPriority;
   final dynamic averageRating;
   final int? reviewsCount;
+  final String? couponCode;
+
 
   PostModel({
     required this.id,
@@ -67,6 +70,7 @@ class PostModel {
     required this.category,
     required this.subcategory,
     this.serviceType,
+    this.serviceArea,
     this.missingName,
     this.missingAge,
     this.clothingDescription,
@@ -89,6 +93,7 @@ class PostModel {
     this.boostPriority,
     required this.averageRating,
     required this.reviewsCount,
+    this.couponCode,
   });
 
   PostModel copyWith({
@@ -110,6 +115,7 @@ class PostModel {
     String? category,
     dynamic subcategory,
     String? serviceType,
+    String? serviceArea,
     String? missingName,
     int? missingAge,
     String? clothingDescription,
@@ -132,6 +138,7 @@ class PostModel {
     int? boostPriority,
     dynamic averageRating,
     int? reviewsCount,
+    String? couponCode,
   }) => PostModel(
     id: id ?? this.id,
     image: image ?? this.image,
@@ -151,6 +158,7 @@ class PostModel {
     category: category ?? this.category,
     subcategory: subcategory ?? this.subcategory,
     serviceType: serviceType ?? this.serviceType,
+    serviceArea: serviceArea ?? this.serviceArea,
     missingName: missingName ?? this.missingName,
     missingAge: missingAge ?? this.missingAge,
     clothingDescription: clothingDescription ?? this.clothingDescription,
@@ -173,6 +181,7 @@ class PostModel {
     boostPriority: boostPriority ?? this.boostPriority,
     averageRating: averageRating ?? this.averageRating,
     reviewsCount: reviewsCount ?? this.reviewsCount,
+    couponCode: couponCode ?? this.couponCode,
   );
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
@@ -208,6 +217,7 @@ class PostModel {
     category: json["category"],
     subcategory: json["subcategory"],
     serviceType: json["serviceType"],
+    serviceArea: json["serviceArea"],
     missingName: json["missingName"],
     missingAge: json["missingAge"],
     clothingDescription: json["clothingDescription"],
@@ -240,6 +250,7 @@ class PostModel {
     boostPriority: json["boostPriority"],
     averageRating: json["averageRating"],
     reviewsCount: json["reviewsCount"],
+    couponCode: json["couponCode"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -261,6 +272,7 @@ class PostModel {
     "category": category,
     "subcategory": subcategory,
     "serviceType": serviceType,
+    "serviceArea": serviceArea,
     "missingName": missingName,
     "missingAge": missingAge,
     "clothingDescription": clothingDescription,
@@ -285,6 +297,7 @@ class PostModel {
     "boostPriority": boostPriority,
     "averageRating": averageRating,
     "reviewsCount": reviewsCount,
+    "couponCode": couponCode,
   };
 }
 

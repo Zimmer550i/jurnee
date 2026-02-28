@@ -29,6 +29,7 @@ class _PostServiceState extends State<PostService> {
   final hashtagCtrl = TextEditingController();
   final priceCtrl = TextEditingController();
   final serviceTypeCtrl = TextEditingController();
+  final serviceAreaCtrl = TextEditingController();
   final capacityCtrl = TextEditingController();
   final amenitiesCtrl = TextEditingController();
 
@@ -61,6 +62,7 @@ class _PostServiceState extends State<PostService> {
 
     // Others
     subCategory = widget.post!.subcategory;
+    serviceAreaCtrl.text = widget.post!.serviceArea ?? "";
     hashtagCtrl.text = widget.post!.hasTag?.join(" ") ?? "";
 
     // Populate category-specific fields
@@ -119,6 +121,7 @@ class _PostServiceState extends State<PostService> {
       if (widget.post == null || _baseKey.currentState!.cover != null)
         "image": _baseKey.currentState?.cover,
       "media": _baseKey.currentState?.images,
+      if (serviceAreaCtrl.text.isNotEmpty) "serviceArea": serviceAreaCtrl.text,
     };
 
     switch (subCategory) {
@@ -135,7 +138,8 @@ class _PostServiceState extends State<PostService> {
       case "Personal/Home Services":
         (payload['data'] as Map<String, dynamic>).addAll({
           "price": num.tryParse(priceCtrl.text),
-          "serviceType": serviceTypeCtrl.text,
+          if (serviceTypeCtrl.text.trim().isNotEmpty)
+            "serviceType": serviceTypeCtrl.text.trim(),
         });
         if (lisenses != null) payload.addAll({"licenses": lisenses});
         break;
@@ -218,6 +222,12 @@ class _PostServiceState extends State<PostService> {
                 initialSchedule: widget.post?.schedule,
               ),
 
+              const SizedBox(height: 16),
+              CustomTextField(
+                title: "Service Area",
+                controller: serviceAreaCtrl,
+                hintText: "Enter your service area",
+              ),
               const SizedBox(height: 16),
               CustomTextField(
                 controller: hashtagCtrl,

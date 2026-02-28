@@ -234,7 +234,7 @@ class _HomeState extends State<Home> {
                                     child: Column(
                                       children: [
                                         CustomSvg(
-                                          asset: "assets/icons/alerts.svg",
+                                          asset: "assets/icons/alert.svg",
                                         ),
                                         Text(
                                           "Alerts",

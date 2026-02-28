@@ -23,8 +23,8 @@ class _PostDealState extends State<PostDeal> {
   final GlobalKey<PostBaseWidgetState> _baseKey = GlobalKey();
   final map = Get.find<MapsController>();
   final hashtagCtrl = TextEditingController();
+  final couponCtrl = TextEditingController();
 
-  String? placeId;
   DateTime? startDate;
   DateTime? endDate;
 
@@ -69,6 +69,7 @@ class _PostDealState extends State<PostDeal> {
       if (widget.post == null || _baseKey.currentState!.cover != null)
         "image": _baseKey.currentState?.cover,
       "media": _baseKey.currentState?.images,
+      "coupon": couponCtrl.text,
     };
 
     late String message;
@@ -143,6 +144,7 @@ class _PostDealState extends State<PostDeal> {
 
     // Others
     hashtagCtrl.text = widget.post!.hasTag?.join(" ") ?? "";
+    couponCtrl.text = widget.post!.couponCode ?? "";
     startDate = widget.post!.startDate;
     endDate = widget.post!.endDate;
   }
@@ -171,7 +173,7 @@ class _PostDealState extends State<PostDeal> {
                         );
                         setState(() {});
                       },
-                      title: "Start",
+                      title: "Time Period",
                       hintText: "Start date",
                       controller: startDate != null
                           ? TextEditingController(
@@ -191,7 +193,7 @@ class _PostDealState extends State<PostDeal> {
                         );
                         setState(() {});
                       },
-                      title: "End",
+                      title: "",
                       hintText: "End Date",
                       controller: endDate != null
                           ? TextEditingController(
@@ -202,6 +204,12 @@ class _PostDealState extends State<PostDeal> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                controller: couponCtrl,
+                title: "Redeem Code (optional)",
+                hintText: "Enter redeem code",
               ),
               const SizedBox(height: 16),
               CustomTextField(
