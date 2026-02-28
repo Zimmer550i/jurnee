@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -24,14 +25,15 @@ class BoostPost extends StatelessWidget {
               const SizedBox(height: 24),
               Text(
                 "Boost Your Post",
-                style: AppTexts.dsms.copyWith(color: AppColors.gray.shade700),
+                style: AppTexts.dxss.copyWith(color: AppColors.gray.shade700),
               ),
               const SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Text(
                   "Boost keeps your post on top of the feed for 24 hours. Flat fee: \$5.",
-                  style: AppTexts.tlgm.copyWith(color: AppColors.gray.shade400),
+                  textAlign: TextAlign.center,
+                  style: AppTexts.tlgr.copyWith(color: AppColors.gray.shade400),
                 ),
               ),
               const SizedBox(height: 20),
@@ -46,7 +48,7 @@ class BoostPost extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         "Post must have at least 1 clear photo",
-                        style: AppTexts.tlgm.copyWith(
+                        style: AppTexts.tmdm.copyWith(
                           color: AppColors.gray.shade700,
                         ),
                       ),
@@ -61,7 +63,7 @@ class BoostPost extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         "Complete title & description",
-                        style: AppTexts.tlgm.copyWith(
+                        style: AppTexts.tmdm.copyWith(
                           color: AppColors.gray.shade700,
                         ),
                       ),
@@ -76,7 +78,7 @@ class BoostPost extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         "Local relevance (within 25 miles)",
-                        style: AppTexts.tlgm.copyWith(
+                        style: AppTexts.tmdm.copyWith(
                           color: AppColors.gray.shade700,
                         ),
                       ),
@@ -84,10 +86,16 @@ class BoostPost extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              PostCardSmall(post: post),
+              const SizedBox(height: 32),
+              PostCardSmall(post: post, witdth: double.infinity),
               Spacer(),
               CustomButton(text: "Boost Now- \$5"),
+              const SizedBox(height: 16),
+              CustomButton(
+                onTap: () => Get.back(),
+                text: "Skip",
+                isSecondary: true,
+              ),
               const SizedBox(height: 16),
               Text(
                 "Posts will be rotated with a \"Featured\" badge in feed.",

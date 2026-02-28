@@ -30,7 +30,7 @@ class _NotificationsState extends State<Notifications> {
         title: Row(
           children: [
             const SizedBox(width: 24),
-            CustomSvg(asset: "assets/icons/logo.svg"),
+            CustomSvg(asset: "assets/icons/logo.svg", height: 22),
             Spacer(),
             const SizedBox(width: 24),
           ],

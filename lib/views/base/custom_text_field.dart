@@ -147,7 +147,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       });
                     },
                     onChanged: widget.onChanged,
-                    style: AppTexts.tsmr,
+                    style: AppTexts.tmdr,
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       isDense: true,
@@ -159,8 +159,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     ),
                   ),
                 ),
-                if(widget.trailingWidget != null)
-                  widget.trailingWidget!,
+                if (widget.trailingWidget != null) widget.trailingWidget!,
                 if (widget.trailing != null)
                   SvgPicture.asset(
                     widget.trailing!,

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/maps_controller.dart';
@@ -10,6 +9,7 @@ import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/post/post_base_widget.dart';
+import 'package:jurnee/views/screens/profile/boost_post.dart';
 
 class PostEvent extends StatefulWidget {
   final PostModel? post;
@@ -23,6 +23,7 @@ class _PostEventState extends State<PostEvent> {
   final GlobalKey<PostBaseWidgetState> _baseKey = GlobalKey();
   final map = Get.find<MapsController>();
   final hashtagCtrl = TextEditingController();
+  final priceCtrl = TextEditingController();
 
   String? placeId;
   DateTime? date;
@@ -71,6 +72,7 @@ class _PostEventState extends State<PostEvent> {
       if (widget.post == null || _baseKey.currentState!.cover != null)
         "image": _baseKey.currentState?.cover,
       "media": _baseKey.currentState?.images,
+      "price": num.tryParse(priceCtrl.text),
     };
 
     late String message;
@@ -87,6 +89,7 @@ class _PostEventState extends State<PostEvent> {
     if (message == "success") {
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
+        Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
       }
       customSnackBar(
         "Event ${widget.post == null ? "created" : "updated"} successfully",
@@ -144,6 +147,7 @@ class _PostEventState extends State<PostEvent> {
 
     // Others
     hashtagCtrl.text = widget.post!.hasTag?.join(" ") ?? "";
+    priceCtrl.text = widget.post!.price != null ? widget.post!.price.toString() : "";
     date = widget.post!.startDate;
     time = widget.post!.startTime != null
         ? TimeOfDay.fromDateTime(widget.post!.startTime!)
@@ -204,6 +208,12 @@ class _PostEventState extends State<PostEvent> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                controller: priceCtrl,
+                title: "Entry Fee",
+                hintText: "Enter Entry fee",
               ),
               const SizedBox(height: 16),
               CustomTextField(

@@ -9,6 +9,7 @@ import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/post/post_base_widget.dart';
+import 'package:jurnee/views/screens/profile/boost_post.dart';
 
 class PostDeal extends StatefulWidget {
   final PostModel? post;
@@ -84,6 +85,7 @@ class _PostDealState extends State<PostDeal> {
     if (message == "success") {
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
+        Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
       }
       customSnackBar(
         "Deal ${widget.post == null ? "created" : "updated"} successfully",

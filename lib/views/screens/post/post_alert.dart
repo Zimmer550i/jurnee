@@ -12,6 +12,7 @@ import 'package:jurnee/views/base/custom_drop_down.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/post/location_picker.dart';
 import 'package:jurnee/views/screens/post/post_base_widget.dart';
+import 'package:jurnee/views/screens/profile/boost_post.dart';
 
 class PostAlert extends StatefulWidget {
   final PostModel? post;
@@ -141,6 +142,7 @@ class _PostAlertState extends State<PostAlert> {
     if (message == "success") {
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
+        Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
       }
       customSnackBar(
         "Alert ${widget.post == null ? "created" : "updated"} successfully",

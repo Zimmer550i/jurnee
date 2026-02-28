@@ -63,7 +63,7 @@ class _ProfileState extends State<Profile> {
               title: Row(
                 children: [
                   const SizedBox(width: 24),
-                  CustomSvg(asset: "assets/icons/logo.svg"),
+                  CustomSvg(asset: "assets/icons/logo.svg", height: 22),
                   Spacer(),
                   const SizedBox(width: 24),
                 ],
@@ -468,11 +468,11 @@ class _ProfileState extends State<Profile> {
               //   Get.back();
               //   Get.to(() => EditProfile());
               // }),
-              drawerButton("My Bookings", "calendar", () {
+              drawerButton("My Orders", "calendar", () {
                 Get.back();
                 Get.to(() => Bookings());
               }),
-              drawerButton("Client Bookings", "client", () {
+              drawerButton("Client Orders", "client", () {
                 Get.back();
                 Get.to(() => Bookings(showClientBooking: true));
               }),
@@ -524,7 +524,7 @@ class _ProfileState extends State<Profile> {
         width: MediaQuery.of(context).size.width * 0.7,
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 32),
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: AppColors.green.shade300)),
+          border: Border(bottom: BorderSide(color: AppColors.gray.shade700)),
         ),
         child: Row(
           spacing: 8,

@@ -7,6 +7,7 @@ import 'package:jurnee/models/message_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_list_handler.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/offer_widget.dart';
@@ -32,7 +33,11 @@ class _ChatState extends State<Chat> {
     super.initState();
     chat.addChatListener(widget.inboxId);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      chat.fetchMessages(widget.inboxId);
+      chat.fetchMessages(widget.inboxId).then((message) {
+        if (message != "success") {
+          customSnackBar(message);
+        }
+      });
     });
   }
 

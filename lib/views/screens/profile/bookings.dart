@@ -55,7 +55,7 @@ class _BookingsState extends State<Bookings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: widget.showClientBooking ? "Client Bookings" : "My Bookings",
+        title: widget.showClientBooking ? "Client Orders" : "My Orders",
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),

@@ -7,6 +7,7 @@ import 'package:jurnee/models/chat_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_list_handler.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
@@ -26,7 +27,11 @@ class _MessagesState extends State<Messages> {
   @override
   void initState() {
     super.initState();
-    chat.fetchChats();
+    chat.fetchChats().then((message) {
+      if (message != "success") {
+        customSnackBar(message);
+      }
+    });
     userId = Get.find<UserController>().userData!.id;
   }
 
@@ -41,7 +46,7 @@ class _MessagesState extends State<Messages> {
         title: Row(
           children: [
             const SizedBox(width: 24),
-            CustomSvg(asset: "assets/icons/logo.svg"),
+            CustomSvg(asset: "assets/icons/logo.svg", height: 22),
             Spacer(),
             const SizedBox(width: 24),
           ],
@@ -87,7 +92,12 @@ class _MessagesState extends State<Messages> {
 
   Widget messageWidget(ChatModel chat) {
     // Hides chat with single member
-    if (chat.members.length == 1) return Container();
+    // if (chat.members.length == 1) {
+    //   return SizedBox(
+    //     width: double.infinity,
+    //     child: Text("!!!", style: AppTexts.tsmr.copyWith(color: AppColors.red)),
+    //   );
+    // }
     final Member recipent = chat.members.where((mem) => mem.id != userId).first;
 
     return GestureDetector(

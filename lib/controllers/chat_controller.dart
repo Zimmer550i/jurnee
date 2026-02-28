@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/offer_model.dart';
 import 'package:jurnee/views/screens/messages/chat.dart';
 import 'package:get/get.dart';
@@ -137,10 +138,19 @@ class ChatController extends GetxController {
 
         final newId = data['_id'];
 
+        final currentUserId = Get.find<UserController>().userData?.id;
+
+        final otherMember = (data["members"] as List)
+            .map((mem) => Member.fromJson(mem))
+            .firstWhere(
+              (mem) => mem.id != currentUserId,
+              orElse: () => Member.fromJson(data["members"].first),
+            );
+
         Get.to(
           () => Chat(
             inboxId: newId,
-            chatMember: Member.fromJson(data["members"][1]),
+            chatMember: otherMember,
           ),
         );
 

@@ -44,9 +44,10 @@ class HomepageState extends State<Homepage> {
       body: Stack(
         children: [
           Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               AppBar(
-                toolbarHeight: 50,
+                // toolbarHeight: 50,
                 automaticallyImplyLeading: false,
                 backgroundColor: AppColors.scaffoldBG,
                 surfaceTintColor: Colors.transparent,

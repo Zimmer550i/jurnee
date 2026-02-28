@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -239,6 +240,11 @@ class PostController extends GetxController {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
+        try {
+          posts.add(PostModel.fromJson(body['data']));
+        } catch (e) {
+          debugPrint(e.toString());
+        }
         return "success";
       } else {
         return body['message'] ?? "Something went wrong";

@@ -12,6 +12,7 @@ import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_drop_down.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/post/post_base_widget.dart';
+import 'package:jurnee/views/screens/profile/boost_post.dart';
 
 class PostService extends StatefulWidget {
   final PostModel? post;
@@ -165,6 +166,7 @@ class _PostServiceState extends State<PostService> {
     if (message == "success") {
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
+        Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
       }
       customSnackBar("Post created successfully", isError: false);
     } else {
