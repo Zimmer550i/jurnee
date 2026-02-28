@@ -4,6 +4,7 @@ import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_list_handler.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/post_card.dart';
@@ -35,7 +36,11 @@ class HomepageState extends State<Homepage> {
   @override
   void initState() {
     super.initState();
-    post.fetchPosts();
+    post.fetchPosts().then((message) {
+      if (message != "success") {
+        customSnackBar(message);
+      }
+    });
   }
 
   @override
@@ -118,8 +123,13 @@ class HomepageState extends State<Homepage> {
                       child: Obx(
                         () => CustomListHandler(
                           isLoading: post.isFirstLoad.value,
-                          onRefresh: () =>
-                              post.fetchPosts(category: categoryList[tab]),
+                          onRefresh: () => post
+                              .fetchPosts(category: categoryList[tab])
+                              .then((message) {
+                                if (message != "success") {
+                                  customSnackBar(message);
+                                }
+                              }),
                           onLoadMore: () => post.fetchPosts(
                             loadMore: true,
                             category: categoryList[tab],
@@ -178,7 +188,11 @@ class HomepageState extends State<Homepage> {
       onTap: () {
         setState(() {
           tab = index;
-          post.fetchPosts(category: categoryList[tab]);
+          post.fetchPosts(category: categoryList[tab]).then((message) {
+            if (message != "success") {
+              customSnackBar(message);
+            }
+          });
         });
       },
       child: AnimatedContainer(
@@ -217,7 +231,8 @@ class HomepageState extends State<Homepage> {
 
   bool isFiltering() {
     if (post.customLocation.value != null ||
-        post.date.value != null ||
+        post.fromDate.value != null ||
+        post.toDate.value != null ||
         post.minPrice.value != null ||
         post.maxPrice.value != null ||
         post.search.value != null ||

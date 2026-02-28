@@ -285,7 +285,8 @@ class _HomeState extends State<Home> {
                 final post = Get.find<PostController>();
 
                 post.customLocation.value = null;
-                post.date.value = null;
+                post.fromDate.value = null;
+                post.toDate.value = null;
                 post.distance.value = null;
                 post.maxPrice.value = null;
                 post.minPrice.value = null;

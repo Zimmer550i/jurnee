@@ -203,7 +203,11 @@ class _SearchWidgetState extends State<SearchWidget> {
                 alignment: WrapAlignment.spaceBetween,
                 children: [
                   dropDown("City", 0, post.customLocation.value != null),
-                  dropDown("Dates", 1, post.date.value != null),
+                  dropDown(
+                    "Dates",
+                    1,
+                    post.fromDate.value != null && post.toDate.value != null,
+                  ),
                   dropDown("Distance", 2, post.distance.value != null),
                 ],
               ),
@@ -295,7 +299,7 @@ class _SearchWidgetState extends State<SearchWidget> {
                             i.description,
                             maxLines: 2,
                             style: AppTexts.tsmr.copyWith(
-                              color: AppColors.gray.shade700,
+                              color: AppColors.gray.shade600,
                             ),
                           ),
                         ),
@@ -312,15 +316,23 @@ class _SearchWidgetState extends State<SearchWidget> {
               todayHighlightColor: AppColors.green.shade600,
               backgroundColor: AppColors.white,
               selectionColor: AppColors.green[700],
-              selectionMode: DateRangePickerSelectionMode.single,
+              rangeSelectionColor: AppColors.green[50],
+              endRangeSelectionColor: AppColors.green.shade600,
+              startRangeSelectionColor: AppColors.green.shade600,
+              selectionMode: DateRangePickerSelectionMode.range,
               onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
                 setState(() {
-                  if (args.value is DateTime) {
-                    post.date.value = args.value;
+                  if (args.value is PickerDateRange) {
+                    PickerDateRange range = args.value;
+                    post.fromDate.value = range.startDate;
+                    post.toDate.value = range.endDate;
                   }
                 });
               },
-              initialSelectedDate: post.date.value,
+              initialSelectedRange: PickerDateRange(
+                post.fromDate.value,
+                post.toDate.value,
+              ),
             ),
           if (expanded == 2)
             Obx(
@@ -329,8 +341,8 @@ class _SearchWidgetState extends State<SearchWidget> {
                 children: [
                   Slider(
                     value: post.distance.value ?? 0.05,
-                    activeColor: AppColors.green,
-                    thumbColor: Colors.white,
+                    activeColor: AppColors.green.shade700,
+                    thumbColor: Colors.green[50],
                     padding: EdgeInsets.zero,
                     onChanged: (val) {
                       post.distance.value = val;
@@ -350,7 +362,8 @@ class _SearchWidgetState extends State<SearchWidget> {
                 child: CustomButton(
                   onTap: () {
                     post.customLocation.value = null;
-                    post.date.value = null;
+                    post.fromDate.value = null;
+                    post.toDate.value = null;
                     post.distance.value = null;
                     post.maxPrice.value = null;
                     post.minPrice.value = null;
@@ -424,18 +437,18 @@ class _SearchWidgetState extends State<SearchWidget> {
                 height: 16,
                 color: isSelected
                     ? AppColors.green[25]
-                    : AppColors.green.shade600,
+                    : AppColors.green.shade700,
               ),
             Text(
               title,
               style: AppTexts.tsmr.copyWith(
-                color: isSelected ? AppColors.white : AppColors.gray.shade700,
+                color: isSelected ? AppColors.white : AppColors.gray.shade600,
               ),
             ),
             if (dropDown == true)
               CustomSvg(
                 asset: "assets/icons/dropdown.svg",
-                color: isSelected ? AppColors.white : AppColors.gray.shade700,
+                color: isSelected ? AppColors.white : AppColors.gray.shade600,
               ),
           ],
         ),
@@ -476,15 +489,16 @@ class _SearchWidgetState extends State<SearchWidget> {
             Text(
               title,
               style: AppTexts.tsmr.copyWith(
-                color: isActive ? AppColors.white : AppColors.gray.shade700,
+                color: isActive ? AppColors.white : AppColors.gray.shade600,
               ),
             ),
             AnimatedRotation(
               turns: index == expanded ? 0.5 : 0,
               duration: Duration(milliseconds: 300),
               child: CustomSvg(
-                asset: "assets/icons/dropdown.svg", size: 16,
-                color: isActive ? AppColors.white : AppColors.gray.shade700,
+                asset: "assets/icons/dropdown.svg",
+                size: 16,
+                color: isActive ? AppColors.white : AppColors.gray.shade600,
               ),
             ),
           ],

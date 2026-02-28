@@ -36,7 +36,8 @@ class PostController extends GetxController {
   RxnInt maxPrice = RxnInt();
   RxnDouble distance = RxnDouble();
   Rxn<LatLng> customLocation = Rxn();
-  Rxn<DateTime> date = Rxn<DateTime>();
+  Rxn<DateTime> fromDate = Rxn<DateTime>();
+  Rxn<DateTime> toDate = Rxn<DateTime>();
 
   Future<void> fetchLocation() async {
     await getLocation().then((val) {
@@ -106,7 +107,9 @@ class PostController extends GetxController {
           "minPrice": minPrice.value,
           "maxPrice": maxPrice.value,
           "category": category ?? categoryList.join(","),
-          "dateTime": date.value?.toIso8601String(),
+          // TODO: Make these date key match with backend
+          "fromDate": fromDate.value?.toIso8601String(),
+          "toDate": toDate.value?.toIso8601String(),
           "search": search.value,
         }),
         authReq: true,
@@ -240,9 +243,8 @@ class PostController extends GetxController {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        try {
-          posts.add(PostModel.fromJson(body['data']));
-        } catch (e) {
+        posts.insert(0, PostModel.fromJson(body['data']));
+        try {} catch (e) {
           debugPrint(e.toString());
         }
         return "success";
