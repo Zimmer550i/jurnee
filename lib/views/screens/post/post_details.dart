@@ -72,6 +72,8 @@ class _PostDetailsState extends State<PostDetails> {
         });
       }
       post.addViewCount(widget.post.id);
+      post.getMedia(widget.post.id, type: "owner");
+      post.getMedia(widget.post.id, type: "community");
     });
   }
 
@@ -135,7 +137,7 @@ class _PostDetailsState extends State<PostDetails> {
                     if (isOwner) postEarnings(),
                     postDescriptions(isOwner),
                     postMetaData(),
-                    if(widget.post.category == "event") attendingUsers(),
+                    if (widget.post.category == "event") attendingUsers(),
                     if (widget.post.media != null) postMedia(),
 
                     if (isOwner) ownerActionButtons(),
@@ -304,8 +306,7 @@ class _PostDetailsState extends State<PostDetails> {
               ],
             ),
           if (!isOwner) const SizedBox(height: 32),
-          if (!isOwner)
-          getButton(),
+          if (!isOwner) getButton(),
         ],
       ),
     );
@@ -345,53 +346,6 @@ class _PostDetailsState extends State<PostDetails> {
             ],
           ),
           const SizedBox(height: 20),
-          // if (widget.post.category == "service")
-          //   Row(
-          //     children: [
-          //       RatingWidget(
-          //         averageRating: widget.post.averageRating,
-          //         isSmall: true,
-          //       ),
-          //       GestureDetector(
-          //         onTap: () {},
-          //         child: Text(
-          //           "See All",
-          //           style: AppTexts.tsms.copyWith(
-          //             color: AppColors.green.shade700,
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // if (widget.post.category != "service")
-          //   Row(
-          //     spacing: 4,
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     children: [
-          //       Padding(
-          //         padding: const EdgeInsets.only(top: 2),
-          //         child: CustomSvg(
-          //           asset: "assets/icons/message.svg",
-          //           color: AppColors.green.shade700,
-          //           size: 16,
-          //         ),
-          //       ),
-          //       Text(
-          //         "112 Comments • ",
-          //         style: AppTexts.tsmm.copyWith(color: AppColors.gray.shade700),
-          //       ),
-          //       GestureDetector(
-          //         onTap: () {},
-          //         child: Text(
-          //           "See All",
-          //           style: AppTexts.tsms.copyWith(
-          //             color: AppColors.green.shade700,
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // const SizedBox(height: 12),
           GestureDetector(
             onTap: () {
               Get.to(() => PostLocation(post: widget.post));
@@ -474,6 +428,7 @@ class _PostDetailsState extends State<PostDetails> {
                         mediaList: [
                           widget.post.image,
                           ...widget.post.media ?? [],
+                          ...post.mediaListCommunity,
                         ],
                       ),
                       transition: Transition.noTransition,
@@ -639,8 +594,10 @@ class _PostDetailsState extends State<PostDetails> {
             ListView.separated(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) =>
-                  CommentWidget(comment: post.comments.elementAt(index)),
+              itemBuilder: (context, index) => CommentWidget(
+                comment: post.comments.elementAt(index),
+                postData: widget.post,
+              ),
               separatorBuilder: (context, index) =>
                   Divider(height: 32, color: AppColors.gray.shade100),
               itemCount: post.comments.length,
@@ -657,6 +614,11 @@ class _PostDetailsState extends State<PostDetails> {
   }
 
   Widget postMedia() {
+    List<String> mediaCollection = [
+      [...post.mediaListOwner, ...post.mediaListCommunity],
+      [...post.mediaListOwner],
+      [...post.mediaListCommunity],
+    ][momentsIndex];
     return Container(
       color: Colors.white,
       padding: EdgeInsets.all(24),
@@ -690,23 +652,23 @@ class _PostDetailsState extends State<PostDetails> {
             ),
             physics: NeverScrollableScrollPhysics(),
             children: [
-              for (int i = 0; i < (widget.post.media!.length); i++)
+              for (int i = 0; i < (mediaCollection.length); i++)
                 GestureDetector(
                   onTap: () {
                     Get.to(
                       () => MediaPlayer(
                         postData: widget.post,
-                        preferedStart: widget.post.media![i],
+                        preferedStart: mediaCollection[i],
                         mediaList: [
                           widget.post.image,
-                          ...widget.post.media ?? [],
+                          ...mediaCollection,
                         ],
                       ),
                     );
                   },
                   child: ClipRRect(
                     borderRadius: BorderRadiusGeometry.circular(12),
-                    child: MediaThumbnail(path: widget.post.media![i]),
+                    child: MediaThumbnail(path: mediaCollection[i]),
                   ),
                 ),
 

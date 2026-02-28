@@ -10,7 +10,7 @@ import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/rating_widget.dart';
 import 'package:jurnee/views/base/video_widget.dart';
-import 'package:jurnee/views/screens/profile/profile.dart';
+import 'package:share_plus/share_plus.dart';
 
 class MediaPlayer extends StatefulWidget {
   final List<String?> mediaList;
@@ -129,25 +129,30 @@ class _MediaPlayerState extends State<MediaPlayer> {
                               ),
                               child: SafeArea(
                                 child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    // Text(
-                                    //   "Post from event",
-                                    //   style: AppTexts.tmdr.copyWith(
-                                    //     color: AppColors.gray[25],
-                                    //   ),
-                                    // ),
-                                    // const SizedBox(height: 12),
+                                  children: [
                                     Text(
                                       widget.postData.title,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: AppTexts.dxsm.copyWith(
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w600,
                                         color: AppColors.gray[25],
                                       ),
                                     ),
                                     const SizedBox(height: 4),
+                                    Text(
+                                      widget.postData.title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AppTexts.txsr.copyWith(
+                                        color: AppColors.gray[50],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
                                     Row(
                                       children: [
                                         Text(
@@ -162,44 +167,109 @@ class _MediaPlayerState extends State<MediaPlayer> {
                                                     .location
                                                     .coordinates[1],
                                               ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: AppTexts.tmdm.copyWith(
                                             color: AppColors.gray[25],
                                           ),
                                         ),
-                                        const SizedBox(width: 8),
-                                        RatingWidget(
-                                          isSmall: true,
-                                          averageRating:
-                                              widget.postData.averageRating,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 12),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Get.to(
-                                          () => Profile(
-                                            userId: widget.postData.author.id,
+                                        if (widget.postData.averageRating !=
+                                            null)
+                                          RatingWidget(
+                                            averageRating:
+                                                widget.postData.averageRating,
                                           ),
-                                        );
-                                      },
-                                      child: Row(
-                                        children: [
-                                          ProfilePicture(
-                                            image: widget.postData.author.image,
-                                            size: 52,
-                                          ),
-                                          const SizedBox(width: 8),
+                                        if (widget.postData.averageRating !=
+                                            null)
                                           Text(
-                                            widget.postData.author.name,
-                                            style: AppTexts.txlm.copyWith(
+                                            widget.postData.averageRating
+                                                .toString(),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: AppTexts.tsmm.copyWith(
                                               color: AppColors.gray[25],
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 20),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        ProfilePicture(
+                                          image: widget.postData.author.image,
+                                          size: 36,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          widget.postData.author.name,
+                                          style: AppTexts.tmdm.copyWith(
+                                            color: AppColors.gray[25],
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        CustomSvg(
+                                          size: 16,
+                                          asset: "assets/icons/view.svg",
+                                          color: Colors.white,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          widget.postData.views.toString(),
+                                          style: AppTexts.tsms.copyWith(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Get.find<PostController>()
+                                                .likeToggle(
+                                                  widget.postData.id,
+                                                  "post",
+                                                )
+                                                .then((message) {});
+                                          },
+                                          child: Row(
+                                            children: [
+                                              CustomSvg(
+                                                size: 16,
+                                                asset:
+                                                    "assets/icons/${widget.postData.isSaved ? "loved" : "love"}.svg",
+                                                color: Colors.white,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                widget.postData.likes
+                                                    .toString(),
+                                                style: AppTexts.tsms.copyWith(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        GestureDetector(
+                                          onTap: () {
+                                            final deepLink =
+                                                "https://jurnee.app/post/${widget.postData.id}";
+
+                                            SharePlus.instance.share(
+                                              ShareParams(
+                                                text:
+                                                    "Check out ${widget.postData.title} on Jurnee:\n$deepLink",
+                                                subject: "Jurnee Post",
+                                              ),
+                                            );
+                                          },
+                                          child: CustomSvg(
+                                            size: 16,
+                                            asset: "assets/icons/share.svg",
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),

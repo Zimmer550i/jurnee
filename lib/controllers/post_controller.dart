@@ -19,8 +19,11 @@ class PostController extends GetxController {
   RxList<PostModel> posts = RxList.empty();
   RxList<CommentModel> comments = RxList.empty();
   RxList<ReviewModel> reviews = RxList.empty();
+  RxList<String> mediaListOwner = RxList.empty();
+  RxList<String> mediaListCommunity = RxList.empty();
   Rxn<Position> userLocation = Rxn();
   RxBool isLoading = RxBool(false);
+  RxBool mediaLoading = RxBool(false);
 
   RxInt currentPage = 1.obs;
   int limit = 10;
@@ -472,6 +475,38 @@ class PostController extends GetxController {
       return e.toString();
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<String> getMedia(String id, {String type = "owner"}) async {
+    mediaLoading(true);
+    try {
+      final res = await api.get("/post/moment/$id/$type", authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final data = body['data'];
+
+        if (type == "owner") {
+          mediaListOwner.clear();
+          for (var i in data['media']) {
+            mediaListOwner.add(i);
+          }
+        } else {
+          mediaListCommunity.clear();
+          for (var i in data['media']) {
+            mediaListCommunity.add(i);
+          }
+        }
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      mediaLoading(false);
     }
   }
 }

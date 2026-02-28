@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
+import 'package:jurnee/views/base/rating_widget.dart';
+import 'package:share_plus/share_plus.dart';
 
 /// Default portrait controls.
 class CustomFlickPortraitControls extends StatelessWidget {
@@ -115,16 +117,28 @@ class CustomFlickPortraitControls extends StatelessWidget {
                       // const SizedBox(height: 12),
                       if (postData != null)
                         Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               postData!.title,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: AppTexts.dxsm.copyWith(
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.gray[25],
                               ),
                             ),
                             const SizedBox(height: 4),
+                            Text(
+                              postData!.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTexts.txsr.copyWith(
+                                color: AppColors.gray[50],
+                              ),
+                            ),
+                            const SizedBox(height: 12),
                             Row(
                               children: [
                                 Text(
@@ -132,25 +146,25 @@ class CustomFlickPortraitControls extends StatelessWidget {
                                     postData!.location.coordinates[0],
                                     postData!.location.coordinates[1],
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: AppTexts.tmdm.copyWith(
                                     color: AppColors.gray[25],
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                for (int i = 0; i < 4; i++)
-                                  CustomSvg(asset: "assets/icons/star.svg"),
-                                for (int i = 0; i < 1; i++)
-                                  CustomSvg(
-                                    asset: "assets/icons/star.svg",
-                                    color: Colors.white,
+                                if (postData!.averageRating != null)
+                                  RatingWidget(
+                                    averageRating: postData!.averageRating,
                                   ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  postData!.averageRating.toString(),
-                                  style: AppTexts.tmdm.copyWith(
-                                    color: AppColors.gray[25],
+                                if (postData!.averageRating != null)
+                                  Text(
+                                    postData!.averageRating.toString(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTexts.tsmm.copyWith(
+                                      color: AppColors.gray[25],
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                             const SizedBox(height: 12),
@@ -158,13 +172,71 @@ class CustomFlickPortraitControls extends StatelessWidget {
                               children: [
                                 ProfilePicture(
                                   image: postData!.author.image,
-                                  size: 52,
+                                  size: 36,
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
                                   postData!.author.name,
-                                  style: AppTexts.txlm.copyWith(
+                                  style: AppTexts.tmdm.copyWith(
                                     color: AppColors.gray[25],
+                                  ),
+                                ),
+                                Spacer(),
+                                CustomSvg(
+                                  size: 16,
+                                  asset: "assets/icons/view.svg",
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  postData!.views.toString(),
+                                  style: AppTexts.tsms.copyWith(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                GestureDetector(
+                                  onTap: () {
+                                    Get.find<PostController>()
+                                        .likeToggle(postData!.id, "post")
+                                        .then((message) {});
+                                  },
+                                  child: Row(
+                                    children: [
+                                      CustomSvg(
+                                        size: 16,
+                                        asset:
+                                            "assets/icons/${postData!.isSaved ? "loved" : "love"}.svg",
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        postData!.likes.toString(),
+                                        style: AppTexts.tsms.copyWith(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                GestureDetector(
+                                  onTap: () {
+                                    final deepLink =
+                                        "https://jurnee.app/post/${postData!.id}";
+
+                                    SharePlus.instance.share(
+                                      ShareParams(
+                                        text:
+                                            "Check out ${postData!.title} on Jurnee:\n$deepLink",
+                                        subject: "Jurnee Post",
+                                      ),
+                                    );
+                                  },
+                                  child: CustomSvg(
+                                    size: 16,
+                                    asset: "assets/icons/share.svg",
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],

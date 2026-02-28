@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/models/comment_model.dart';
+import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
@@ -13,6 +14,7 @@ import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
+import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/video_widget.dart';
@@ -20,7 +22,13 @@ import 'package:jurnee/views/base/video_widget.dart';
 class CommentWidget extends StatefulWidget {
   final CommentModel comment;
   final bool isReply;
-  const CommentWidget({super.key, required this.comment, this.isReply = false});
+  final PostModel postData;
+  const CommentWidget({
+    super.key,
+    required this.comment,
+    this.isReply = false,
+    required this.postData,
+  });
 
   @override
   State<CommentWidget> createState() => _CommentWidgetState();
@@ -79,16 +87,26 @@ class _CommentWidgetState extends State<CommentWidget> {
                   style: AppTexts.tmdr.copyWith(color: AppColors.gray.shade700),
                 ),
               if (widget.comment.image?.isNotEmpty ?? false)
-                CustomNetworkedImage(url: widget.comment.image, height: 200),
+                GestureDetector(
+                  onTap: () => Get.to(
+                    () => MediaPlayer(
+                      postData: widget.postData,
+                      mediaList: [widget.comment.image],
+                    ),
+                  ),
+                  child: CustomNetworkedImage(
+                    url: widget.comment.image,
+                    height: 200,
+                  ),
+                ),
               if (widget.comment.video?.isNotEmpty ?? false)
                 ClipRRect(
                   borderRadius: BorderRadiusGeometry.circular(12),
                   child: SizedBox(
                     height: 200,
                     child: GestureDetector(
-                      onTap: () => Get.to(
-                        () => VideoWidget(widget.comment.video),
-                      ),
+                      onTap: () =>
+                          Get.to(() => VideoWidget(widget.comment.video)),
                       child: MediaThumbnail(path: widget.comment.video),
                     ),
                   ),
@@ -222,7 +240,11 @@ class _CommentWidgetState extends State<CommentWidget> {
                   ],
                 ),
               for (var i in widget.comment.reply)
-                CommentWidget(comment: i, isReply: true),
+                CommentWidget(
+                  comment: i,
+                  isReply: true,
+                  postData: widget.postData,
+                ),
             ],
           ),
         ),

@@ -8,18 +8,15 @@ import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
+import 'package:jurnee/views/base/rating_widget.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoWidget extends StatefulWidget {
   final String? url;
   final VideoPlayerController? controller;
   final PostModel? postData;
-  const VideoWidget(
-    this.url, {
-    super.key,
-    this.controller,
-    this.postData,
-  });
+  const VideoWidget(this.url, {super.key, this.controller, this.postData});
 
   @override
   State<VideoWidget> createState() => _VideoWidgetState();
@@ -153,64 +150,135 @@ class _VideoWidgetState extends State<VideoWidget> {
                       //   ),
                       // ),
                       // const SizedBox(height: 12),
-                      if(widget.postData != null)
-                      Column(
-                        children: [
-                          Text(
-                            widget.postData!.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTexts.dxsm.copyWith(
-                              color: AppColors.gray[25],
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Text(
-                                Get.find<PostController>().getDistance(
-                                  widget.postData!.location.coordinates[0],
-                                  widget.postData!.location.coordinates[1],
-                                ),
-                                style: AppTexts.tmdm.copyWith(
-                                  color: AppColors.gray[25],
-                                ),
+                      if (widget.postData != null)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.postData!.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.gray[25],
                               ),
-                              const SizedBox(width: 8),
-                              for (int i = 0; i < 4; i++)
-                                CustomSvg(asset: "assets/icons/star.svg"),
-                              for (int i = 0; i < 1; i++)
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              widget.postData!.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTexts.txsr.copyWith(
+                                color: AppColors.gray[50],
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Text(
+                                  Get.find<PostController>().getDistance(
+                                    widget.postData!.location.coordinates[0],
+                                    widget.postData!.location.coordinates[1],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTexts.tmdm.copyWith(
+                                    color: AppColors.gray[25],
+                                  ),
+                                ),
+                                if (widget.postData!.averageRating != null)
+                                  RatingWidget(
+                                    averageRating:
+                                        widget.postData!.averageRating,
+                                  ),
+                                if (widget.postData!.averageRating != null)
+                                  Text(
+                                    widget.postData!.averageRating.toString(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTexts.tsmm.copyWith(
+                                      color: AppColors.gray[25],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                ProfilePicture(
+                                  image: widget.postData!.author.image,
+                                  size: 36,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  widget.postData!.author.name,
+                                  style: AppTexts.tmdm.copyWith(
+                                    color: AppColors.gray[25],
+                                  ),
+                                ),
+                                Spacer(),
                                 CustomSvg(
-                                  asset: "assets/icons/star.svg",
+                                  size: 16,
+                                  asset: "assets/icons/view.svg",
                                   color: Colors.white,
                                 ),
-                              const SizedBox(width: 4),
-                              Text(
-                                widget.postData!.averageRating.toString(),
-                                style: AppTexts.tmdm.copyWith(
-                                  color: AppColors.gray[25],
+                                const SizedBox(width: 4),
+                                Text(
+                                  widget.postData!.views.toString(),
+                                  style: AppTexts.tsms.copyWith(
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              ProfilePicture(
-                                image: widget.postData!.author.image,
-                                size: 52,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                widget.postData!.author.name,
-                                style: AppTexts.txlm.copyWith(
-                                  color: AppColors.gray[25],
+                                const SizedBox(width: 12),
+                                GestureDetector(
+                                  onTap: () {
+                                    Get.find<PostController>()
+                                        .likeToggle(widget.postData!.id, "post")
+                                        .then((message) {});
+                                  },
+                                  child: Row(
+                                    children: [
+                                      CustomSvg(
+                                        size: 16,
+                                        asset:
+                                            "assets/icons/${widget.postData!.isSaved ? "loved" : "love"}.svg",
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        widget.postData!.likes.toString(),
+                                        style: AppTexts.tsms.copyWith(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                                const SizedBox(width: 12),
+                                GestureDetector(
+                                  onTap: () {
+                                    final deepLink =
+                                        "https://jurnee.app/post/${widget.postData!.id}";
+
+                                    SharePlus.instance.share(
+                                      ShareParams(
+                                        text:
+                                            "Check out ${widget.postData!.title} on Jurnee:\n$deepLink",
+                                        subject: "Jurnee Post",
+                                      ),
+                                    );
+                                  },
+                                  child: CustomSvg(
+                                    size: 16,
+                                    asset: "assets/icons/share.svg",
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       FlickVideoProgressBar(
                         flickProgressBarSettings: FlickProgressBarSettings(
                           playedColor: AppColors.green,

@@ -100,15 +100,20 @@ class HomepageState extends State<Homepage> {
                     horizontal: 24,
                     vertical: 8,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      tabs("All", "assets/icons/icon.svg", 0),
-                      tabs("Events", "assets/icons/event.svg", 1),
-                      tabs("Deals", "assets/icons/deal.svg", 2),
-                      tabs("Services", "assets/icons/service.svg", 3),
-                      tabs("Alerts", "assets/icons/alert.svg", 4),
-                    ],
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    clipBehavior: Clip.none,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: 8,
+                      children: [
+                        tabs("All", "assets/icons/icon.svg", 0),
+                        tabs("Events", "assets/icons/event.svg", 1),
+                        tabs("Deals", "assets/icons/deal.svg", 2),
+                        tabs("Services", "assets/icons/service.svg", 3),
+                        tabs("Alerts", "assets/icons/alert.svg", 4),
+                      ],
+                    ),
                   ),
                 ),
 
