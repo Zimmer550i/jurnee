@@ -13,6 +13,7 @@ import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
+import 'package:jurnee/utils/formatter.dart';
 import 'package:jurnee/views/base/comment_widget.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
@@ -51,7 +52,7 @@ class _PostDetailsState extends State<PostDetails> {
   File? commentVideo;
 
   bool showFullDescription = false;
-  int momentsIndex = 0;
+  int momentsIndex = 1;
   final GlobalKey commentSectionKey = GlobalKey();
 
   @override
@@ -190,74 +191,95 @@ class _PostDetailsState extends State<PostDetails> {
     );
   }
 
-  Container postMetaData() {
+  Widget postMetaData() {
+    final index = post.posts.indexWhere((val) => val.id == widget.post.id);
     return Container(
       color: Colors.white,
       padding: EdgeInsets.all(24),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              Get.to(() => Profile(userId: widget.post.author.id));
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Post by:",
-                  style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade600),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    ProfilePicture(image: widget.post.author.image, size: 32),
-                    const SizedBox(width: 8),
-                    Text(
-                      widget.post.author.name,
-                      style: AppTexts.tmdb.copyWith(
-                        color: AppColors.gray.shade700,
-                      ),
+      child: Obx(
+        () => Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Get.to(
+                  () => Profile(userId: post.posts.elementAt(index).author.id),
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Post by:",
+                    style: AppTexts.tsmr.copyWith(
+                      color: AppColors.gray.shade600,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      ProfilePicture(
+                        image: post.posts.elementAt(index).author.image,
+                        size: 32,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        post.posts.elementAt(index).author.name,
+                        style: AppTexts.tmdb.copyWith(
+                          color: AppColors.gray.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          Spacer(),
-          CustomSvg(asset: "assets/icons/view.svg"),
-          const SizedBox(width: 4),
-          Text(widget.post.views.toString(), style: AppTexts.tsmr),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: () => post.saveToggle(widget.post.id),
-            child: Row(
-              children: [
-                CustomSvg(
-                  asset:
-                      "assets/icons/${widget.post.isSaved ? "saved" : "save"}.svg",
-                ),
-                const SizedBox(width: 4),
-                Text(widget.post.totalSaved.toString(), style: AppTexts.tsmr),
-              ],
+            Spacer(),
+            CustomSvg(asset: "assets/icons/view.svg"),
+            const SizedBox(width: 4),
+            Text(
+              post.posts.elementAt(index).views.toString(),
+              style: AppTexts.tsmr,
             ),
-          ),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {
-              post.likeToggle(widget.post.id, "post").then((message) {});
-            },
-            child: Row(
-              children: [
-                CustomSvg(
-                  asset:
-                      "assets/icons/${widget.post.isSaved ? "loved" : "love"}.svg",
-                ),
-                const SizedBox(width: 4),
-                Text(widget.post.likes.toString(), style: AppTexts.tsmr),
-              ],
+            const SizedBox(width: 12),
+            GestureDetector(
+              onTap: () => post.saveToggle(post.posts.elementAt(index).id),
+              child: Row(
+                children: [
+                  CustomSvg(
+                    asset:
+                        "assets/icons/${post.posts.elementAt(index).isSaved ? "saved" : "save"}.svg",
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    post.posts.elementAt(index).totalSaved.toString(),
+                    style: AppTexts.tsmr,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            GestureDetector(
+              onTap: () {
+                post
+                    .likeToggle(post.posts.elementAt(index).id, "post")
+                    .then((message) {});
+              },
+              child: Row(
+                children: [
+                  CustomSvg(
+                    asset:
+                        "assets/icons/${post.posts.elementAt(index).isSaved ? "loved" : "love"}.svg",
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    post.posts.elementAt(index).likes.toString(),
+                    style: AppTexts.tsmr,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -334,7 +356,8 @@ class _PostDetailsState extends State<PostDetails> {
                       ),
                     ),
                     Text(
-                      widget.post.subcategory ?? widget.post.category,
+                      widget.post.subcategory ??
+                          Formatter.toPascelCase(widget.post.category),
                       style: AppTexts.txsr.copyWith(
                         color: AppColors.gray.shade700,
                       ),
@@ -659,10 +682,7 @@ class _PostDetailsState extends State<PostDetails> {
                       () => MediaPlayer(
                         postData: widget.post,
                         preferedStart: mediaCollection[i],
-                        mediaList: [
-                          widget.post.image,
-                          ...mediaCollection,
-                        ],
+                        mediaList: [widget.post.image, ...mediaCollection],
                       ),
                     );
                   },

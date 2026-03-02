@@ -175,14 +175,16 @@ class _UserInterestsState extends State<UserInterests> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   CustomSvg(asset: "assets/icons/$assetName.svg", size: 40),
-                  Checkbox(
-                    value: isSelected,
-                    onChanged: (val) {},
-                    activeColor: AppColors.green.shade600,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    side: BorderSide(
-                      color: AppColors.gray.shade200,
-                      width: 1.5,
+                  AbsorbPointer(
+                    child: Checkbox(
+                      value: isSelected,
+                      onChanged: (val) {},
+                      activeColor: AppColors.green.shade600,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      side: BorderSide(
+                        color: AppColors.gray.shade200,
+                        width: 1.5,
+                      ),
                     ),
                   ),
                 ],

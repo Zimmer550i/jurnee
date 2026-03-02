@@ -60,7 +60,7 @@ class _SearchWidgetState extends State<SearchWidget> {
             titleSpacing: 0,
             title: Row(
               children: [
-                CustomSvg(asset: "assets/icons/logo.svg"),
+                CustomSvg(asset: "assets/icons/logo.svg", size: 22),
                 Spacer(),
               ],
             ),
@@ -312,13 +312,16 @@ class _SearchWidgetState extends State<SearchWidget> {
             SfDateRangePicker(
               headerStyle: DateRangePickerHeaderStyle(
                 backgroundColor: Colors.white,
+                textStyle: AppTexts.tmdm.copyWith(
+                  color: AppColors.gray.shade700,
+                ),
               ),
               todayHighlightColor: AppColors.green.shade600,
               backgroundColor: AppColors.white,
               selectionColor: AppColors.green[700],
-              rangeSelectionColor: AppColors.green[50],
-              endRangeSelectionColor: AppColors.green.shade600,
-              startRangeSelectionColor: AppColors.green.shade600,
+              rangeSelectionColor: AppColors.gray.shade100,
+              endRangeSelectionColor: AppColors.green.shade700,
+              startRangeSelectionColor: AppColors.green.shade700,
               selectionMode: DateRangePickerSelectionMode.range,
               onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
                 setState(() {

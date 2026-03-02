@@ -1,7 +1,5 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_image_picker.dart';
@@ -102,11 +100,15 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
               for (int i = 0; i < 5; i++)
                 GestureDetector(
                   onTap: () async {
-                    final XFile? picked = await ImagePicker().pickMedia(
-                      imageQuality: 90,
+                    final File? picked = await customImagePicker(
+                      isCircular: false,
+                      isSquared: false,
                     );
+                    // final XFile? picked = await ImagePicker().pickMedia(
+                    //   imageQuality: 90,
+                    // );
                     if (picked != null) {
-                      images[i] = File(picked.path);
+                      images[i] = picked;
                       setState(() {});
                     }
                   },

@@ -14,6 +14,7 @@ class CustomTextField extends StatefulWidget {
   final Widget? trailingWidget;
   final TextInputType? textInputType;
   final bool isDisabled;
+  final bool isPrice;
   final double radius;
   final double? height;
   final double? width;
@@ -30,6 +31,7 @@ class CustomTextField extends StatefulWidget {
     this.hintText,
     this.leading,
     this.trailing,
+    this.isPrice = false,
     this.isPassword = false,
     this.isDisabled = false,
     this.isOptional = false,
@@ -118,9 +120,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   : Border.all(color: AppColors.gray.shade200),
             ),
             child: Row(
-              spacing: 16,
+              spacing: widget.isPrice ? 2 : 16,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                if (widget.isPrice)
+                  SvgPicture.asset(
+                    "assets/icons/dollar.svg",
+                    height: 16,
+                    width: 8,
+                    colorFilter: ColorFilter.mode(
+                      AppColors.gray.shade900,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 if (widget.leading != null)
                   SvgPicture.asset(
                     widget.leading!,

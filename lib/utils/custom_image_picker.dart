@@ -30,8 +30,8 @@ Future<File?> customImagePicker({isCircular = true, isSquared = true}) async {
           initAspectRatio: CropAspectRatioPreset.square,
         ),
         IOSUiSettings(
+          title: "Crop your image",
           cropStyle: isCircular ? CropStyle.circle : CropStyle.rectangle,
-          showCancelConfirmationDialog: true,
         ),
       ],
     );

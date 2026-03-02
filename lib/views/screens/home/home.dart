@@ -37,7 +37,9 @@ class _HomeState extends State<Home> {
     super.initState();
     Get.find<PostController>().fetchLocation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (Get.find<UserController>().userData!.interested.isEmpty) {
+      // TODO: Remove "|| true" after march 4
+      if (Get.find<UserController>().userData!.interested.isEmpty || true) {
+        customSnackBar("Showing this page for testing...", isError: false);
         Get.to(() => UserInterests());
       }
     });
@@ -109,7 +111,7 @@ class _HomeState extends State<Home> {
                                   child: Container(
                                     padding: EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: AppColors.green[50],
+                                      color: AppColors.gray[50],
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Column(
@@ -147,7 +149,7 @@ class _HomeState extends State<Home> {
                                   child: Container(
                                     padding: EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: AppColors.green[50],
+                                      color: AppColors.gray[50],
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Column(
@@ -190,7 +192,7 @@ class _HomeState extends State<Home> {
                                   child: Container(
                                     padding: EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: AppColors.green[50],
+                                      color: AppColors.gray[50],
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Column(
@@ -228,7 +230,7 @@ class _HomeState extends State<Home> {
                                   child: Container(
                                     padding: EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: AppColors.green[50],
+                                      color: AppColors.gray[50],
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Column(

@@ -10,6 +10,7 @@ import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_checkbox.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/auth/verification.dart';
+import 'package:jurnee/views/screens/post/location_picker.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -41,7 +42,7 @@ class _RegisterState extends State<Register> {
       emailCtrl.text,
       passCtrl.text,
       nameCtrl.text,
-      locationCtrl.text,
+      // locationCtrl.text,
       LatLng(userLocation?.latitude ?? 0, userLocation?.longitude ?? 0),
     );
 
@@ -81,12 +82,13 @@ class _RegisterState extends State<Register> {
                   controller: nameCtrl,
                 ),
                 const SizedBox(height: 16),
-                CustomTextField(
-                  title: "Location",
-                  hintText: "Enter your location",
-                  controller: locationCtrl,
-                ),
-                const SizedBox(height: 16),
+                LocationPicker(controller: locationCtrl),
+                // CustomTextField(
+                //   title: "Location",
+                //   hintText: "Enter your location",
+                //   controller: locationCtrl,
+                // ),
+                const SizedBox(height: 8),
                 CustomTextField(
                   title: "Email",
                   hintText: "Enter your email",

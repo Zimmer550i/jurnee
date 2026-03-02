@@ -352,14 +352,19 @@ class PostController extends GetxController {
         if (body['data'] == "disliked") isLiked = false;
 
         if (postCommentOrReply == "post") {
-          posts.firstWhere((val) => val.id == id).likes += isLiked ? 1 : -1;
-          posts.refresh();
+          final index = posts.indexWhere((val) => val.id == id);
+          if (index != -1) {
+            posts[index].isSaved = isLiked;
+            posts[index].likes += isLiked ? 1 : -1;
+            posts.refresh();
+          }
         } else if (postCommentOrReply == "comment") {
-          comments.firstWhere((val) => val.id == id).like += isLiked ? 1 : -1;
-          comments.firstWhere((val) => val.id == id).liked = isLiked
-              ? true
-              : false;
-          comments.refresh();
+          final index = comments.indexWhere((val) => val.id == id);
+          if (index != -1) {
+            comments[index].like += isLiked ? 1 : -1;
+            comments[index].liked = isLiked;
+            comments.refresh();
+          }
         } else if (postCommentOrReply == "reply") {
           final parentComment = comments.firstWhere(
             (c) => c.reply.any((r) => r.id == id),

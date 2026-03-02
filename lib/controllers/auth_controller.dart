@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:jurnee/controllers/maps_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/user.dart';
 import 'package:jurnee/services/api_service.dart';
@@ -54,7 +55,6 @@ class AuthController extends GetxController {
     String email,
     String password,
     String name,
-    String address,
     LatLng location,
   ) async {
     isLoading(true);
@@ -63,7 +63,7 @@ class AuthController extends GetxController {
         "email": email,
         "password": password,
         "name": name,
-        "address": address,
+        "address": Get.find<MapsController>().selected.value?.description,
         "location": {
           "type": "Point",
           "coordinates": [location.longitude, location.latitude],

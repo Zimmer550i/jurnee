@@ -27,6 +27,7 @@ class _PostServiceState extends State<PostService> {
   final GlobalKey<PostBaseWidgetState> _baseKey = GlobalKey();
   final map = Get.find<MapsController>();
   final hashtagCtrl = TextEditingController();
+  final priceCtrl = TextEditingController();
   final serviceTypeCtrl = TextEditingController();
   final serviceAreaCtrl = TextEditingController();
   final capacityCtrl = TextEditingController();
@@ -66,10 +67,18 @@ class _PostServiceState extends State<PostService> {
 
     // Populate category-specific fields
     switch (subCategory) {
+      case "Food & Beverage":
+        priceCtrl.text = widget.post!.price?.toString() ?? "";
+        break;
+      case "Entertainment":
+        priceCtrl.text = widget.post!.price?.toString() ?? "";
+        break;
       case "Personal/Home Services":
+        priceCtrl.text = widget.post!.price?.toString() ?? "";
         serviceTypeCtrl.text = widget.post!.serviceType ?? "";
         break;
       case "Venues":
+        priceCtrl.text = widget.post!.price?.toString() ?? "";
         capacityCtrl.text = widget.post!.capacity?.toString() ?? "";
         amenitiesCtrl.text = widget.post!.amenities?.join(", ") ?? "";
         break;
@@ -116,8 +125,19 @@ class _PostServiceState extends State<PostService> {
     };
 
     switch (subCategory) {
+      case "Food & Beverage":
+        (payload['data'] as Map<String, dynamic>).addAll({
+          "price": num.tryParse(priceCtrl.text),
+        });
+        break;
+      case "Entertainment":
+        (payload['data'] as Map<String, dynamic>).addAll({
+          "price": num.tryParse(priceCtrl.text),
+        });
+        break;
       case "Personal/Home Services":
         (payload['data'] as Map<String, dynamic>).addAll({
+          "price": num.tryParse(priceCtrl.text),
           if (serviceTypeCtrl.text.trim().isNotEmpty)
             "serviceType": serviceTypeCtrl.text.trim(),
         });
@@ -125,7 +145,8 @@ class _PostServiceState extends State<PostService> {
         break;
       case "Venues":
         (payload['data'] as Map<String, dynamic>).addAll({
-          "capacity": num.tryParse(capacityCtrl.text),
+          "price": num.tryParse(priceCtrl.text),
+          "capacity": num.tryParse(priceCtrl.text),
           "amenities": amenitiesCtrl.text.trim().split(","),
         });
         break;
@@ -196,11 +217,18 @@ class _PostServiceState extends State<PostService> {
           child: Column(
             children: [
               PostBaseWidget(key: _baseKey),
+              CustomTextField(
+                title: "Starting Price",
+                controller: priceCtrl,
+                isPrice: true,
+                textInputType: TextInputType.number,
+                hintText: "  Enter the selling price",
+              ),
+              const SizedBox(height: 16),
               AvailabilityWidget(
                 key: _availabilityKey,
                 initialSchedule: widget.post?.schedule,
               ),
-
               const SizedBox(height: 16),
               CustomTextField(
                 title: "Service Area (optional)",

@@ -108,16 +108,20 @@ class Formatter {
       duration -= Duration(days: duration.inDays);
     }
 
-    if (duration.inHours != 0) {
-      rtn += duration.inHours.toString();
-      rtn += "h ";
-      duration -= Duration(hours: duration.inHours);
-    }
+    if (!rtn.contains("d") || true) {
+      if (duration.inHours != 0) {
+        rtn += duration.inHours.toString();
+        rtn += "h ";
+        duration -= Duration(hours: duration.inHours);
+      }
 
-    if (duration.inMinutes >= 0) {
-      rtn += duration.inMinutes.toString();
-      rtn += "m";
-      duration -= Duration(hours: duration.inMinutes);
+      if (!rtn.contains("h")) {
+        if (duration.inMinutes >= 0) {
+          rtn += duration.inMinutes.toString();
+          rtn += "m";
+          duration -= Duration(hours: duration.inMinutes);
+        }
+      }
     }
 
     if (showSeconds) {
@@ -129,7 +133,7 @@ class Formatter {
     return rtn;
   }
 
-  static String toTitleCase(String text) {
+  static String toPascelCase(String text) {
     if (text.isEmpty) return text;
 
     return text
