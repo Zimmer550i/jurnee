@@ -27,7 +27,6 @@ class _PostServiceState extends State<PostService> {
   final GlobalKey<PostBaseWidgetState> _baseKey = GlobalKey();
   final map = Get.find<MapsController>();
   final hashtagCtrl = TextEditingController();
-  final priceCtrl = TextEditingController();
   final serviceTypeCtrl = TextEditingController();
   final serviceAreaCtrl = TextEditingController();
   final capacityCtrl = TextEditingController();
@@ -67,18 +66,10 @@ class _PostServiceState extends State<PostService> {
 
     // Populate category-specific fields
     switch (subCategory) {
-      case "Food & Beverage":
-        priceCtrl.text = widget.post!.price?.toString() ?? "";
-        break;
-      case "Entertainment":
-        priceCtrl.text = widget.post!.price?.toString() ?? "";
-        break;
       case "Personal/Home Services":
-        priceCtrl.text = widget.post!.price?.toString() ?? "";
         serviceTypeCtrl.text = widget.post!.serviceType ?? "";
         break;
       case "Venues":
-        priceCtrl.text = widget.post!.price?.toString() ?? "";
         capacityCtrl.text = widget.post!.capacity?.toString() ?? "";
         amenitiesCtrl.text = widget.post!.amenities?.join(", ") ?? "";
         break;
@@ -125,19 +116,8 @@ class _PostServiceState extends State<PostService> {
     };
 
     switch (subCategory) {
-      case "Food & Beverage":
-        (payload['data'] as Map<String, dynamic>).addAll({
-          "price": num.tryParse(priceCtrl.text),
-        });
-        break;
-      case "Entertainment":
-        (payload['data'] as Map<String, dynamic>).addAll({
-          "price": num.tryParse(priceCtrl.text),
-        });
-        break;
       case "Personal/Home Services":
         (payload['data'] as Map<String, dynamic>).addAll({
-          "price": num.tryParse(priceCtrl.text),
           if (serviceTypeCtrl.text.trim().isNotEmpty)
             "serviceType": serviceTypeCtrl.text.trim(),
         });
@@ -145,8 +125,7 @@ class _PostServiceState extends State<PostService> {
         break;
       case "Venues":
         (payload['data'] as Map<String, dynamic>).addAll({
-          "price": num.tryParse(priceCtrl.text),
-          "capacity": num.tryParse(priceCtrl.text),
+          "capacity": num.tryParse(capacityCtrl.text),
           "amenities": amenitiesCtrl.text.trim().split(","),
         });
         break;
@@ -224,7 +203,7 @@ class _PostServiceState extends State<PostService> {
 
               const SizedBox(height: 16),
               CustomTextField(
-                title: "Service Area",
+                title: "Service Area (optional)",
                 controller: serviceAreaCtrl,
                 hintText: "Enter your service area",
               ),
@@ -281,31 +260,14 @@ class _PostServiceState extends State<PostService> {
   Widget getAdditionalFields() {
     switch (subCategory) {
       case "Food & Beverage":
-        return CustomTextField(
-          title: "Starting Price",
-          controller: priceCtrl,
-          textInputType: TextInputType.number,
-          hintText: "\$ Enter the selling price",
-        );
+        return Container();
       case "Entertainment":
-        return CustomTextField(
-          title: "Starting Price",
-          controller: priceCtrl,
-          textInputType: TextInputType.number,
-          hintText: "\$ Enter the starting price",
-        );
+        return Container();
       case "Personal/Home Services":
         return Column(
           children: [
             CustomTextField(
-              title: "Starting Price",
-              controller: priceCtrl,
-              textInputType: TextInputType.number,
-              hintText: "\$ Enter the starting price",
-            ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              title: "Service Type",
+              title: "Service Type (optional)",
               controller: serviceTypeCtrl,
               hintText: "Enter your service type",
             ),
@@ -321,7 +283,7 @@ class _PostServiceState extends State<PostService> {
                   });
                 }
               },
-              title: "Licenses",
+              title: "Licenses (optional)",
               controller: lisenses != null
                   ? TextEditingController(text: lisenses!.path.split("/").last)
                   : null,
@@ -334,21 +296,14 @@ class _PostServiceState extends State<PostService> {
         return Column(
           children: [
             CustomTextField(
-              title: "Starting Price",
-              controller: priceCtrl,
-              textInputType: TextInputType.number,
-              hintText: "\$ Enter the starting price",
-            ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              title: "Capacity",
+              title: "Capacity (optional)",
               controller: capacityCtrl,
               textInputType: TextInputType.number,
               hintText: "Enter max guests",
             ),
             const SizedBox(height: 16),
             CustomTextField(
-              title: "Amenities",
+              title: "Amenities (optional)",
               controller: amenitiesCtrl,
               hintText: "Use comma(,) to seperate",
             ),
