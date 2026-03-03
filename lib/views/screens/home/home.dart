@@ -37,9 +37,7 @@ class _HomeState extends State<Home> {
     super.initState();
     Get.find<PostController>().fetchLocation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // TODO: Remove "|| true" after march 4
-      if (Get.find<UserController>().userData!.interested.isEmpty || true) {
-        customSnackBar("Showing this page for testing...", isError: false);
+      if (Get.find<UserController>().userData!.interested.isEmpty) {
         Get.to(() => UserInterests());
       }
     });

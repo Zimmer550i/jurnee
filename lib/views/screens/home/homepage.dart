@@ -7,6 +7,7 @@ import 'package:jurnee/utils/custom_list_handler.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
+import 'package:jurnee/views/base/native_ad_widget.dart';
 import 'package:jurnee/views/base/post_card.dart';
 import 'package:jurnee/views/base/search_widget.dart';
 import 'package:jurnee/views/screens/home/location_map.dart';
@@ -142,11 +143,14 @@ class HomepageState extends State<Homepage> {
                           child: Column(
                             children: [
                               const SizedBox(height: 12),
-                              for (var i in post.posts)
+                              for (int i = 0; i < post.posts.length; i++) ...[
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 20),
-                                  child: PostCard(i),
+                                  child: PostCard(post.posts.elementAt(i)),
                                 ),
+
+                                if (i != 1 && i % 4 == 0) NativeAdWidget(),
+                              ],
                               if (post.isMoreLoading.value) CustomLoading(),
                               if (!post.isMoreLoading.value)
                                 Text(

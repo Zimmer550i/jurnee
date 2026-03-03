@@ -26,8 +26,14 @@
         android:label="jurnee"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-        <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyDltI2vV-mbS5Qy-gz2lPMTf7RAbR4tZRs"/>
+        <meta-data 
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDltI2vV-mbS5Qy-gz2lPMTf7RAbR4tZRs"
+        />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-6145393247747170~2994844598"
+        />
         <activity
             android:name=".MainActivity"
             android:exported="true"

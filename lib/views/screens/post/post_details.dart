@@ -268,7 +268,7 @@ class _PostDetailsState extends State<PostDetails> {
                 children: [
                   CustomSvg(
                     asset:
-                        "assets/icons/${post.posts.elementAt(index).isSaved ? "loved" : "love"}.svg",
+                        "assets/icons/${post.posts.elementAt(index).isLiked ? "loved" : "love"}.svg",
                   ),
                   const SizedBox(width: 4),
                   Text(

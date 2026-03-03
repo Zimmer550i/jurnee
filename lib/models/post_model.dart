@@ -20,6 +20,7 @@ class PostModel {
   final List<String>? hasTag;
   final int views;
   int likes;
+  bool isLiked;
   final dynamic endDate;
   final double? price;
   final String category;
@@ -65,6 +66,7 @@ class PostModel {
     this.hasTag,
     required this.views,
     required this.likes,
+    required this.isLiked,
     required this.endDate,
     this.price,
     required this.category,
@@ -110,6 +112,7 @@ class PostModel {
     List<String>? hasTag,
     int? views,
     int? likes,
+    bool? isLiked,
     dynamic endDate,
     double? price,
     String? category,
@@ -153,6 +156,7 @@ class PostModel {
     hasTag: hasTag ?? this.hasTag,
     views: views ?? this.views,
     likes: likes ?? this.likes,
+    isLiked: isLiked ?? this.isLiked,
     endDate: endDate ?? this.endDate,
     price: price ?? this.price,
     category: category ?? this.category,
@@ -210,6 +214,7 @@ class PostModel {
         : List<String>.from(json["hasTag"].map((x) => x)),
     views: json["views"],
     likes: json["likes"],
+    isLiked: json["isLiked"] ?? false,
     endDate: json["endDate"] != null
         ? DateTime.tryParse(json["endDate"])
         : null,
@@ -267,6 +272,7 @@ class PostModel {
     "hasTag": hasTag == null ? null : List<dynamic>.from(hasTag!.map((x) => x)),
     "views": views,
     "likes": likes,
+    "isLiked": isLiked,
     "endDate": endDate,
     "price": price,
     "category": category,

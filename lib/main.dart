@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:jurnee/firebase_options.dart';
 import 'package:jurnee/themes/light_theme.dart';
 import 'package:jurnee/utils/app_colors.dart';
@@ -17,6 +18,10 @@ import 'helpers/route.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await MobileAds.instance.initialize();
+  await MobileAds.instance.updateRequestConfiguration(
+    RequestConfiguration(testDeviceIds: ['5d5be013ce0959eae5547111446cf6f6']),
+  );
   await dotenv.load(fileName: ".env");
   Map<String, Map<String, String>> languages = await di.init();
   SystemChrome.setSystemUIOverlayStyle(

@@ -354,7 +354,7 @@ class PostController extends GetxController {
         if (postCommentOrReply == "post") {
           final index = posts.indexWhere((val) => val.id == id);
           if (index != -1) {
-            posts[index].isSaved = isLiked;
+            posts[index].isLiked = isLiked;
             posts[index].likes += isLiked ? 1 : -1;
             posts.refresh();
           }
