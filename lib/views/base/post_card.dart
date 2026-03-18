@@ -20,6 +20,7 @@ class PostCard extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
+        constraints: BoxConstraints(maxWidth: 400),
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),

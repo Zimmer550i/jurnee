@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:jurnee/utils/app_colors.dart';
@@ -12,11 +11,13 @@ class NativeAdWidget extends StatefulWidget {
 }
 
 class _NativeAdWidgetState extends State<NativeAdWidget> {
+  final String androidAdUnit = "ca-app-pub-6145393247747170/4449341154";
+  final String iosAdUnit = "ca-app-pub-6145393247747170/8638887669";
+
   NativeAd? _nativeAd;
   bool _nativeAdLoaded = false;
-  final adUnitId = Platform.isAndroid
-      ? 'ca-app-pub-6145393247747170/4449341154'
-      : 'ca-app-pub-6145393247747170/8638887669';
+  String? _adError;
+  String get adUnitId => Platform.isAndroid ? androidAdUnit : iosAdUnit;
 
   @override
   void initState() {
@@ -25,6 +26,7 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
   }
 
   loadAd() {
+    debugPrint('NativeAd: initiated | adUnitId=$adUnitId');
     _nativeAd = NativeAd(
       adUnitId: adUnitId,
       request: const AdRequest(),
@@ -56,17 +58,30 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
       ),
       listener: NativeAdListener(
         onAdLoaded: (ad) {
+          debugPrint('NativeAd: loaded successfully');
           setState(() {
             _nativeAdLoaded = true;
+            _adError = null;
           });
         },
         onAdFailedToLoad: (ad, error) {
+          debugPrint('NativeAd: failed to load | error=${error.message}');
+          setState(() {
+            _adError = error.message;
+          });
           ad.dispose();
         },
       ),
     );
 
     _nativeAd!.load();
+  }
+
+  @override
+  void dispose() {
+    debugPrint('NativeAd: disposed');
+    _nativeAd?.dispose();
+    super.dispose();
   }
 
   @override
@@ -79,10 +94,7 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
         return SizeTransition(
           sizeFactor: animation,
           axisAlignment: -1.0,
-          child: FadeTransition(
-            opacity: animation,
-            child: child,
-          ),
+          child: FadeTransition(opacity: animation, child: child),
         );
       },
       child: _nativeAdLoaded
@@ -91,9 +103,19 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
               aspectRatio: 1,
               child: AdWidget(ad: _nativeAd!),
             )
-          : const SizedBox(
-              key: ValueKey('ad_empty'),
-            ),
+          : _adError != null
+          ? Center(
+              child: Column(
+                children: [
+                  Text(
+                    _adError.toString(),
+                    style: TextStyle(color: AppColors.red),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              ),
+            )
+          : const SizedBox(key: ValueKey('ad_empty')),
     );
   }
 }

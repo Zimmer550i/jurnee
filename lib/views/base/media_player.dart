@@ -176,6 +176,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
                                         if (widget.postData.averageRating !=
                                             null)
                                           RatingWidget(
+                                            showText: false,
                                             averageRating:
                                                 widget.postData.averageRating,
                                           ),

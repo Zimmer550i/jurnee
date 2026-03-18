@@ -85,7 +85,8 @@ class _PostDetailsState extends State<PostDetails> {
     return Scaffold(
       backgroundColor: AppColors.gray[50],
       appBar: CustomAppBar(
-        title: "Event Details",
+        title:
+            "${widget.post.category.substring(0, 1).toUpperCase()}${widget.post.category.substring(1)} Details",
         trailing: "assets/icons/share.svg",
         trailingAction: () {
           final deepLink = "https://jurnee.app/post/${widget.post.id}";
@@ -126,6 +127,7 @@ class _PostDetailsState extends State<PostDetails> {
           controller: listController,
           physics: ClampingScrollPhysics(),
           child: SafeArea(
+            bottom: false,
             child: Column(
               children: [
                 postCover(context),
@@ -217,9 +219,11 @@ class _PostDetailsState extends State<PostDetails> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      ProfilePicture(
-                        image: post.posts.elementAt(index).author.image,
-                        size: 32,
+                      AbsorbPointer(
+                        child: ProfilePicture(
+                          image: post.posts.elementAt(index).author.image,
+                          size: 32,
+                        ),
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -359,7 +363,9 @@ class _PostDetailsState extends State<PostDetails> {
                       widget.post.subcategory ??
                           Formatter.toPascelCase(widget.post.category),
                       style: AppTexts.txsr.copyWith(
-                        color: AppColors.gray.shade700,
+                        color: widget.post.subcategory == "Missing Person"
+                            ? AppColors.red
+                            : AppColors.gray.shade700,
                       ),
                     ),
                   ],

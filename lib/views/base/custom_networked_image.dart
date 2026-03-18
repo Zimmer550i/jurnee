@@ -73,8 +73,8 @@ class CustomNetworkedImage extends StatelessWidget {
               },
               placeholder: (context, url) {
                 return Shimmer.fromColors(
-                  baseColor: AppColors.green.shade300,
-                  highlightColor: AppColors.green[25]!,
+                  baseColor: AppColors.gray.shade300,
+                  highlightColor: AppColors.gray[25]!,
                   period: Duration(milliseconds: 800),
                   child: Container(
                     height: height ?? width,
