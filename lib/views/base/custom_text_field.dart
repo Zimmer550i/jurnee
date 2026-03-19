@@ -151,6 +151,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     cursorColor: AppColors.green,
                     keyboardType: widget.textInputType,
                     obscureText: isObscured,
+                    textCapitalization: TextCapitalization.sentences,
                     enabled: !widget.isDisabled && widget.onTap == null,
                     onTapOutside: (event) {
                       setState(() {

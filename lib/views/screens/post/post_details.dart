@@ -14,6 +14,7 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/utils/formatter.dart';
+import 'package:jurnee/utils/no_data.dart';
 import 'package:jurnee/views/base/comment_widget.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
@@ -52,6 +53,7 @@ class _PostDetailsState extends State<PostDetails> {
   File? commentVideo;
 
   bool showFullDescription = false;
+  bool showAllTags = false;
   int momentsIndex = 1;
   final GlobalKey commentSectionKey = GlobalKey();
 
@@ -333,7 +335,10 @@ class _PostDetailsState extends State<PostDetails> {
             Row(
               children: [
                 Text("Entry: ", style: AppTexts.tsmr),
-                Text(widget.post.price.toString(), style: AppTexts.tlgb),
+                Text(
+                  Formatter.numberFormatter(widget.post.price),
+                  style: AppTexts.tlgb,
+                ),
               ],
             ),
           if (!isOwner) const SizedBox(height: 32),
@@ -513,6 +518,7 @@ class _PostDetailsState extends State<PostDetails> {
                 padding: const EdgeInsets.all(8.0),
                 child: CustomLoading(),
               ),
+            if (post.reviews.isEmpty) Center(child: noData("No reviews yet")),
             ListView.separated(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
@@ -607,6 +613,10 @@ class _PostDetailsState extends State<PostDetails> {
                                   if (message != "success") {
                                     customSnackBar(message);
                                   } else {
+                                    post.getMedia(
+                                      widget.post.id,
+                                      type: "community",
+                                    );
                                     setState(() {
                                       commentController.clear();
                                       commentImage = null;
@@ -624,7 +634,7 @@ class _PostDetailsState extends State<PostDetails> {
                 ],
               ),
             const SizedBox(height: 16),
-
+            if (post.comments.isEmpty) Center(child: noData("No comments yet")),
             ListView.separated(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
@@ -648,11 +658,6 @@ class _PostDetailsState extends State<PostDetails> {
   }
 
   Widget postMedia() {
-    List<String> mediaCollection = [
-      [...post.mediaListOwner, ...post.mediaListCommunity],
-      [...post.mediaListOwner],
-      [...post.mediaListCommunity],
-    ][momentsIndex];
     return Container(
       color: Colors.white,
       padding: EdgeInsets.all(24),
@@ -677,58 +682,110 @@ class _PostDetailsState extends State<PostDetails> {
             ],
           ),
           const SizedBox(height: 16),
-          GridView(
-            shrinkWrap: true,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-            ),
-            physics: NeverScrollableScrollPhysics(),
-            children: [
-              for (int i = 0; i < (mediaCollection.length); i++)
-                GestureDetector(
-                  onTap: () {
-                    Get.to(
-                      () => MediaPlayer(
-                        postData: widget.post,
-                        preferedStart: mediaCollection[i],
-                        mediaList: [widget.post.image, ...mediaCollection],
-                      ),
-                    );
-                  },
-                  child: ClipRRect(
-                    borderRadius: BorderRadiusGeometry.circular(12),
-                    child: MediaThumbnail(path: mediaCollection[i]),
-                  ),
-                ),
+          AnimatedSize(
+            duration: Duration(milliseconds: 200),
+            alignment: Alignment.topLeft,
+            child: Obx(() {
+              List<String> mediaCollection = [
+                [
+                  widget.post.image ?? "",
+                  ...post.mediaListOwner,
+                  ...post.mediaListCommunity,
+                ],
+                [widget.post.image ?? "", ...post.mediaListOwner],
+                [...post.mediaListCommunity],
+              ][momentsIndex];
 
-              // CustomNetworkedImage(
-              //   url: post.media![i],
-              //   radius: 12,
-              // ),
-            ],
+              if (mediaCollection.isEmpty) {
+                return noData("No Moments available");
+              }
+              return MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                removeBottom: true,
+                child: GridView(
+                  shrinkWrap: true,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                  ),
+                  physics: NeverScrollableScrollPhysics(),
+                  children: [
+                    for (int i = 0; i < (mediaCollection.length); i++)
+                      GestureDetector(
+                        onTap: () {
+                          Get.to(
+                            () => MediaPlayer(
+                              postData: widget.post,
+                              preferedStart: mediaCollection[i],
+                              mediaList: [
+                                widget.post.image,
+                                ...mediaCollection,
+                              ],
+                            ),
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadiusGeometry.circular(12),
+                          child: MediaThumbnail(path: mediaCollection[i]),
+                        ),
+                      ),
+
+                    // CustomNetworkedImage(
+                    //   url: post.media![i],
+                    //   radius: 12,
+                    // ),
+                  ],
+                ),
+              );
+            }),
           ),
           const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            children: [
-              for (var tag in widget.post.hasTag ?? [])
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.gray.shade100,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    tag.contains("#") ? "$tag " : "#$tag ",
-                    style: AppTexts.tsmr.copyWith(
-                      color: AppColors.green.shade800,
+          if (widget.post.hasTag != null)
+            Wrap(
+              spacing: 8,
+              children: [
+                for (var tag
+                    in showAllTags
+                        ? widget.post.hasTag!
+                        : widget.post.hasTag!.getRange(0, 3).toList())
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.gray.shade100,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      tag.contains("#") ? "$tag " : "#$tag ",
+                      style: AppTexts.tsmr.copyWith(
+                        color: AppColors.green.shade800,
+                      ),
                     ),
                   ),
-                ),
-            ],
-          ),
+                if (widget.post.hasTag!.length > 3 && !showAllTags)
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        showAllTags = true;
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.gray.shade100,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        "+${widget.post.hasTag!.length - 3} More",
+                        style: AppTexts.tsmr.copyWith(
+                          color: AppColors.green.shade800,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
         ],
       ),
     );

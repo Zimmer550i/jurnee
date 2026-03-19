@@ -11,6 +11,7 @@ import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/models/reivew_model.dart';
 import 'package:jurnee/services/api_service.dart';
 import 'package:jurnee/utils/get_location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum PostType { defaultPosts }
 
@@ -420,11 +421,22 @@ class PostController extends GetxController {
 
   Future<String> addViewCount(String id) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final now = DateTime.now();
+      final todayKey = now.year * 10000 + now.month * 100 + now.day;
+      final prefsKey = 'post_view_count_day_$id';
+      final lastCalledDay = prefs.getInt(prefsKey);
+
+      if (lastCalledDay == todayKey) {
+        return "success";
+      }
+
       final res = await api.get("/post/details/$id", authReq: true);
 
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
+        await prefs.setInt(prefsKey, todayKey);
         return "success";
       } else {
         return body['message'] ?? "Something went wrong";

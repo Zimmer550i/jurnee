@@ -32,6 +32,8 @@ class _HomeState extends State<Home> {
   bool showOverlay = false;
   bool showNavBar = true;
 
+  late final List<Widget> pages;
+
   @override
   void initState() {
     super.initState();
@@ -41,21 +43,15 @@ class _HomeState extends State<Home> {
         Get.to(() => UserInterests());
       }
     });
+    pages = [Homepage(key: homeKey), Messages(), Notifications(), Profile()];
   }
-
-  List<Widget> pages = [
-    Homepage(key: homeKey),
-    Messages(),
-    Notifications(),
-    Profile(),
-  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          pages[index],
+          IndexedStack(index: index, children: pages),
           if (showOverlay)
             GestureDetector(
               onTap: () {
@@ -309,7 +305,15 @@ class _HomeState extends State<Home> {
                   color: AppColors.green.shade600,
                   shape: BoxShape.circle,
                 ),
-                child: Center(child: CustomSvg(asset: "assets/icons/map.svg")),
+                child: Center(
+                  child: CustomSvg(
+                    asset: homeKey.currentState?.showMap ?? false
+                        ? "assets/icons/home.svg"
+                        : "assets/icons/map.svg",
+                    size: 30,
+                    color: AppColors.white,
+                  ),
+                ),
               ),
             ),
       bottomNavigationBar: showNavBar

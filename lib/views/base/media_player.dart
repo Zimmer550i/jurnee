@@ -145,7 +145,10 @@ class _MediaPlayerState extends State<MediaPlayer> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      widget.postData.title,
+                                      widget.postData.category
+                                              .substring(0, 1)
+                                              .toUpperCase() +
+                                          widget.postData.category.substring(1),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: AppTexts.txsr.copyWith(
@@ -209,7 +212,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
                                         ),
                                         Spacer(),
                                         CustomSvg(
-                                          size: 16,
+                                          size: 20,
                                           asset: "assets/icons/view.svg",
                                           color: Colors.white,
                                         ),
@@ -233,7 +236,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
                                           child: Row(
                                             children: [
                                               CustomSvg(
-                                                size: 16,
+                                                size: 20,
                                                 asset:
                                                     "assets/icons/${widget.postData.isSaved ? "loved" : "love"}.svg",
                                                 color: Colors.white,
@@ -264,7 +267,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
                                             );
                                           },
                                           child: CustomSvg(
-                                            size: 16,
+                                            size: 20,
                                             asset: "assets/icons/share.svg",
                                             color: Colors.white,
                                           ),
