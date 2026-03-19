@@ -62,7 +62,7 @@ class _PostDealState extends State<PostDeal> {
           "type": "Point",
           "coordinates": [pos['lng'], pos['lat']],
         },
-        "hasTag": hashtagCtrl.text.split(" "),
+        "hasTag": hashtagCtrl.text.trim().split(" "),
         "startDate": startDate?.toIso8601String(),
         "endDate": endDate?.toIso8601String(),
       },

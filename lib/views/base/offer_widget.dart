@@ -126,7 +126,7 @@ class OfferWidget extends StatelessWidget {
                       ),
 
                       Text(
-                        "Total: \$${total.toStringAsFixed(2)}",
+                        "Total: \$${Formatter.numberFormatter(total)}",
                         style: AppTexts.tlgb,
                       ),
                       // if (Get.find<UserController>().userData!.id ==

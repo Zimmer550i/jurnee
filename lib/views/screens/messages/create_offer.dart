@@ -87,6 +87,7 @@ class _CreateOfferState extends State<CreateOffer> {
   @override
   Widget build(BuildContext context) {
     num sum = 0;
+    final discount = double.tryParse(_discountController.text) ?? 0;
 
     for (int i = 0; i < titleController.length; i++) {
       var quantity = double.tryParse(quantityController.elementAt(i).text) ?? 1;
@@ -231,7 +232,7 @@ class _CreateOfferState extends State<CreateOffer> {
                       ),
                       Spacer(),
                       Text(
-                        "\$$sum",
+                        "\$${Formatter.numberFormatter(sum)}",
                         style: AppTexts.tsmm.copyWith(color: AppColors.gray),
                       ),
                     ],
@@ -244,7 +245,7 @@ class _CreateOfferState extends State<CreateOffer> {
                       ),
                       Spacer(),
                       Text(
-                        "\$${_discountController.text}",
+                        "\$${Formatter.numberFormatter(discount)}",
                         style: AppTexts.tsmm.copyWith(color: AppColors.gray),
                       ),
                     ],
@@ -255,7 +256,7 @@ class _CreateOfferState extends State<CreateOffer> {
                       Text("Total", style: AppTexts.tmdb),
                       Spacer(),
                       Text(
-                        "\$${sum - (double.tryParse(_discountController.text) ?? 0)}",
+                        "\$${Formatter.numberFormatter(sum - discount)}",
                         style: AppTexts.tmdb,
                       ),
                     ],

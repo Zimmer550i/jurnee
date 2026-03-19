@@ -63,7 +63,7 @@ class _PostEventState extends State<PostEvent> {
           "type": "Point",
           "coordinates": [pos['lng'], pos['lat']],
         },
-        "hasTag": hashtagCtrl.text.split(" "),
+        "hasTag": hashtagCtrl.text.trim().split(" "),
         "startDate": date?.toIso8601String(),
         "startTime": date
             ?.copyWith(hour: time?.hour, minute: time?.minute)
@@ -147,7 +147,9 @@ class _PostEventState extends State<PostEvent> {
 
     // Others
     hashtagCtrl.text = widget.post!.hasTag?.join(" ") ?? "";
-    priceCtrl.text = widget.post!.price != null ? widget.post!.price.toString() : "";
+    priceCtrl.text = widget.post!.price != null
+        ? widget.post!.price.toString()
+        : "";
     date = widget.post!.startDate;
     time = widget.post!.startTime != null
         ? TimeOfDay.fromDateTime(widget.post!.startTime!)

@@ -102,7 +102,7 @@ class _PostAlertState extends State<PostAlert> {
           "type": "Point",
           "coordinates": [pos['lng'], pos['lat']],
         },
-        "hasTag": hashtagCtrl.text.split(" "),
+        "hasTag": hashtagCtrl.text.trim().split(" "),
         "contactInfo": contactCtrl.text,
         "expireLimit": num.tryParse(expiry.split(" ").first),
       },

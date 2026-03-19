@@ -108,7 +108,7 @@ class Formatter {
       duration -= Duration(days: duration.inDays);
     }
 
-    if (!rtn.contains("d") || true) {
+    if (!rtn.contains("d")) {
       if (duration.inHours != 0) {
         rtn += duration.inHours.toString();
         rtn += "h ";
@@ -143,5 +143,31 @@ class Formatter {
           return word[0].toUpperCase() + word.substring(1);
         })
         .join(' ');
+  }
+
+  static String numberFormatter(dynamic value) {
+    num? number;
+
+    if (value is num) {
+      number = value;
+    } else if (value is String) {
+      number = num.tryParse(value.trim());
+    } else {
+      number = num.tryParse(value.toString());
+    }
+
+    if (number == null) return "0";
+
+    final rounded = (number * 100).round() / 100;
+    String result = rounded.toStringAsFixed(2);
+
+    if (result.endsWith("00")) {
+      return result.substring(0, result.length - 3);
+    }
+    if (result.endsWith("0")) {
+      return result.substring(0, result.length - 1);
+    }
+
+    return result;
   }
 }

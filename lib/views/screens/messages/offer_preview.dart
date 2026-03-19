@@ -9,6 +9,7 @@ import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
+import 'package:jurnee/utils/formatter.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 
@@ -153,9 +154,9 @@ class _OfferPreviewState extends State<OfferPreview> {
                           for (var i in {
                             "Quantity": offer.items.elementAt(index).quantity,
                             "Unit Price":
-                                "\$${offer.items.elementAt(index).unitPrice}",
+                                "\$${Formatter.numberFormatter(offer.items.elementAt(index).unitPrice)}",
                             "Line Total":
-                                "\$${offer.items.elementAt(index).quantity * offer.items.elementAt(index).unitPrice}",
+                                "\$${Formatter.numberFormatter(offer.items.elementAt(index).quantity * offer.items.elementAt(index).unitPrice)}",
                           }.entries)
                             RichText(
                               text: TextSpan(
@@ -205,7 +206,7 @@ class _OfferPreviewState extends State<OfferPreview> {
                           ),
                           Spacer(),
                           Text(
-                            "\$$calculateServiceCharge",
+                            "\$${Formatter.numberFormatter(calculateServiceCharge)}",
                             style: AppTexts.tsmm.copyWith(
                               color: AppColors.gray,
                             ),
@@ -222,7 +223,7 @@ class _OfferPreviewState extends State<OfferPreview> {
                           ),
                           Spacer(),
                           Text(
-                            "\$${offer.discount}",
+                            "\$${Formatter.numberFormatter(offer.discount)}",
                             style: AppTexts.tsmm.copyWith(
                               color: AppColors.gray,
                             ),
@@ -235,7 +236,7 @@ class _OfferPreviewState extends State<OfferPreview> {
                           Text("Total", style: AppTexts.tmdb),
                           Spacer(),
                           Text(
-                            "\$${calculateServiceCharge - offer.discount}",
+                            "\$${Formatter.numberFormatter(calculateServiceCharge - offer.discount)}",
                             style: AppTexts.tmdb,
                           ),
                         ],

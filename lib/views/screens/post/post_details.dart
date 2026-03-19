@@ -296,6 +296,11 @@ class _PostDetailsState extends State<PostDetails> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            "About this ${widget.post.category.substring(0, 1).toUpperCase()}${widget.post.category.substring(1)}",
+            style: AppTexts.tmdb.copyWith(color: AppColors.gray.shade700),
+          ),
+          const SizedBox(height: 8),
           if (widget.post.subcategory != null &&
               widget.post.subcategory == "Missing Person")
             missingPersonInfo(),

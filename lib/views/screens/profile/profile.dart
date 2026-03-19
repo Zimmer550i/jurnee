@@ -472,7 +472,7 @@ class _ProfileState extends State<Profile> {
                 Get.back();
                 Get.to(() => Bookings());
               }),
-              drawerButton("Client Orders", "client", () {
+              drawerButton("My Bookings", "client", () {
                 Get.back();
                 Get.to(() => Bookings(showClientBooking: true));
               }),

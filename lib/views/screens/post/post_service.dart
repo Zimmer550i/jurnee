@@ -114,7 +114,7 @@ class _PostServiceState extends State<PostService> {
           "type": "Point",
           "coordinates": [pos['lng'], pos['lat']],
         },
-        "hasTag": hashtagCtrl.text.split(" "),
+        "hasTag": hashtagCtrl.text.trim().split(" "),
 
         "schedule": _availabilityKey.currentState?.getSchedule(),
       },

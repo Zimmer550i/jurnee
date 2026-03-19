@@ -55,7 +55,7 @@ class _BookingsState extends State<Bookings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: widget.showClientBooking ? "Client Orders" : "My Orders",
+        title: widget.showClientBooking ? "My Bookings" : "My Orders",
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -82,7 +82,7 @@ class _BookingsState extends State<Bookings> {
                       ),
                       child: Center(
                         child: Text(
-                          widget.showClientBooking ? "Incomplete" : "Ongoing",
+                          widget.showClientBooking ? "Incomplete" : "Active",
                           style: AppTexts.tmds.copyWith(
                             color: index == 0
                                 ? AppColors.green.shade600

@@ -18,6 +18,7 @@ import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/video_widget.dart';
+import 'package:jurnee/views/screens/profile/profile.dart';
 
 class CommentWidget extends StatefulWidget {
   final CommentModel comment;
@@ -56,7 +57,17 @@ class _CommentWidgetState extends State<CommentWidget> {
       spacing: 12,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ProfilePicture(size: 32, image: widget.comment.user.image),
+        GestureDetector(
+          onTap: () {
+            Get.to(() => Profile(userId: widget.comment.user.id));
+          },
+          child: AbsorbPointer(
+            child: ProfilePicture(
+              size: 32,
+              image: widget.comment.user.image,
+            ),
+          ),
+        ),
         Expanded(
           child: Column(
             spacing: 12,

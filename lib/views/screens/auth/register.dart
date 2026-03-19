@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -11,6 +12,7 @@ import 'package:jurnee/views/base/custom_checkbox.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/auth/verification.dart';
 import 'package:jurnee/views/screens/post/location_picker.dart';
+import 'package:jurnee/views/screens/profile/app_info.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -135,6 +137,12 @@ class _RegisterState extends State<Register> {
                               style: AppTexts.txsb.copyWith(
                                 color: AppColors.green.shade600,
                               ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Get.to(
+                                    () => AppInfo(title: "Terms of Services"),
+                                  );
+                                },
                             ),
                             TextSpan(text: " and the "),
                             TextSpan(
@@ -142,6 +150,12 @@ class _RegisterState extends State<Register> {
                               style: AppTexts.txsb.copyWith(
                                 color: AppColors.green.shade600,
                               ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Get.to(
+                                    () => AppInfo(title: "Privacy Policy"),
+                                  );
+                                },
                             ),
                             TextSpan(text: "."),
                           ],
@@ -157,6 +171,27 @@ class _RegisterState extends State<Register> {
                     isLoading: auth.isLoading.value,
                     text: "Register",
                   ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already have an account? ",
+                      style: AppTexts.txsr.copyWith(color: Color(0xff808080)),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: Text(
+                        " Log In ",
+                        style: AppTexts.txsb.copyWith(
+                          color: AppColors.green.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
