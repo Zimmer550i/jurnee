@@ -298,21 +298,26 @@ class PostController extends GetxController {
   }
 
   Future<String> createReply(
-    String id,
+    String postId,
+    String parentId,
     String content,
     File? image,
     File? video,
   ) async {
-    commentLoading(id);
+    commentLoading(parentId);
     try {
       final data = {
-        "data": {"commentId": id, "content": content},
+        "data": {
+          "postId": postId,
+          "parentComment": parentId,
+          "content": content,
+        },
         "image": image,
         "video": video,
       };
 
       final res = await api.post(
-        "/replies",
+        "/comments",
         data,
         isMultiPart: true,
         authReq: true,
@@ -321,10 +326,20 @@ class PostController extends GetxController {
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         var reply = CommentModel.fromJson(body['data']);
-        comments
-            .firstWhere((val) => reply.commentId == val.id)
-            .reply
-            .insert(0, reply);
+        // Recursive function to find the parent comment
+        bool insertReply(List<CommentModel> commentsList) {
+          for (var c in commentsList) {
+            if (c.id == reply.parentComment) {
+              c.children.insert(0, reply);
+              return true;
+            } else if (c.children.isNotEmpty) {
+              if (insertReply(c.children)) return true;
+            }
+          }
+          return false;
+        }
+
+        insertReply(comments);
 
         comments.refresh();
 
@@ -368,14 +383,16 @@ class PostController extends GetxController {
           }
         } else if (postCommentOrReply == "reply") {
           final parentComment = comments.firstWhere(
-            (c) => c.reply.any((r) => r.id == id),
+            (c) => c.children.any((r) => r.id == id),
           );
 
-          final replyIndex = parentComment.reply.indexWhere((r) => r.id == id);
+          final replyIndex = parentComment.children.indexWhere(
+            (r) => r.id == id,
+          );
 
           if (replyIndex != -1) {
-            parentComment.reply[replyIndex].like += isLiked ? 1 : -1;
-            parentComment.reply[replyIndex].liked = isLiked;
+            parentComment.children[replyIndex].like += isLiked ? 1 : -1;
+            parentComment.children[replyIndex].liked = isLiked;
           }
 
           comments.refresh();
@@ -483,6 +500,8 @@ class PostController extends GetxController {
       if (res.statusCode == 200 || res.statusCode == 201) {
         int index = posts.indexWhere((val) => val.id == id);
         posts.removeAt(index);
+
+        posts.refresh();
 
         return "success";
       } else {

@@ -9,6 +9,7 @@ import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
+import 'package:jurnee/views/screens/post/location_picker.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -62,39 +63,48 @@ class _EditProfileState extends State<EditProfile> {
       appBar: CustomAppBar(title: "Edit Profile"),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 24),
-              ProfilePicture(
-                image: user.userImage,
-                imageFile: image,
-                size: 144,
-                borderColor: AppColors.green.shade600,
-                borderWidth: 2,
-                isEditable: true,
-                imagePickerCallback: (val) {
-                  setState(() {
-                    image = val;
-                  });
-                },
-              ),
-              const SizedBox(height: 24),
-              CustomTextField(title: "Name", controller: nameCtrl),
-              const SizedBox(height: 16),
-              CustomTextField(title: "Location", controller: locationCtrl),
-              const SizedBox(height: 16),
-              CustomTextField(title: "Bio", controller: bioCtrl, lines: 5),
-              Spacer(),
-              Obx(
-                () => CustomButton(
-                  onTap: onSubmit,
-                  isLoading: user.isLoading.value,
-                  text: "Save Changes",
+        child: SingleChildScrollView(
+          child: SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 24),
+                ProfilePicture(
+                  image: user.userImage,
+                  imageFile: image,
+                  size: 144,
+                  borderColor: AppColors.green.shade600,
+                  borderWidth: 2,
+                  isEditable: true,
+                  imagePickerCallback: (val) {
+                    setState(() {
+                      image = val;
+                    });
+                  },
                 ),
-              ),
-              const SizedBox(height: 16),
-            ],
+                const SizedBox(height: 24),
+                CustomTextField(title: "Name", controller: nameCtrl),
+                const SizedBox(height: 16),
+                // CustomTextField(title: "Location", controller: locationCtrl),
+                LocationPicker(controller: locationCtrl),
+                const SizedBox(height: 8),
+                CustomTextField(
+                  title: "Bio",
+                  hintText: "Enter your bio",
+                  controller: bioCtrl,
+                  lines: 5,
+                ),
+                const SizedBox(height: 24),
+                // Spacer(),
+                Obx(
+                  () => CustomButton(
+                    onTap: onSubmit,
+                    isLoading: user.isLoading.value,
+                    text: "Save Changes",
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),

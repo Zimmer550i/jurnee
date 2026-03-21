@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
+import 'package:jurnee/models/comment_model.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -34,6 +35,8 @@ import 'package:jurnee/views/screens/profile/boost_post.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 import 'package:page_indicator_plus/page_indicator_plus.dart';
 import 'package:share_plus/share_plus.dart';
+
+Map<String, GlobalKey> commentKeys = {};
 
 class PostDetails extends StatefulWidget {
   final PostModel post;
@@ -638,10 +641,13 @@ class _PostDetailsState extends State<PostDetails> {
             ListView.separated(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) => CommentWidget(
-                comment: post.comments.elementAt(index),
-                postData: widget.post,
-              ),
+              itemBuilder: (context, index) {
+                assignCommentKeys(post.comments.elementAt(index));
+                return CommentWidget(
+                  comment: post.comments.elementAt(index),
+                  postData: widget.post,
+                );
+              },
               separatorBuilder: (context, index) =>
                   Divider(height: 32, color: AppColors.gray.shade100),
               itemCount: post.comments.length,
@@ -1226,5 +1232,12 @@ class _PostDetailsState extends State<PostDetails> {
         );
       },
     );
+  }
+
+  void assignCommentKeys(CommentModel comment) {
+    commentKeys[comment.id] = GlobalKey();
+    for (var child in comment.children) {
+      assignCommentKeys(child); // recursive call
+    }
   }
 }

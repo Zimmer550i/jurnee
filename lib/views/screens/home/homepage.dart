@@ -130,6 +130,7 @@ class HomepageState extends State<Homepage> {
                       child: Obx(
                         () => CustomListHandler(
                           isLoading: post.isFirstLoad.value,
+                          horizontalPadding: 16,
                           onRefresh: () => post
                               .fetchPosts(category: categoryList[tab])
                               .then((message) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
@@ -11,6 +12,7 @@ import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/auth/forgot_password.dart';
 import 'package:jurnee/views/screens/auth/register.dart';
 import 'package:jurnee/views/screens/home/home.dart';
+import 'package:jurnee/views/screens/profile/edit_profile.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -215,6 +217,12 @@ class _LoginState extends State<Login> {
                           ) {
                             if (message == "success") {
                               Get.offAll(() => Home(), routeName: "/app");
+                              if (Get.find<UserController>().userData?.name ==
+                                      "" ||
+                                  Get.find<UserController>().userData?.name ==
+                                      null) {
+                                Get.to(() => EditProfile());
+                              }
                             } else {
                               customSnackBar(message);
                             }
@@ -239,6 +247,12 @@ class _LoginState extends State<Login> {
                           ) {
                             if (message == "success") {
                               Get.offAll(() => Home(), routeName: "/app");
+                              if (Get.find<UserController>().userData?.name ==
+                                      "" ||
+                                  Get.find<UserController>().userData?.name ==
+                                      null) {
+                                Get.to(() => EditProfile());
+                              }
                             } else {
                               customSnackBar(message);
                             }

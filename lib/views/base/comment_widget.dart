@@ -18,6 +18,7 @@ import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/video_widget.dart';
+import 'package:jurnee/views/screens/post/post_details.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
 class CommentWidget extends StatefulWidget {
@@ -44,222 +45,345 @@ class _CommentWidgetState extends State<CommentWidget> {
   final commentController = TextEditingController();
   File? commentImage;
   File? commentVideo;
+  Offset? _lineStart;
+  Offset? _lineEnd;
 
   @override
   void initState() {
     super.initState();
     isLiked = widget.comment.liked;
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _updateConnectionLine(),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant CommentWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _updateConnectionLine(),
+    );
+  }
+
+  void _updateConnectionLine() {
+    // if (widget.comment.content == "Bla") {
+    //   print("found culprint");
+    // }
+    if (!mounted || widget.comment.parentComment == null) return;
+
+    final parentKey = commentKeys[widget.comment.parentComment];
+    final currentKey = commentKeys[widget.comment.id];
+    final parentContext = parentKey?.currentContext;
+    final currentContext = currentKey?.currentContext;
+    if (parentContext == null || currentContext == null) return;
+
+    final rootBox = context.findRenderObject() as RenderBox?;
+    final parentBox = parentContext.findRenderObject() as RenderBox?;
+    final currentBox = currentContext.findRenderObject() as RenderBox?;
+    if (rootBox == null || parentBox == null || currentBox == null) return;
+
+    final from = parentBox.localToGlobal(
+      Offset(parentBox.size.width / 2, parentBox.size.height + 9),
+    );
+    final to = currentBox.localToGlobal(Offset(-3, currentBox.size.height));
+
+    final newStart = rootBox.globalToLocal(from);
+    final newEnd = rootBox.globalToLocal(to);
+
+    if (_lineStart != newStart || _lineEnd != newEnd) {
+      setState(() {
+        _lineStart = newStart;
+        _lineEnd = newEnd;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      spacing: 12,
-      crossAxisAlignment: CrossAxisAlignment.start,
+    if (widget.comment.parentComment != null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _updateConnectionLine(),
+      );
+    }
+
+    return Stack(
       children: [
-        GestureDetector(
-          onTap: () {
-            Get.to(() => Profile(userId: widget.comment.user.id));
-          },
-          child: AbsorbPointer(
-            child: ProfilePicture(
-              size: 32,
-              image: widget.comment.user.image,
+        Row(
+          spacing: 12,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Get.to(() => Profile(userId: widget.comment.user.id));
+              },
+              child: AbsorbPointer(
+                child: ProfilePicture(
+                  key: commentKeys[widget.comment.id],
+                  size: 32,
+                  image: widget.comment.user.image,
+                ),
+              ),
             ),
-          ),
-        ),
-        Expanded(
-          child: Column(
-            spacing: 12,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+            Expanded(
+              child: Column(
                 spacing: 12,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.comment.user.name,
-                    style: AppTexts.tmdb.copyWith(
-                      color: AppColors.gray.shade700,
-                    ),
-                  ),
-                  Text(
-                    Formatter.durationFormatter(
-                      DateTime.now().difference(widget.comment.createdAt),
-                    ),
-                    style: AppTexts.txss.copyWith(
-                      color: AppColors.green.shade700,
-                    ),
-                  ),
-                ],
-              ),
-              if (widget.comment.content.isNotEmpty)
-                Text(
-                  widget.comment.content,
-                  style: AppTexts.tmdr.copyWith(color: AppColors.gray.shade700),
-                ),
-              if (widget.comment.image?.isNotEmpty ?? false)
-                GestureDetector(
-                  onTap: () => Get.to(
-                    () => MediaPlayer(
-                      postData: widget.postData,
-                      mediaList: [widget.comment.image],
-                    ),
-                  ),
-                  child: CustomNetworkedImage(
-                    url: widget.comment.image,
-                    height: 200,
-                  ),
-                ),
-              if (widget.comment.video?.isNotEmpty ?? false)
-                ClipRRect(
-                  borderRadius: BorderRadiusGeometry.circular(12),
-                  child: SizedBox(
-                    height: 200,
-                    child: GestureDetector(
-                      onTap: () =>
-                          Get.to(() => VideoWidget(widget.comment.video)),
-                      child: MediaThumbnail(path: widget.comment.video),
-                    ),
-                  ),
-                ),
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      post.likeToggle(
-                        widget.comment.id,
-                        widget.isReply ? "reply" : "comment",
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        CustomSvg(
-                          asset:
-                              "assets/icons/${widget.comment.liked == true ? "loved" : "love"}.svg",
-                          size: 16,
+                  Row(
+                    spacing: 12,
+                    children: [
+                      Text(
+                        widget.comment.user.name,
+                        style: AppTexts.tmdb.copyWith(
+                          color: AppColors.gray.shade700,
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          widget.comment.like.toString(),
-                          style: AppTexts.tsms.copyWith(
-                            color: AppColors.gray.shade600,
-                          ),
+                      ),
+                      Text(
+                        Formatter.durationFormatter(
+                          DateTime.now().difference(widget.comment.createdAt),
                         ),
-                      ],
-                    ),
+                        style: AppTexts.txss.copyWith(
+                          color: AppColors.green.shade700,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 24),
-                  if (!widget.isReply)
+                  if (widget.comment.content.isNotEmpty)
+                    Text(
+                      widget.comment.content,
+                      style: AppTexts.tmdr.copyWith(
+                        color: AppColors.gray.shade700,
+                      ),
+                    ),
+                  if (widget.comment.image?.isNotEmpty ?? false)
                     GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isReplying = !isReplying;
-                        });
-                      },
-                      child: Row(
-                        children: [
-                          CustomSvg(
-                            asset: "assets/icons/message.svg",
-                            size: 16,
-                            color: AppColors.black,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            "Reply",
-                            style: AppTexts.tsms.copyWith(
-                              color: AppColors.gray.shade600,
-                            ),
-                          ),
-                        ],
+                      onTap: () => Get.to(
+                        () => MediaPlayer(
+                          postData: widget.postData,
+                          mediaList: [widget.comment.image],
+                        ),
+                      ),
+                      child: CustomNetworkedImage(
+                        url: widget.comment.image,
+                        height: 200,
                       ),
                     ),
-                ],
-              ),
-              if (isReplying)
-                Row(
-                  children: [
-                    Expanded(
-                      child: CustomTextField(
-                        height: 36,
-                        hintText: "Add a reply",
-                        controller: commentController,
-                        trailingWidget: GestureDetector(
-                          onTap: () async {
-                            final file = await ImagePicker().pickMedia();
-                            if (file != null) {
-                              setState(() {
-                                final pickedFile = File(file.path);
-                                if (file.mimeType?.startsWith('video/') ??
-                                    false) {
-                                  commentVideo = pickedFile;
-                                  commentImage = null;
-                                } else {
-                                  commentImage = pickedFile;
-                                  commentVideo = null;
-                                }
-                              });
-                            }
-                          },
-                          child: commentImage == null && commentVideo == null
-                              ? CustomSvg(asset: "assets/icons/add_image.svg")
-                              : ClipRRect(
-                                  borderRadius: BorderRadiusGeometry.circular(
-                                    4,
-                                  ),
-                                  child: SizedBox(
-                                    height: 36,
-                                    child: MediaThumbnail(
-                                      path:
-                                          commentImage?.path ??
-                                          commentVideo?.path,
-                                    ),
-                                  ),
-                                ),
+                  if (widget.comment.video?.isNotEmpty ?? false)
+                    ClipRRect(
+                      borderRadius: BorderRadiusGeometry.circular(12),
+                      child: SizedBox(
+                        height: 200,
+                        child: GestureDetector(
+                          onTap: () =>
+                              Get.to(() => VideoWidget(widget.comment.video)),
+                          child: MediaThumbnail(path: widget.comment.video),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    post.commentLoading.value == widget.comment.id
-                        ? CustomLoading()
-                        : CustomButton(
-                            onTap: () {
-                              post
-                                  .createReply(
-                                    widget.comment.id,
-                                    commentController.text,
-                                    commentImage,
-                                    commentVideo,
-                                  )
-                                  .then((message) {
-                                    if (message != "success") {
-                                      customSnackBar(message);
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          post.likeToggle(
+                            widget.comment.id,
+                            widget.isReply ? "reply" : "comment",
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            CustomSvg(
+                              asset:
+                                  "assets/icons/${widget.comment.liked == true ? "loved" : "love"}.svg",
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              widget.comment.like.toString(),
+                              style: AppTexts.tsms.copyWith(
+                                color: AppColors.gray.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      // if (!widget.isReply)
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isReplying = !isReplying;
+                          });
+                        },
+                        child: Row(
+                          children: [
+                            CustomSvg(
+                              asset: "assets/icons/message.svg",
+                              size: 16,
+                              color: AppColors.black,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              "Reply",
+                              style: AppTexts.tsms.copyWith(
+                                color: AppColors.gray.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (isReplying)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomTextField(
+                            height: 36,
+                            hintText: "Add a reply",
+                            controller: commentController,
+                            trailingWidget: GestureDetector(
+                              onTap: () async {
+                                final file = await ImagePicker().pickMedia();
+                                if (file != null) {
+                                  setState(() {
+                                    final pickedFile = File(file.path);
+                                    if (file.mimeType?.startsWith('video/') ??
+                                        false) {
+                                      commentVideo = pickedFile;
+                                      commentImage = null;
                                     } else {
-                                      setState(() {
-                                        commentController.clear();
-                                        commentImage = null;
-                                        commentVideo = null;
-                                      });
+                                      commentImage = pickedFile;
+                                      commentVideo = null;
                                     }
                                   });
-                            },
-                            text: "Reply",
-                            width: null,
-                            padding: 12,
-                            height: 36,
-                            fontSize: 14,
+                                }
+                              },
+                              child:
+                                  commentImage == null && commentVideo == null
+                                  ? CustomSvg(
+                                      asset: "assets/icons/add_image.svg",
+                                    )
+                                  : ClipRRect(
+                                      borderRadius:
+                                          BorderRadiusGeometry.circular(4),
+                                      child: SizedBox(
+                                        height: 36,
+                                        child: MediaThumbnail(
+                                          path:
+                                              commentImage?.path ??
+                                              commentVideo?.path,
+                                        ),
+                                      ),
+                                    ),
+                            ),
                           ),
-                  ],
-                ),
-              for (var i in widget.comment.reply)
-                CommentWidget(
-                  comment: i,
-                  isReply: true,
-                  postData: widget.postData,
-                ),
-            ],
-          ),
+                        ),
+                        const SizedBox(width: 12),
+                        post.commentLoading.value == widget.comment.id
+                            ? CustomLoading()
+                            : CustomButton(
+                                onTap: () {
+                                  post
+                                      .createReply(
+                                        widget.comment.postId,
+                                        widget.comment.id,
+                                        commentController.text,
+                                        commentImage,
+                                        commentVideo,
+                                      )
+                                      .then((message) {
+                                        if (message != "success") {
+                                          customSnackBar(message);
+                                        } else {
+                                          setState(() {
+                                            commentController.clear();
+                                            commentImage = null;
+                                            commentVideo = null;
+                                          });
+                                        }
+                                      });
+                                },
+                                text: "Reply",
+                                width: null,
+                                padding: 12,
+                                height: 36,
+                                fontSize: 14,
+                              ),
+                      ],
+                    ),
+                  for (var i in widget.comment.children)
+                    CommentWidget(
+                      comment: i,
+                      isReply: true,
+                      postData: widget.postData,
+                    ),
+                ],
+              ),
+            ),
+          ],
         ),
+        if (widget.comment.parentComment != null &&
+            _lineStart != null &&
+            _lineEnd != null)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(
+                painter: _ReplyConnectorPainter(
+                  start: _lineStart!,
+                  end: _lineEnd!,
+                  color: AppColors.gray.shade100,
+                ),
+              ),
+            ),
+          ),
       ],
     );
+  }
+}
+
+class _ReplyConnectorPainter extends CustomPainter {
+  final Offset start;
+  final Offset end;
+  final Color color;
+
+  const _ReplyConnectorPainter({
+    required this.start,
+    required this.end,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const radius = 8.0;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final dy = end.dy - start.dy;
+    final effectiveRadius = dy.abs() < radius ? dy.abs() : radius;
+    final direction = dy >= 0 ? 1.0 : -1.0;
+    final cornerY = end.dy - (effectiveRadius * direction);
+    final cornerX = start.dx + effectiveRadius;
+
+    final path = Path()
+      ..moveTo(start.dx, start.dy)
+      ..lineTo(start.dx, cornerY)
+      ..arcToPoint(
+        Offset(cornerX, end.dy),
+        radius: Radius.circular(effectiveRadius),
+        clockwise: direction < 0,
+      )
+      ..lineTo(end.dx, end.dy);
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _ReplyConnectorPainter oldDelegate) {
+    return oldDelegate.start != start ||
+        oldDelegate.end != end ||
+        oldDelegate.color != color;
   }
 }

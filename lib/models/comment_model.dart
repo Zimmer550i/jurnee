@@ -1,6 +1,6 @@
 class CommentModel {
   final String id;
-  final String? commentId;
+  final String? parentComment;
   final String postId;
   int like;
   final String content;
@@ -11,11 +11,12 @@ class CommentModel {
   final int v;
   final UserModel user;
   bool liked;
-  final List<CommentModel> reply;
+  final int replyCount;
+  final List<CommentModel> children;
 
   CommentModel({
     required this.id,
-    this.commentId,
+    this.parentComment,
     required this.postId,
     required this.like,
     required this.content,
@@ -26,13 +27,14 @@ class CommentModel {
     required this.v,
     required this.user,
     required this.liked,
-    required this.reply,
+    required this.replyCount,
+    required this.children,
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
     return CommentModel(
       id: json['_id'] ?? '',
-      commentId: json['commentId'],
+      parentComment: json['parentComment'],
       postId: json['postId'] ?? '',
       like: json['like'] ?? 0,
       content: json['content'] ?? '',
@@ -43,7 +45,8 @@ class CommentModel {
       v: json['__v'] ?? 0,
       user: UserModel.fromJson(json['user'] ?? {}),
       liked: json['liked'] ?? false,
-      reply: (json['reply'] as List<dynamic>? ?? [])
+      replyCount: json['replyCount'] ?? 0,
+      children: (json['children'] as List<dynamic>? ?? [])
           .map((e) => CommentModel.fromJson(e))
           .toList(),
     );
@@ -52,7 +55,7 @@ class CommentModel {
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
-      'commentId': commentId,
+      'parentComment': parentComment,
       'postId': postId,
       'like': like,
       'content': content,
@@ -63,7 +66,8 @@ class CommentModel {
       '__v': v,
       'user': user.toJson(),
       'liked': liked,
-      'reply': reply.map((e) => e.toJson()).toList(),
+      'replyCount': replyCount,
+      'children': children.map((e) => e.toJson()).toList(),
     };
   }
 }
