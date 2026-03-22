@@ -18,7 +18,7 @@ import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/video_widget.dart';
-import 'package:jurnee/views/screens/post/post_details.dart';
+import 'package:jurnee/views/screens/post/post_details/post_details.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
 class CommentWidget extends StatefulWidget {
