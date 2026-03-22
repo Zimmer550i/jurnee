@@ -80,7 +80,12 @@ class _ChatState extends State<Chat> {
               child: Row(
                 spacing: 12,
                 children: [
-                  ProfilePicture(image: widget.chatMember.image, size: 40),
+                  AbsorbPointer(
+                    child: ProfilePicture(
+                      image: widget.chatMember.image,
+                      size: 40,
+                    ),
+                  ),
                   Text(
                     widget.chatMember.name,
                     style: AppTexts.tlgb.copyWith(color: AppColors.gray),
@@ -125,7 +130,7 @@ class _ChatState extends State<Chat> {
                           bottom: MediaQuery.of(context).size.height / 3,
                         ),
                         child: Text(
-                          "Send somthing to start chatting",
+                          "Send a message to start chatting",
                           textAlign: TextAlign.center,
                           style: AppTexts.tlgm.copyWith(
                             color: AppColors.gray.shade300,

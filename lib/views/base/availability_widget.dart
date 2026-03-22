@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jurnee/models/schedule_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/formatter.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 
 class AvailabilityWidget extends StatefulWidget {
@@ -146,7 +147,7 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
                         setState(() {});
                       },
                       controller: TextEditingController(
-                        text: schedule[index].startTime,
+                        text: formatTime(schedule[index].startTime),
                       ),
                       title: "From",
                       hintText: "Available from",
@@ -160,7 +161,7 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
                         setState(() {});
                       },
                       controller: TextEditingController(
-                        text: schedule[index].endTime,
+                        text: formatTime(schedule[index].endTime),
                       ),
                       title: "To",
                       hintText: "Available till",
@@ -186,5 +187,16 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
       return "${time.hour}:${time.minute}";
     }
     return null;
+  }
+
+  String formatTime(String? time) {
+    if (time == null) return "";
+
+    TimeOfDay temp = TimeOfDay(
+      hour: int.parse(time.split(":").first),
+      minute: int.parse(time.split(":").last),
+    );
+
+    return Formatter.timeFormatter(time: temp);
   }
 }

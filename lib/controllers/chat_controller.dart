@@ -16,7 +16,7 @@ class ChatController extends GetxController {
 
   RxBool isConnected = RxBool(false);
   IO.Socket? socket;
-  final _socketUrl = "http://10.10.12.98:3001/";
+  final _socketUrl = "https://api.joinjurnee.com/";
 
   final RxList<ChatModel> chats = RxList.empty();
   final RxList<MessageModel> messages = RxList.empty();
@@ -147,12 +147,7 @@ class ChatController extends GetxController {
               orElse: () => Member.fromJson(data["members"].first),
             );
 
-        Get.to(
-          () => Chat(
-            inboxId: newId,
-            chatMember: otherMember,
-          ),
-        );
+        Get.to(() => Chat(inboxId: newId, chatMember: otherMember));
 
         return "success";
       } else {

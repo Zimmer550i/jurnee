@@ -388,6 +388,20 @@ class _PostDetailsState extends State<PostDetails> {
             ],
           ),
           const SizedBox(height: 20),
+          if (widget.post.subcategory == "Missing Person" &&
+              widget.post.lastSeenDate != null)
+            Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Text("Last Seen: ", style: AppTexts.tsms),
+                  Text(
+                    Formatter.dateFormatter(widget.post.lastSeenDate!),
+                    style: AppTexts.tsmr,
+                  ),
+                ],
+              ),
+            ),
           GestureDetector(
             onTap: () {
               Get.to(() => PostLocation(post: widget.post));
@@ -694,11 +708,14 @@ class _PostDetailsState extends State<PostDetails> {
             child: Obx(() {
               List<String> mediaCollection = [
                 [
-                  widget.post.image ?? "",
+                  // widget.post.image ?? "",
                   ...post.mediaListOwner,
                   ...post.mediaListCommunity,
                 ],
-                [widget.post.image ?? "", ...post.mediaListOwner],
+                [
+                  // widget.post.image ?? "",
+                  ...post.mediaListOwner,
+                ],
                 [...post.mediaListCommunity],
               ][momentsIndex];
 
@@ -755,7 +772,9 @@ class _PostDetailsState extends State<PostDetails> {
                 for (var tag
                     in showAllTags
                         ? widget.post.hasTag!
-                        : widget.post.hasTag!.getRange(0, 3).toList())
+                        : widget.post.hasTag!
+                              .getRange(0, min(3, widget.post.hasTag!.length))
+                              .toList())
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
@@ -1142,7 +1161,7 @@ class _PostDetailsState extends State<PostDetails> {
               ? AppColors.green.shade600
               : AppColors.gray.shade100,
           border: isSelected
-              ? null
+              ? Border.all(color: AppColors.green.shade600)
               : Border.all(color: AppColors.gray.shade300),
           borderRadius: BorderRadius.circular(8),
         ),

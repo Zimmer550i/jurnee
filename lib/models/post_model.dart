@@ -31,7 +31,7 @@ class PostModel {
   final int? missingAge;
   final String? clothingDescription;
   final Location? lastSeenLocation;
-  final dynamic lastSeenDate;
+  final DateTime? lastSeenDate;
   final String? contactInfo;
   final int? expireLimit;
   final int? capacity;
@@ -123,7 +123,7 @@ class PostModel {
     int? missingAge,
     String? clothingDescription,
     Location? lastSeenLocation,
-    dynamic lastSeenDate,
+    DateTime? lastSeenDate,
     String? contactInfo,
     int? expireLimit,
     int? capacity,
@@ -229,7 +229,9 @@ class PostModel {
     lastSeenLocation: json["lastSeenLocation"] == null
         ? null
         : Location.fromJson(json["lastSeenLocation"]),
-    lastSeenDate: json["lastSeenDate"],
+    lastSeenDate: json["lastSeenDate"] == null
+        ? null
+        : DateTime.tryParse(json["lastSeenDate"]),
     contactInfo: json["contactInfo"],
     expireLimit: json["expireLimit"],
     capacity: json["capacity"],
@@ -283,7 +285,7 @@ class PostModel {
     "missingAge": missingAge,
     "clothingDescription": clothingDescription,
     "lastSeenLocation": lastSeenLocation?.toJson(),
-    "lastSeenDate": lastSeenDate,
+    "lastSeenDate": lastSeenDate?.toIso8601String(),
     "contactInfo": contactInfo,
     "expireLimit": expireLimit,
     "capacity": capacity,
