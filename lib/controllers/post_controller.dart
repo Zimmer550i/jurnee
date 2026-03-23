@@ -61,10 +61,13 @@ class PostController extends GetxController {
   }
 
   String getDistance(double targetLong, double targetLat) {
+    final currentLat = customLocation.value?.latitude ?? userLocation.value?.latitude ?? 0;
+    final currentLng = customLocation.value?.longitude ?? userLocation.value?.longitude ?? 0;
+
     // Calculate distance in meters
     double distanceInMeters = Geolocator.distanceBetween(
-      userLocation.value?.latitude ?? 0,
-      userLocation.value?.longitude ?? 0,
+      currentLat,
+      currentLng,
       targetLat,
       targetLong,
     );
