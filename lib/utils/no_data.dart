@@ -5,6 +5,6 @@ import 'package:jurnee/utils/app_texts.dart';
 Widget noData(String? message) {
   return Text(
     message ?? "No data available",
-    style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade400),
+    style: AppTexts.txsr.copyWith(color: AppColors.gray),
   );
 }

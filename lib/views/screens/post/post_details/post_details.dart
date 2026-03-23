@@ -156,18 +156,16 @@ class _PostDetailsState extends State<PostDetails> {
                     PostMetaData(postController: post, postData: widget.post),
                     if (widget.post.category == "event")
                       AttendingUsers(post: widget.post),
-                    if (widget.post.media != null)
-                      PostMedia(postData: widget.post, postController: post),
+                    PostMedia(postData: widget.post, postController: post),
 
                     if (isOwner)
                       OwnerActionButtons(
                         post: widget.post,
-                        onDeleteTap:
-                            () => showPostDeleteSheet(
-                              context,
-                              postController: post,
-                              postData: widget.post,
-                            ),
+                        onDeleteTap: () => showPostDeleteSheet(
+                          context,
+                          postController: post,
+                          postData: widget.post,
+                        ),
                       ),
 
                     if (widget.post.category != "service")

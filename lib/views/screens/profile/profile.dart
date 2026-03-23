@@ -36,8 +36,10 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    getSpecificUserData();
-    user.getUserPosts(index, widget.userId ?? user.userData?.id);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getSpecificUserData();
+      user.getUserPosts(index, widget.userId ?? user.userData?.id);
+    });
   }
 
   void getSpecificUserData() async {

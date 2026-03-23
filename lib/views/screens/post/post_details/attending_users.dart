@@ -30,7 +30,9 @@ class AttendingUsers extends StatelessWidget {
             ),
             Spacer(),
             SizedBox(
-              width: 79,
+              width:
+                  29 +
+                  (12 * min(5, double.parse(post.attenders.length.toString()))),
               height: 26,
               child: Stack(
                 children: [
@@ -43,9 +45,11 @@ class AttendingUsers extends StatelessWidget {
                           color: AppColors.white,
                           shape: BoxShape.circle,
                         ),
-                        child: ProfilePicture(
-                          image: post.attenders.elementAt(i).image,
-                          size: 24,
+                        child: AbsorbPointer(
+                          child: ProfilePicture(
+                            image: post.attenders.elementAt(i).image,
+                            size: 24,
+                          ),
                         ),
                       ),
                     ),

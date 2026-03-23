@@ -37,11 +37,7 @@ class _PostMediaState extends State<PostMedia> {
           const SizedBox(height: 16),
           Row(
             spacing: 8,
-            children: [
-              _tab('All', 0),
-              _tab('Owners', 1),
-              _tab('Community', 2),
-            ],
+            children: [_tab('All', 0), _tab('Owners', 1), _tab('Community', 2)],
           ),
           const SizedBox(height: 16),
           AnimatedSize(
@@ -49,8 +45,15 @@ class _PostMediaState extends State<PostMedia> {
             alignment: Alignment.topLeft,
             child: Obx(() {
               final mediaCollection = [
-                [...widget.postController.mediaListOwner, ...widget.postController.mediaListCommunity],
-                [...widget.postController.mediaListOwner],
+                [
+                  widget.postData.image,
+                  ...widget.postController.mediaListOwner,
+                  ...widget.postController.mediaListCommunity,
+                ],
+                [
+                  widget.postData.image,
+                  ...widget.postController.mediaListOwner,
+                ],
                 [...widget.postController.mediaListCommunity],
               ][momentsIndex];
 
@@ -78,7 +81,7 @@ class _PostMediaState extends State<PostMedia> {
                             () => MediaPlayer(
                               postData: widget.postData,
                               preferedStart: mediaCollection[i],
-                              mediaList: [widget.postData.image, ...mediaCollection],
+                              mediaList: [...mediaCollection],
                             ),
                           );
                         },
@@ -104,7 +107,10 @@ class _PostMediaState extends State<PostMedia> {
                     in showAllTags
                         ? widget.postData.hasTag!
                         : widget.postData.hasTag!
-                              .getRange(0, min(3, widget.postData.hasTag!.length))
+                              .getRange(
+                                0,
+                                min(3, widget.postData.hasTag!.length),
+                              )
                               .toList())
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -161,7 +167,9 @@ class _PostMediaState extends State<PostMedia> {
         duration: Duration(milliseconds: 100),
         padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.green.shade600 : AppColors.gray.shade100,
+          color: isSelected
+              ? AppColors.green.shade600
+              : AppColors.gray.shade100,
           border: isSelected
               ? Border.all(color: AppColors.green.shade600)
               : Border.all(color: AppColors.gray.shade300),
