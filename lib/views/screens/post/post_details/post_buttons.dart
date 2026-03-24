@@ -37,7 +37,7 @@ class PostButtons extends StatelessWidget {
     } else if (category == "deal") {
       buttonText = "Get Deal";
       buttonAction = () {
-        // TODO: Create the modal here
+        showRedeemCodeSheet(context, postData);
       };
     } else if (category == "alert") {
       buttonText = "Add Comment";

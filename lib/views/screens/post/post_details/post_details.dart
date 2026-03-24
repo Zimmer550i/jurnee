@@ -30,6 +30,7 @@ import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/post/post_alert.dart';
 import 'package:jurnee/views/screens/post/post_deal.dart';
 import 'package:jurnee/views/screens/post/post_event.dart';
+import 'package:jurnee/views/screens/post/post_details/redeem_code_sheet.dart';
 import 'package:jurnee/views/screens/post/post_service.dart';
 import 'package:jurnee/views/screens/profile/boost_post.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
