@@ -18,6 +18,7 @@ import 'package:jurnee/views/screens/profile/app_info.dart';
 import 'package:jurnee/views/screens/profile/edit_profile.dart';
 import 'package:jurnee/views/screens/profile/bookings.dart';
 import 'package:jurnee/views/screens/profile/support.dart';
+import 'package:jurnee/views/screens/profile/boost_results.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
 
 class Profile extends StatefulWidget {
@@ -495,8 +496,7 @@ class _ProfileState extends State<Profile> {
               }),
               drawerButton("Boosted Posts", "boost", () {
                 Get.back();
-                // TODO: Add Boosted Posts Page
-                Get.to(() => Bookings(showClientBooking: true));
+                Get.to(() => BoostResults());
               }),
               drawerButton("Community Guidelines", "guidelines", () {
                 Get.back();
