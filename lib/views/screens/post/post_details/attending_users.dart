@@ -16,9 +16,6 @@ class AttendingUsers extends StatelessWidget {
             () => UsersList(
               title: 'Attending',
               data: post.attenders,
-              getListMethod: (loadMore) {
-                // return Get.find<UserController>().getFollowers();
-              },
             ),
           );
         },

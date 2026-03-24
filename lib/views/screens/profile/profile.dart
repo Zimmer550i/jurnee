@@ -18,6 +18,7 @@ import 'package:jurnee/views/screens/profile/app_info.dart';
 import 'package:jurnee/views/screens/profile/edit_profile.dart';
 import 'package:jurnee/views/screens/profile/bookings.dart';
 import 'package:jurnee/views/screens/profile/support.dart';
+import 'package:jurnee/views/screens/home/users_list.dart';
 
 class Profile extends StatefulWidget {
   final String? userId;
@@ -84,7 +85,7 @@ class _ProfileState extends State<Profile> {
           loadMore: true,
         ),
         child: Obx(
-          () => user.isLoading.value
+          () => user.isLoading.value || user.specificUser.value == null
               ? CustomLoading()
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -175,12 +176,19 @@ class _ProfileState extends State<Profile> {
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
-                              // Get.to(
-                              //   () => UsersList(
-                              //     title:
-                              //         "Followers (${user.userData?.followers.toString()})",
-                              //   ),
-                              // );
+                              final String profileId =
+                                  widget.userId ?? user.userData?.id ?? "";
+                              if (profileId.isEmpty) return;
+                              Get.to(
+                                () => UsersList(
+                                  title: "Followers",
+                                  getListMethod: (loadMore) =>
+                                      user.getFollowers(
+                                        profileId,
+                                        loadMore: loadMore,
+                                      ),
+                                ),
+                              );
                             },
                             child: Column(
                               children: [
@@ -214,12 +222,19 @@ class _ProfileState extends State<Profile> {
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
-                              // Get.to(
-                              //   () => UsersList(
-                              //     title:
-                              //         "Following (${user.userData?.following.toString()})",
-                              //   ),
-                              // );
+                              final String profileId =
+                                  widget.userId ?? user.userData?.id ?? "";
+                              if (profileId.isEmpty) return;
+                              Get.to(
+                                () => UsersList(
+                                  title: "Following",
+                                  getListMethod: (loadMore) =>
+                                      user.getFollowing(
+                                        profileId,
+                                        loadMore: loadMore,
+                                      ),
+                                ),
+                              );
                             },
                             child: Column(
                               children: [

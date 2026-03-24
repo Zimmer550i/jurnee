@@ -15,7 +15,11 @@ class PostButtons extends StatelessWidget {
     final category = postData.category.toLowerCase();
     String buttonText = "Request Quote";
     VoidCallback buttonAction = () {
-      Get.find<ChatController>().createOrGetChat(postData.author.id);
+      if (postData.author.id != null) {
+        Get.find<ChatController>().createOrGetChat(postData.author.id!);
+      } else {
+        customSnackBar("Can't start chat with this user");
+      }
     };
 
     if (category == "event") {
@@ -57,7 +61,11 @@ class PostButtons extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () {
-            Get.find<ChatController>().createOrGetChat(postData.author.id);
+            if (postData.author.id != null) {
+              Get.find<ChatController>().createOrGetChat(postData.author.id!);
+            } else {
+              customSnackBar("Can't start chat with this user");
+            }
           },
           child: Obx(
             () => Container(

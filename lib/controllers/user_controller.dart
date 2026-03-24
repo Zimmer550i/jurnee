@@ -22,6 +22,7 @@ class UserController extends GetxController {
   RxInt totalPages = 1.obs;
   RxBool isFirstLoad = true.obs;
   RxBool isMoreLoading = false.obs;
+  RxList<Author> usersList = RxList.empty();
 
   User? get userData => user.value;
   String? get userImage {
@@ -71,9 +72,9 @@ class UserController extends GetxController {
         bool isFollower = body['data']['isFollower'];
 
         if (isFollower) {
-          specificUser.value!.following += 1;
+          specificUser.value!.followers += 1;
         } else {
-          specificUser.value!.following -= 1;
+          specificUser.value!.followers -= 1;
         }
         specificUser.value!.isFollow = isFollower;
 
@@ -126,7 +127,7 @@ class UserController extends GetxController {
           "/post/user-post/$id",
           "/post/user-join-event/$id",
           "/save/my-saved-post",
-          "/post/my-service"
+          "/post/my-service",
         ][index],
         queryParams: {
           "page": currentPage.value.toString(),
@@ -191,7 +192,7 @@ class UserController extends GetxController {
     }
     try {
       final res = await api.get(
-        "/follower/my-followers/$id",
+        "/follower/followers/$id",
         queryParams: {
           "page": currentPage.value.toString(),
           "limit": limit.toString(),
@@ -201,12 +202,28 @@ class UserController extends GetxController {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
+        if (!loadMore) {
+          usersList.clear();
+        }
+
+        final meta = PaginationMeta.fromJson(body['meta']);
+        totalPages(meta.totalPage);
+
+        final List<dynamic> dataList = body['data'] ?? [];
+        final newItems = dataList
+            .map((e) => _mapFollowUserToAuthor(e, preferredKey: 'follower'))
+            .whereType<Author>()
+            .toList();
+        usersList.addAll(newItems);
         return "success";
       } else {
         return body["message"] ?? "Something went wrong";
       }
     } catch (e) {
       return e.toString();
+    } finally {
+      isFirstLoad(false);
+      isMoreLoading(false);
     }
   }
 
@@ -222,7 +239,7 @@ class UserController extends GetxController {
     }
     try {
       final res = await api.get(
-        "/follower/my-following/$id",
+        "/follower/following/$id",
         queryParams: {
           "page": currentPage.value.toString(),
           "limit": limit.toString(),
@@ -232,13 +249,48 @@ class UserController extends GetxController {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
+        if (!loadMore) {
+          usersList.clear();
+        }
+
+        final meta = PaginationMeta.fromJson(body['meta']);
+        totalPages(meta.totalPage);
+
+        final List<dynamic> dataList = body['data'] ?? [];
+        final newItems = dataList
+            .map((e) => _mapFollowUserToAuthor(e, preferredKey: 'followed'))
+            .whereType<Author>()
+            .toList();
+        usersList.addAll(newItems);
         return "success";
       } else {
         return body["message"] ?? "Something went wrong";
       }
     } catch (e) {
       return e.toString();
+    } finally {
+      isFirstLoad(false);
+      isMoreLoading(false);
     }
+  }
+
+  Author? _mapFollowUserToAuthor(dynamic raw, {required String preferredKey}) {
+    if (raw is! Map<String, dynamic>) return null;
+
+    final dynamic preferred = raw[preferredKey];
+    final dynamic alternate =
+        raw[preferredKey == 'follower' ? 'followed' : 'follower'];
+    final Map<String, dynamic>? userData = preferred is Map<String, dynamic>
+        ? preferred
+        : (alternate is Map<String, dynamic> ? alternate : null);
+
+    if (userData == null) return null;
+
+    final String? id = userData['_id'] ?? userData['id'];
+    final String name = (userData['name'] ?? '').toString();
+    final String image = (userData['image'] ?? '').toString();
+
+    return Author(id: id, name: name, image: image);
   }
 
   Future<String> postSupport(

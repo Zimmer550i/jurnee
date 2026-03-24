@@ -310,7 +310,7 @@ class PostModel {
 }
 
 class Author {
-  final String id;
+  final String? id;
   final String name;
   final String image;
 
