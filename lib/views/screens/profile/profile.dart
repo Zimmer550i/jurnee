@@ -86,7 +86,9 @@ class _ProfileState extends State<Profile> {
           loadMore: true,
         ),
         child: Obx(
-          () => user.isLoading.value || user.specificUser.value == null
+          () =>
+              user.isLoading.value ||
+                  (widget.userId != null && user.specificUser.value == null)
               ? CustomLoading()
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
