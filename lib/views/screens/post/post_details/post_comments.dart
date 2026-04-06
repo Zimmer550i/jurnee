@@ -37,7 +37,7 @@ class _PostCommentsState extends State<PostComments> {
         () => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Comments', style: AppTexts.tmdb),
+            Text('Comments (${widget.postController.commentReviewCount.value})', style: AppTexts.tmdb),
             const SizedBox(height: 16),
             if (widget.postController.isFirstLoad.value)
               Padding(

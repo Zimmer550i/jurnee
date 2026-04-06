@@ -20,7 +20,10 @@ class PostReviews extends StatelessWidget {
         () => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Reviews', style: AppTexts.tmdb),
+            Text(
+              'Reviews (${postController.commentReviewCount.value})',
+              style: AppTexts.tmdb,
+            ),
             const SizedBox(height: 16),
             if (postController.isFirstLoad.value)
               Padding(

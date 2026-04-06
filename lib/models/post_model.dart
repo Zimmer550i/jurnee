@@ -41,7 +41,7 @@ class PostModel {
   final bool? boost;
   final List<Author> attenders;
   bool isSaved;
-  final int totalSaved;
+  int totalSaved;
   final List<Schedule> schedule;
   final DateTime createdAt;
   final DateTime updatedAt;

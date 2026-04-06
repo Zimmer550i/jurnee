@@ -32,6 +32,7 @@ class PostController extends GetxController {
   RxBool isFirstLoad = true.obs;
   RxBool isMoreLoading = false.obs;
   RxString commentLoading = RxString("");
+  RxInt commentReviewCount = 0.obs;
 
   RxBool highlyRated = RxBool(false);
   RxList<String> categoryList = RxList.empty();
@@ -108,7 +109,7 @@ class PostController extends GetxController {
           "lat": customLocation.value?.latitude,
           "lng": customLocation.value?.longitude,
           "maxDistance": distance.value != null
-              ? (distance.value! * 1609.344 * 1000).toInt()
+              ? (distance.value! * 1609.344 * 1000).toInt()+100
               : null,
           "rating": highlyRated.value ? "4" : null,
           "minPrice": minPrice.value,
@@ -173,6 +174,7 @@ class PostController extends GetxController {
 
       if (res.statusCode == 200) {
         final meta = PaginationMeta.fromJson(body['meta']);
+        commentReviewCount(meta.total);
         totalPages(meta.totalPage);
 
         final List<dynamic> dataList = body['data'];
@@ -358,6 +360,81 @@ class PostController extends GetxController {
   }
 
   Future<String> likeToggle(String id, String postCommentOrReply) async {
+    void Function()? revert;
+    void Function(bool isLiked)? syncFromServer;
+
+    void flipPostLike() {
+      final i = posts.indexWhere((p) => p.id == id);
+      if (i == -1) return;
+      final liked = posts[i].isLiked;
+      final n = posts[i].likes;
+      posts[i].isLiked = !liked;
+      posts[i].likes = n + (posts[i].isLiked ? 1 : -1);
+      posts.refresh();
+      revert = () {
+        posts[i].isLiked = liked;
+        posts[i].likes = n;
+        posts.refresh();
+      };
+      syncFromServer = (ok) {
+        posts[i].isLiked = ok;
+        posts[i].likes = n + (ok ? 1 : -1);
+        posts.refresh();
+      };
+    }
+
+    void flipCommentLike() {
+      final i = comments.indexWhere((c) => c.id == id);
+      if (i == -1) return;
+      final liked = comments[i].liked;
+      final n = comments[i].like;
+      comments[i].liked = !liked;
+      comments[i].like = n + (comments[i].liked ? 1 : -1);
+      comments.refresh();
+      revert = () {
+        comments[i].liked = liked;
+        comments[i].like = n;
+        comments.refresh();
+      };
+      syncFromServer = (ok) {
+        comments[i].liked = ok;
+        comments[i].like = n + (ok ? 1 : -1);
+        comments.refresh();
+      };
+    }
+
+    void flipReplyLike() {
+      for (final c in comments) {
+        final ri = c.children.indexWhere((r) => r.id == id);
+        if (ri == -1) continue;
+        final r = c.children[ri];
+        final liked = r.liked;
+        final n = r.like;
+        r.liked = !liked;
+        r.like = n + (r.liked ? 1 : -1);
+        comments.refresh();
+        revert = () {
+          r.liked = liked;
+          r.like = n;
+          comments.refresh();
+        };
+        syncFromServer = (ok) {
+          r.liked = ok;
+          r.like = n + (ok ? 1 : -1);
+          comments.refresh();
+        };
+        break;
+      }
+    }
+
+    if (postCommentOrReply == "post") {
+      flipPostLike();
+    } else if (postCommentOrReply == "comment") {
+      flipCommentLike();
+    } else if (postCommentOrReply == "reply") {
+      flipReplyLike();
+    }
+
     try {
       final res = await api.post(
         "/like/${postCommentOrReply == "post" ? "like-toggle" : postCommentOrReply}",
@@ -367,74 +444,53 @@ class PostController extends GetxController {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        bool isLiked = true;
-        if (body['data'] == "disliked") isLiked = false;
-
-        if (postCommentOrReply == "post") {
-          final index = posts.indexWhere((val) => val.id == id);
-          if (index != -1) {
-            posts[index].isLiked = isLiked;
-            posts[index].likes += isLiked ? 1 : -1;
-            posts.refresh();
-          }
-        } else if (postCommentOrReply == "comment") {
-          final index = comments.indexWhere((val) => val.id == id);
-          if (index != -1) {
-            comments[index].like += isLiked ? 1 : -1;
-            comments[index].liked = isLiked;
-            comments.refresh();
-          }
-        } else if (postCommentOrReply == "reply") {
-          final parentComment = comments.firstWhere(
-            (c) => c.children.any((r) => r.id == id),
-          );
-
-          final replyIndex = parentComment.children.indexWhere(
-            (r) => r.id == id,
-          );
-
-          if (replyIndex != -1) {
-            parentComment.children[replyIndex].like += isLiked ? 1 : -1;
-            parentComment.children[replyIndex].liked = isLiked;
-          }
-
-          comments.refresh();
-        }
-
+        syncFromServer?.call(body['data'] != "disliked");
         return "liked";
-      } else {
-        return body['message'] ?? "Something went wrong";
       }
+      revert?.call();
+      return body['message'] ?? "Something went wrong";
     } catch (e) {
+      revert?.call();
       return e.toString();
     }
   }
 
   Future<String> saveToggle(String id) async {
-    try {
-      final res = await api.post("/save/save-toggle", {
-        "postId": id,
-      }, authReq: true);
+    void Function()? revert;
+    void Function(bool isSaved)? syncFromServer;
 
+    final i = posts.indexWhere((p) => p.id == id);
+    if (i != -1) {
+      final saved = posts[i].isSaved;
+      final n = posts[i].totalSaved;
+      posts[i].isSaved = !saved;
+      posts[i].totalSaved = n + (posts[i].isSaved ? 1 : -1);
+      posts.refresh();
+      revert = () {
+        posts[i].isSaved = saved;
+        posts[i].totalSaved = n;
+        posts.refresh();
+      };
+      syncFromServer = (ok) {
+        posts[i].isSaved = ok;
+        posts[i].totalSaved = n + (ok ? 1 : -1);
+        posts.refresh();
+      };
+    }
+
+    try {
+      final res = await api.post("/save/save-toggle", {"postId": id}, authReq: true);
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        bool isSaved = true;
-        if (body['data'] == "unsaved") isSaved = false;
-
-        final postIndex = posts.indexWhere((val) => val.id == id);
-
-        if (postIndex != -1) {
-          posts[postIndex].isSaved = isSaved;
-        }
-
-        posts.refresh();
-
+        syncFromServer?.call(body['data'] != "unsaved");
+        if (syncFromServer == null) posts.refresh();
         return "success";
-      } else {
-        return body['message'] ?? "Something went wrong";
       }
+      revert?.call();
+      return body['message'] ?? "Something went wrong";
     } catch (e) {
+      revert?.call();
       return e.toString();
     }
   }
