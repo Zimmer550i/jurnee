@@ -55,6 +55,36 @@ class _LoginState extends State<Login> {
     }
   }
 
+  bool _isNullOrEmpty(String? value) => value == null || value.trim().isEmpty;
+
+  bool _shouldCompleteProfile() {
+    final user = Get.find<UserController>().userData;
+
+    if (user == null) return true;
+
+    return _isNullOrEmpty(user.name);
+  }
+
+  Future<void> _handleSocialLogin(Future<String> Function() loginAction) async {
+    if (!agreedTerms) {
+      customSnackBar(
+        "You must accept the Terms and Conditions and Privacy Policy to proceed",
+      );
+      return;
+    }
+
+    final message = await loginAction();
+    if (message != "success") {
+      customSnackBar(message);
+      return;
+    }
+
+    Get.offAll(() => Home(), routeName: "/app");
+    if (_shouldCompleteProfile()) {
+      Get.to(() => EditProfile());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -205,29 +235,9 @@ class _LoginState extends State<Login> {
                   children: [
                     Obx(
                       () => GestureDetector(
-                        onTap: () {
-                          if (!agreedTerms) {
-                            customSnackBar(
-                              "You must accept the Terms and Conditions and Privacy Policy to proceed",
-                            );
-                            return;
-                          }
-                          Get.find<AuthController>().googleSignin().then((
-                            message,
-                          ) {
-                            if (message == "success") {
-                              Get.offAll(() => Home(), routeName: "/app");
-                              if (Get.find<UserController>().userData?.name ==
-                                      "" ||
-                                  Get.find<UserController>().userData?.name ==
-                                      null) {
-                                Get.to(() => EditProfile());
-                              }
-                            } else {
-                              customSnackBar(message);
-                            }
-                          });
-                        },
+                        onTap: () => _handleSocialLogin(
+                          () => Get.find<AuthController>().googleSignin(),
+                        ),
                         child: Get.find<AuthController>().googleLoading.value
                             ? CustomLoading(color: AppColors.red.shade300)
                             : CustomSvg(asset: "assets/icons/google.svg"),
@@ -235,29 +245,9 @@ class _LoginState extends State<Login> {
                     ),
                     Obx(
                       () => GestureDetector(
-                        onTap: () {
-                          if (!agreedTerms) {
-                            customSnackBar(
-                              "You must accept the Terms and Conditions and Privacy Policy to proceed",
-                            );
-                            return;
-                          }
-                          Get.find<AuthController>().appleLogin().then((
-                            message,
-                          ) {
-                            if (message == "success") {
-                              Get.offAll(() => Home(), routeName: "/app");
-                              if (Get.find<UserController>().userData?.name ==
-                                      "" ||
-                                  Get.find<UserController>().userData?.name ==
-                                      null) {
-                                Get.to(() => EditProfile());
-                              }
-                            } else {
-                              customSnackBar(message);
-                            }
-                          });
-                        },
+                        onTap: () => _handleSocialLogin(
+                          () => Get.find<AuthController>().appleLogin(),
+                        ),
                         child: Get.find<AuthController>().appleLoading.value
                             ? CustomLoading(color: Colors.black)
                             : CustomSvg(asset: "assets/icons/apple.svg"),

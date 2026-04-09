@@ -128,7 +128,7 @@ class _PostCommentsState extends State<PostComments> {
                         ),
                 ],
               ),
-            const SizedBox(height: 16),
+            Divider(height: 32, color: AppColors.gray.shade100),
             if (widget.postController.comments.isEmpty)
               Center(child: noData('No comments yet')),
             ListView.separated(

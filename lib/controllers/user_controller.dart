@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserController extends GetxController {
   Rxn<User> user = Rxn();
   Rxn<User> specificUser = Rxn();
+  // TODO: Replace this posts with PostController posts
   RxList<PostModel> posts = RxList.empty();
   RxBool isLoading = RxBool(false);
   RxBool isFollowLoading = RxBool(false);

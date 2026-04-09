@@ -156,7 +156,7 @@ class ApiService {
               );
             }
           } else {
-            request.fields[key] = jsonEncode(value);
+            request.fields[key] = value?.toString() ?? '';
           }
         }
 

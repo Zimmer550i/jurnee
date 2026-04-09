@@ -58,7 +58,7 @@ class _PostMediaState extends State<PostMedia> {
               ][momentsIndex];
 
               if (mediaCollection.isEmpty) {
-                return noData('No Moments available');
+                return noData('No Media Yet');
               }
 
               return MediaQuery.removePadding(
@@ -145,10 +145,17 @@ class _PostMediaState extends State<PostMedia> {
                 if (widget.postData.hasTag!.length > 3 && showAllTags)
                   GestureDetector(
                     onTap: () => setState(() => showAllTags = false),
-                    child: Text(
-                      '...hide',
-                      style: AppTexts.txsr.copyWith(
-                        color: AppColors.gray.shade300,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.gray.shade100,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        "...hide",
+                        style: AppTexts.tsmr.copyWith(
+                          color: AppColors.green.shade800,
+                        ),
                       ),
                     ),
                   ),

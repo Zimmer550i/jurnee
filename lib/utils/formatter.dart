@@ -130,6 +130,10 @@ class Formatter {
       rtn += "s";
     }
 
+    if(rtn == "0m"){
+      return "Just now";
+    }
+
     return rtn;
   }
 
