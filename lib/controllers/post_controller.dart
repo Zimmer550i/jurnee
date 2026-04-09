@@ -62,8 +62,10 @@ class PostController extends GetxController {
   }
 
   String getDistance(double targetLong, double targetLat) {
-    final currentLat = customLocation.value?.latitude ?? userLocation.value?.latitude ?? 0;
-    final currentLng = customLocation.value?.longitude ?? userLocation.value?.longitude ?? 0;
+    final currentLat =
+        customLocation.value?.latitude ?? userLocation.value?.latitude ?? 0;
+    final currentLng =
+        customLocation.value?.longitude ?? userLocation.value?.longitude ?? 0;
 
     // Calculate distance in meters
     double distanceInMeters = Geolocator.distanceBetween(
@@ -109,7 +111,7 @@ class PostController extends GetxController {
           "lat": customLocation.value?.latitude,
           "lng": customLocation.value?.longitude,
           "maxDistance": distance.value != null
-              ? (distance.value! * 1609.344 * 1000).toInt()+100
+              ? (distance.value! * 1609.344 * 1000).toInt() + 100
               : null,
           "rating": highlyRated.value ? "4" : null,
           "minPrice": minPrice.value,
@@ -149,6 +151,7 @@ class PostController extends GetxController {
   }
 
   Future<String> fetchComments(String id, {bool loadMore = false}) async {
+    commentReviewCount(0);
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 
     if (!loadMore) {
@@ -195,6 +198,7 @@ class PostController extends GetxController {
   }
 
   Future<String> fetchReviews(String id, {bool loadMore = false}) async {
+    commentReviewCount(0);
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 
     if (!loadMore) {
@@ -220,6 +224,7 @@ class PostController extends GetxController {
 
       if (res.statusCode == 200) {
         final meta = PaginationMeta.fromJson(body['meta']);
+        commentReviewCount(meta.total);
         totalPages(meta.totalPage);
 
         final List<dynamic> dataList = body['data'];
@@ -272,6 +277,9 @@ class PostController extends GetxController {
     File? image,
     File? video,
   ) async {
+    if (content.isEmpty && image == null && video == null) {
+      return "success";
+    }
     commentLoading(id);
     try {
       final data = {
@@ -479,7 +487,9 @@ class PostController extends GetxController {
     }
 
     try {
-      final res = await api.post("/save/save-toggle", {"postId": id}, authReq: true);
+      final res = await api.post("/save/save-toggle", {
+        "postId": id,
+      }, authReq: true);
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
@@ -557,10 +567,11 @@ class PostController extends GetxController {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        int index = posts.indexWhere((val) => val.id == id);
-        posts.removeAt(index);
+        final user = Get.find<UserController>();
+        int index = user.posts.indexWhere((val) => val.id == id);
+        user.posts.removeAt(index);
 
-        posts.refresh();
+        user.posts.refresh();
 
         return "success";
       } else {

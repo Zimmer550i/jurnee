@@ -15,6 +15,7 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/utils/formatter.dart';
+import 'package:jurnee/utils/media_type.dart';
 import 'package:jurnee/utils/no_data.dart';
 import 'package:jurnee/views/base/comment_widget.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
@@ -55,7 +56,8 @@ Map<String, GlobalKey> commentKeys = {};
 
 class PostDetails extends StatefulWidget {
   final PostModel post;
-  const PostDetails(this.post, {super.key});
+  final bool showPostActions;
+  const PostDetails(this.post, {super.key, this.showPostActions = false});
 
   @override
   State<PostDetails> createState() => _PostDetailsState();
@@ -147,11 +149,23 @@ class _PostDetailsState extends State<PostDetails> {
                   spacing: 8,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    PostInformation(postData: widget.post),
-                    if (isOwner) PostEarnings(),
+                    PostInformation(
+                      postData: widget.post,
+                      onSeeAllTap: () {
+                        final sectionContext = commentSectionKey.currentContext;
+                        if (sectionContext == null) return;
+                        Scrollable.ensureVisible(
+                          sectionContext,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          alignment: 0,
+                        );
+                      },
+                    ),
+                    if (isOwner && widget.showPostActions) PostEarnings(),
                     PostDescription(
                       postData: widget.post,
-                      isOwner: isOwner,
+                      showPostActions: widget.showPostActions,
                       commentSectionKey: commentSectionKey,
                     ),
                     PostMetaData(postController: post, postData: widget.post),
@@ -159,7 +173,7 @@ class _PostDetailsState extends State<PostDetails> {
                       AttendingUsers(post: widget.post),
                     PostMedia(postData: widget.post, postController: post),
 
-                    if (isOwner)
+                    if (isOwner && widget.showPostActions)
                       OwnerActionButtons(
                         post: widget.post,
                         onDeleteTap: () => showPostDeleteSheet(

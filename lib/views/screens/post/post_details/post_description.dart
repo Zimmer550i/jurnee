@@ -4,12 +4,12 @@ class PostDescription extends StatefulWidget {
   const PostDescription({
     super.key,
     required this.postData,
-    required this.isOwner,
+    required this.showPostActions,
     required this.commentSectionKey,
   });
 
   final PostModel postData;
-  final bool isOwner;
+  final bool showPostActions;
   final GlobalKey commentSectionKey;
 
   @override
@@ -67,7 +67,7 @@ class _PostDescriptionState extends State<PostDescription> {
                 Text(
                   widget.postData.category == "service"
                       ? "Starting At: "
-                      : "Entry: ",
+                      : "Entry Fee: ",
                   style: AppTexts.tsmr,
                 ),
                 Text(
@@ -76,8 +76,8 @@ class _PostDescriptionState extends State<PostDescription> {
                 ),
               ],
             ),
-          if (!widget.isOwner) const SizedBox(height: 32),
-          if (!widget.isOwner)
+          if (!widget.showPostActions) const SizedBox(height: 32),
+          if (!widget.showPostActions)
             PostButtons(
               postData: widget.postData,
               commentSectionKey: widget.commentSectionKey,

@@ -215,7 +215,7 @@ class _PostEventState extends State<PostEvent> {
               CustomTextField(
                 controller: priceCtrl,
                 title: "Entry Fee",
-                hintText: "Enter Entry fee",
+                hintText: "Enter Entry Fee, If free, enter 0",
               ),
               const SizedBox(height: 16),
               CustomTextField(

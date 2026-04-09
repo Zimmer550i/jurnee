@@ -43,7 +43,7 @@ class CommentModel {
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
       v: json['__v'] ?? 0,
-      user: UserModel.fromJson(json['user'] ?? {}),
+      user: UserModel.fromJson(json['userId'] ?? json['user'] ?? {}),
       liked: json['liked'] ?? false,
       replyCount: json['replyCount'] ?? 0,
       children: (json['children'] as List<dynamic>? ?? [])

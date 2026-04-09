@@ -10,13 +10,14 @@ import 'package:jurnee/views/screens/post/post_details/post_details.dart';
 
 class PostCard extends StatelessWidget {
   final PostModel post;
-  const PostCard(this.post, {super.key});
+  final bool showPostActions;
+  const PostCard(this.post, {super.key, this.showPostActions = false});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => PostDetails(post));
+        Get.to(() => PostDetails(post, showPostActions: showPostActions));
       },
       child: Container(
         width: double.infinity,

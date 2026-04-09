@@ -1,10 +1,17 @@
 part of 'post_details.dart';
 
 class PostInformation extends StatelessWidget {
-  const PostInformation({super.key, required this.postData});
+  final void Function()? onSeeAllTap;
+  const PostInformation({super.key, required this.postData, this.onSeeAllTap});
 
   final PostModel postData;
-  Widget _infoRow({String? assetName, required String text, String? title}) {
+  Widget _infoRow({
+    String? assetName,
+    required String text,
+    String? title,
+    Widget? trailing,
+  }) {
+    final textStyle = AppTexts.tsmm.copyWith(color: AppColors.gray.shade700);
     return Row(
       spacing: 4,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -19,12 +26,9 @@ class PostInformation extends StatelessWidget {
             ),
           ),
         if (title != null) Text("$title: ", style: AppTexts.tsms),
-        Expanded(
-          child: Text(
-            text,
-            style: AppTexts.tsmm.copyWith(color: AppColors.gray.shade700),
-          ),
-        ),
+        if (trailing == null) Expanded(child: Text(text, style: textStyle)),
+        if (trailing != null) Text(text, style: textStyle),
+        if (trailing != null) trailing,
       ],
     );
   }
@@ -74,8 +78,24 @@ class PostInformation extends StatelessWidget {
               postData.lastSeenDate != null)
             _infoRow(
               title: "Last Seen",
-              text: Formatter.dateFormatter(postData.lastSeenDate!),
+              text: DateFormat('MMM dd, yyyy.').format(postData.lastSeenDate!),
             ),
+          Obx(
+            () => _infoRow(
+              assetName: 'message',
+              text:
+                  "${Get.find<PostController>().commentReviewCount} ${postData.category == "service" ? "Reviews" : "Comments"} • ",
+              trailing: GestureDetector(
+                onTap: onSeeAllTap,
+                child: Text(
+                  "See All",
+                  style: AppTexts.tsms.copyWith(
+                    color: AppColors.green.shade700,
+                  ),
+                ),
+              ),
+            ),
+          ),
           GestureDetector(
             onTap: () => Get.to(() => PostLocation(post: postData)),
             child: _infoRow(

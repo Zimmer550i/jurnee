@@ -2,15 +2,20 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/media_type.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
-import 'package:path/path.dart' as p;
 
 class MediaThumbnail extends StatefulWidget {
   final String? path; // can be local file path or network URL
+  final bool showPlayButton;
 
-  const MediaThumbnail({super.key, required this.path});
+  const MediaThumbnail({
+    super.key,
+    required this.path,
+    this.showPlayButton = true,
+  });
 
   @override
   State<MediaThumbnail> createState() => _MediaThumbnailState();
@@ -25,34 +30,41 @@ class _MediaThumbnailState extends State<MediaThumbnail> {
   @override
   void initState() {
     super.initState();
-    if (widget.path != null) {
-      _loadThumbnail();
+    _reloadForPath(widget.path);
+  }
+
+  @override
+  void didUpdateWidget(covariant MediaThumbnail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.path != widget.path) {
+      setState(() {
+        _reloadForPath(widget.path);
+      });
     }
   }
 
-  Future<void> _loadThumbnail() async {
-    final path = widget.path;
-    _isNetwork = path!.startsWith('http://') || path.startsWith('https://');
+  void _reloadForPath(String? path) {
+    _thumbnailFile = null;
+    _isVideo = false;
+    _isNetwork = false;
+    _loading = path != null;
 
-    String ext = p.extension(path).toLowerCase();
-
-    // Detect video vs image
-    if (['.mp4', '.mov', '.mkv', '.avi', '.webm'].contains(ext)) {
-      _isVideo = true;
-    } else if (['.jpg', '.jpeg', '.png', '.gif', '.webp'].contains(ext)) {
-      _isVideo = false;
-    } else {
-      // Try to detect from URL if no extension
-      if (_isNetwork) {
-        if (path.contains('.mp4') || path.contains('.mov')) _isVideo = true;
-      }
+    if (path != null) {
+      _loadThumbnail(path);
     }
+  }
+
+  Future<void> _loadThumbnail(String path) async {
+    _isNetwork = path.startsWith('http://') || path.startsWith('https://');
+    _isVideo = isVideoMedia(path: path);
 
     // Image → done
     if (!_isVideo) {
-      setState(() {
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
       return;
     }
 
@@ -64,13 +76,19 @@ class _MediaThumbnailState extends State<MediaThumbnail> {
         quality: 75,
       );
 
-      setState(() {
-        _thumbnailFile = thumbPath != null ? File(thumbPath) : null;
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _thumbnailFile = thumbPath != null ? File(thumbPath) : null;
+          _loading = false;
+        });
+      }
     } catch (e) {
-      _thumbnailFile = null;
-      _loading = false;
+      if (mounted) {
+        setState(() {
+          _thumbnailFile = null;
+          _loading = false;
+        });
+      }
     }
   }
 
@@ -110,17 +128,46 @@ class _MediaThumbnailState extends State<MediaThumbnail> {
 
     // Video thumbnail
     if (_thumbnailFile != null) {
-      return Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.file(_thumbnailFile!, fit: BoxFit.cover),
-          const Center(
-            child: Icon(Icons.play_circle_fill, color: Colors.white, size: 50),
-          ),
-        ],
+      return _buildVideoOverlay(
+        Image.file(_thumbnailFile!, fit: BoxFit.cover),
       );
     }
 
-    return const Center(child: Text("Could not load thumbnail"));
+    return _buildVideoOverlay(
+      Container(
+        color: Colors.black12,
+        alignment: Alignment.center,
+        child: Text(
+          "Could not load thumbnail",
+          style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade500),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVideoOverlay(Widget child) {
+    if (!widget.showPlayButton) return child;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        child,
+        Center(
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Icon(
+              Icons.play_arrow_rounded,
+              color: Colors.white,
+              size: 36,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

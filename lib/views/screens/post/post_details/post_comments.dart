@@ -37,7 +37,10 @@ class _PostCommentsState extends State<PostComments> {
         () => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Comments (${widget.postController.commentReviewCount.value})', style: AppTexts.tmdb),
+            Text(
+              'Comments (${widget.postController.commentReviewCount.value})',
+              style: AppTexts.tmdb,
+            ),
             const SizedBox(height: 16),
             if (widget.postController.isFirstLoad.value)
               Padding(
@@ -57,7 +60,10 @@ class _PostCommentsState extends State<PostComments> {
                           if (file != null) {
                             setState(() {
                               final pickedFile = File(file.path);
-                              if (file.mimeType?.startsWith('video/') ?? false) {
+                              if (isVideoMedia(
+                                path: file.path,
+                                mimeType: file.mimeType,
+                              )) {
                                 commentVideo = pickedFile;
                                 commentImage = null;
                               } else {
@@ -73,8 +79,12 @@ class _PostCommentsState extends State<PostComments> {
                                 borderRadius: BorderRadiusGeometry.circular(4),
                                 child: SizedBox(
                                   height: 36,
+                                  width: 36,
                                   child: MediaThumbnail(
-                                    path: commentImage?.path ?? commentVideo?.path,
+                                    showPlayButton: false,
+                                    path:
+                                        commentImage?.path ??
+                                        commentVideo?.path,
                                   ),
                                 ),
                               ),
@@ -82,7 +92,8 @@ class _PostCommentsState extends State<PostComments> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  widget.postController.commentLoading.value == widget.postData.id
+                  widget.postController.commentLoading.value ==
+                          widget.postData.id
                       ? CustomLoading()
                       : CustomButton(
                           onTap: () {
@@ -124,7 +135,9 @@ class _PostCommentsState extends State<PostComments> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
-                _assignCommentKeys(widget.postController.comments.elementAt(index));
+                _assignCommentKeys(
+                  widget.postController.comments.elementAt(index),
+                );
                 return CommentWidget(
                   comment: widget.postController.comments.elementAt(index),
                   postData: widget.postData,

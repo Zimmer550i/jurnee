@@ -76,9 +76,15 @@ class _ProfileState extends State<Profile> {
           : CustomAppBar(title: "Profile"),
       endDrawer: widget.userId == null ? drawer(context) : null,
       body: CustomListHandler(
-        onRefresh: () => widget.userId == null
-            ? user.getUserData()
-            : user.getSpecificUserInfo(widget.userId!),
+        onRefresh: () {
+          if (widget.userId == null) {
+            user.getUserData();
+          } else {
+            user.getSpecificUserInfo(widget.userId!);
+          }
+          // return Future.value();
+          return user.getUserPosts(index, widget.userId ?? user.userData?.id);
+        },
 
         onLoadMore: () => user.getUserPosts(
           index,
@@ -448,11 +454,13 @@ class _ProfileState extends State<Profile> {
                             for (var i in user.posts)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 20),
-                                child: PostCard(i),
+                                child: PostCard(i, showPostActions: true),
                               ),
 
                           if (user.isFirstLoad.value) CustomLoading(),
-                          if (user.isMoreLoading.value) CustomLoading(),
+                          if (!user.isFirstLoad.value &&
+                              user.isMoreLoading.value)
+                            CustomLoading(),
                           if (!user.isMoreLoading.value &&
                               !user.isFirstLoad.value &&
                               user.totalPages.value <= user.currentPage.value)

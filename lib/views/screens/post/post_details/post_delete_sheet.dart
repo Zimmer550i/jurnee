@@ -22,7 +22,10 @@ Future<dynamic> showPostDeleteSheet(
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 24),
-              Text('Delete', style: AppTexts.tlgb.copyWith(color: AppColors.red)),
+              Text(
+                'Delete',
+                style: AppTexts.tlgb.copyWith(color: AppColors.red),
+              ),
               const SizedBox(height: 24),
               Container(
                 width: double.infinity,
@@ -44,10 +47,15 @@ Future<dynamic> showPostDeleteSheet(
                       padding: 0,
                       isSecondary: true,
                       onTap: () async {
-                        final message = await postController.deletePost(postData.id);
-                        Get.back();
+                        final message = await postController.deletePost(
+                          postData.id,
+                        );
 
                         if (message == 'success') {
+                          if (context.mounted) {
+                            Get.back();
+                            Get.back();
+                          }
                           customSnackBar(
                             '${postData.title} has been deleted!',
                             isError: false,
@@ -60,7 +68,10 @@ Future<dynamic> showPostDeleteSheet(
                   ),
                   const SizedBox(width: 18),
                   Expanded(
-                    child: CustomButton(text: 'Cancel', onTap: () => Get.back()),
+                    child: CustomButton(
+                      text: 'Cancel',
+                      onTap: () => Get.back(),
+                    ),
                   ),
                   const SizedBox(width: 40),
                 ],

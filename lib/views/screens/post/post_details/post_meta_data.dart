@@ -12,7 +12,13 @@ class PostMetaData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final index = postController.posts.indexWhere((val) => val.id == postData.id);
+    int index = postController.posts.indexWhere((val) => val.id == postData.id);
+    if (index == -1) {
+      index = Get.find<UserController>().posts.indexWhere(
+        (val) => val.id == postData.id,
+      );
+    }
+    // final index = 0;
     return Container(
       color: Colors.white,
       padding: EdgeInsets.all(24),
@@ -22,7 +28,9 @@ class PostMetaData extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 Get.to(
-                  () => Profile(userId: postController.posts.elementAt(index).author.id),
+                  () => Profile(
+                    userId: postController.posts.elementAt(index).author.id,
+                  ),
                 );
               },
               child: Column(
@@ -30,21 +38,28 @@ class PostMetaData extends StatelessWidget {
                 children: [
                   Text(
                     'Post by:',
-                    style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade600),
+                    style: AppTexts.tsmr.copyWith(
+                      color: AppColors.gray.shade600,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
                       AbsorbPointer(
                         child: ProfilePicture(
-                          image: postController.posts.elementAt(index).author.image,
+                          image: postController.posts
+                              .elementAt(index)
+                              .author
+                              .image,
                           size: 32,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         postController.posts.elementAt(index).author.name,
-                        style: AppTexts.tmdb.copyWith(color: AppColors.gray.shade700),
+                        style: AppTexts.tmdb.copyWith(
+                          color: AppColors.gray.shade700,
+                        ),
                       ),
                     ],
                   ),
@@ -60,7 +75,9 @@ class PostMetaData extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             GestureDetector(
-              onTap: () => postController.saveToggle(postController.posts.elementAt(index).id),
+              onTap: () => postController.saveToggle(
+                postController.posts.elementAt(index).id,
+              ),
               child: Row(
                 children: [
                   CustomSvg(
@@ -79,7 +96,10 @@ class PostMetaData extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 postController
-                    .likeToggle(postController.posts.elementAt(index).id, 'post')
+                    .likeToggle(
+                      postController.posts.elementAt(index).id,
+                      'post',
+                    )
                     .then((message) {});
               },
               child: Row(
