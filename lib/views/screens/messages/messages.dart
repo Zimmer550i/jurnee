@@ -7,7 +7,6 @@ import 'package:jurnee/models/chat_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_list_handler.dart';
-import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
@@ -27,11 +26,11 @@ class _MessagesState extends State<Messages> {
   @override
   void initState() {
     super.initState();
-    chat.fetchChats().then((message) {
-      if (message != "success") {
-        customSnackBar(message);
-      }
-    });
+    // chat.fetchChats().then((message) {
+    //   if (message != "success") {
+    //     customSnackBar(message);
+    //   }
+    // });
     userId = Get.find<UserController>().userData!.id;
   }
 

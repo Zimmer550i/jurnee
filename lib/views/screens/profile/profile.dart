@@ -22,6 +22,8 @@ import 'package:jurnee/views/screens/profile/boost_results.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
 
 class Profile extends StatefulWidget {
+  static int index = 0;
+
   final String? userId;
   const Profile({super.key, this.userId});
 
@@ -33,15 +35,16 @@ class _ProfileState extends State<Profile> {
   final user = Get.find<UserController>();
   final GlobalKey<ScaffoldState> _key = GlobalKey();
 
-  int index = 0;
+  int get index => Profile.index;
+  set index(int value) => Profile.index = value;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      getSpecificUserData();
-      user.getUserPosts(index, widget.userId ?? user.userData?.id);
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   getSpecificUserData();
+    //   user.getUserPosts(index, widget.userId ?? user.userData?.id);
+    // });
   }
 
   void getSpecificUserData() async {

@@ -104,11 +104,8 @@ class PostInformation extends StatelessWidget {
                   '${Get.find<PostController>().getDistance(postData.location.coordinates[0], postData.location.coordinates[1])} • ${postData.address}',
             ),
           ),
-          if (postData.startDate != null)
-            _infoRow(
-              assetName: 'calendar',
-              text: DateFormat('dd MMM, hh:mm a').format(postData.startDate!),
-            ),
+          if (postData.startDate != null || postData.schedule.isNotEmpty)
+            _infoRow(assetName: 'calendar', text: _dateOrScheduleText()),
           if (postData.serviceType != null)
             _infoRow(
               assetName: 'tools',
@@ -136,5 +133,72 @@ class PostInformation extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _dateOrScheduleText() {
+    String fallback = postData.startDate != null
+        ? DateFormat('dd MMM, hh:mm a').format(postData.startDate!)
+        : "";
+    if (postData.category != "service" || postData.schedule.isEmpty) {
+      return fallback;
+    }
+
+    final schedule = postData.schedule
+        .where((s) => s.startTime != null && s.endTime != null)
+        .toList();
+    if (schedule.isEmpty) return fallback;
+
+    final first = schedule.first;
+    final startTime = first.startTime!;
+    final endTime = first.endTime!;
+
+    final dayIndexes = schedule
+        .where((s) => s.startTime == startTime && s.endTime == endTime)
+        .map((s) => _dayOrder(s.day))
+        .where((idx) => idx >= 0 && idx <= 6)
+        .toSet()
+        .toList()
+      ..sort();
+    if (dayIndexes.isEmpty) return fallback;
+
+    final dayRanges = <String>[];
+    int i = 0;
+    while (i < dayIndexes.length) {
+      final start = dayIndexes[i];
+      int end = start;
+      while (i + 1 < dayIndexes.length && dayIndexes[i + 1] == end + 1) {
+        end = dayIndexes[i + 1];
+        i++;
+      }
+      dayRanges.add(start == end ? _dayName(start) : "${_dayName(start)}-${_dayName(end)}");
+      i++;
+    }
+
+    return "${dayRanges.join("-")}, ${_formatTime(startTime)}-${_formatTime(endTime)}";
+  }
+
+  int _dayOrder(String day) {
+    const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    final normalized = day.trim().toLowerCase();
+    final short = normalized.length >= 3
+        ? normalized.substring(0, 3)
+        : normalized;
+    final index = days.indexOf(short);
+    return index == -1 ? 99 : index;
+  }
+
+  String _dayName(int dayIndex) {
+    const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    if (dayIndex < 0 || dayIndex >= names.length) return "Day";
+    return names[dayIndex];
+  }
+
+  String _formatTime(String value) {
+    final chunks = value.split(":");
+    if (chunks.length < 2) return value;
+    final hour = int.tryParse(chunks[0]);
+    final minute = int.tryParse(chunks[1]);
+    if (hour == null || minute == null) return value;
+    return DateFormat('h:mm a').format(DateTime(2000, 1, 1, hour, minute));
   }
 }

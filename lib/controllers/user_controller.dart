@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:get/state_manager.dart';
+import 'package:get/get.dart';
+import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/models/pagination_meta.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/models/user.dart';
@@ -10,11 +11,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserController extends GetxController {
   Rxn<User> user = Rxn();
   Rxn<User> specificUser = Rxn();
-  // TODO: Replace this posts with PostController posts
-  RxList<PostModel> posts = RxList.empty();
+  RxList<PostModel> get posts => Get.find<PostController>().posts;
   RxBool isLoading = RxBool(false);
   RxBool isFollowLoading = RxBool(false);
-
+ 
   final api = ApiService();
   late SharedPreferences prefs;
 

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
@@ -324,6 +325,29 @@ class _HomeState extends State<Home> {
                 setState(() {
                   index = val;
                 });
+                if (val == 0) {
+                  Get.find<PostController>().fetchPosts().then((message) {
+                    if (message != "success") {
+                      customSnackBar(message);
+                    }
+                  });
+                } else if (val == 1) {
+                  Get.find<ChatController>().fetchChats().then((message) {
+                    if (message != "success") {
+                      customSnackBar(message);
+                    }
+                  });
+                } else if (val == 2) {
+                  // Get.find<NotificationController>().fetchNotifications();
+                } else if (val == 3) {
+                  Get.find<UserController>().getUserPosts(Profile.index, null).then((
+                    message,
+                  ) {
+                    if (message != "success") {
+                      customSnackBar(message);
+                    }
+                  });
+                }
               },
               onShowOverlay: () {
                 setState(() {
