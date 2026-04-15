@@ -8,6 +8,7 @@ import 'package:jurnee/utils/formatter.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
+import 'package:jurnee/views/base/custom_time_picker.dart';
 import 'package:jurnee/views/screens/post/post_base_widget.dart';
 import 'package:jurnee/views/screens/profile/boost_post.dart';
 
@@ -193,9 +194,9 @@ class _PostEventState extends State<PostEvent> {
                   Expanded(
                     child: CustomTextField(
                       onTap: () async {
-                        time = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.now(),
+                        time = await showCustomTimePicker(
+                          context,
+                          initialTime: time ?? TimeOfDay.now(),
                         );
                         setState(() {});
                       },

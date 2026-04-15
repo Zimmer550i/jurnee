@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
+import 'package:jurnee/controllers/notification_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
@@ -338,7 +339,7 @@ class _HomeState extends State<Home> {
                     }
                   });
                 } else if (val == 2) {
-                  // Get.find<NotificationController>().fetchNotifications();
+                  Get.find<NotificationController>().fetchNotifications();
                 } else if (val == 3) {
                   final user = Get.find<UserController>();
                   user.getUserPosts(Profile.index, user.userData?.id).then((

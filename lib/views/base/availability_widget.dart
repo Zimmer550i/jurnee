@@ -4,6 +4,7 @@ import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/formatter.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
+import 'package:jurnee/views/base/custom_time_picker.dart';
 
 class AvailabilityWidget extends StatefulWidget {
   final List<Schedule>? initialSchedule;
@@ -178,8 +179,8 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
   }
 
   Future<String?> getTime() async {
-    final time = await showTimePicker(
-      context: context,
+    final time = await showCustomTimePicker(
+      context,
       initialTime: TimeOfDay.now(),
     );
 

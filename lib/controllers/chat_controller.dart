@@ -127,7 +127,7 @@ class ChatController extends GetxController {
     socket!.emit("send-message", payload);
   }
 
-  Future<String> createOrGetChat(String id) async {
+  Future<String> createOrGetChat(String id, {String? postTitle}) async {
     isLoading(true);
     try {
       final res = await api.post("/chat/create", {"member": id}, authReq: true);
@@ -138,7 +138,8 @@ class ChatController extends GetxController {
 
         final newId = data['_id'];
 
-        final currentUserId = Get.find<UserController>().userData?.id;
+        final userController = Get.find<UserController>();
+        final currentUserId = userController.userData?.id;
 
         final otherMember = (data["members"] as List)
             .map((mem) => Member.fromJson(mem))
@@ -146,6 +147,25 @@ class ChatController extends GetxController {
               (mem) => mem.id != currentUserId,
               orElse: () => Member.fromJson(data["members"].first),
             );
+
+        if (postTitle != null) {
+          final senderName = userController.userData?.name ?? "User";
+          if (socket == null) {
+            _initSocket();
+          }
+          if (socket != null && !socket!.connected) {
+            socket!.connect();
+          }
+          if (socket != null && currentUserId != null) {
+            socket!.emit("send-message", {
+              "chat": newId,
+              "sender": currentUserId,
+              "message":
+                  "Mr. $senderName is requesting a Quote Request for $postTitle",
+              "type": "quote",
+            });
+          }
+        }
 
         Get.to(() => Chat(inboxId: newId, chatMember: otherMember));
 

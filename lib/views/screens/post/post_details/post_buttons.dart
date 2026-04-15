@@ -16,7 +16,10 @@ class PostButtons extends StatelessWidget {
     String buttonText = "Request Quote";
     VoidCallback buttonAction = () {
       if (postData.author.id != null) {
-        Get.find<ChatController>().createOrGetChat(postData.author.id!);
+        Get.find<ChatController>().createOrGetChat(
+          postData.author.id!,
+          postTitle: postData.title,
+        );
       } else {
         customSnackBar("Can't start chat with this user");
       }

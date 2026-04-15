@@ -12,6 +12,7 @@ import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_drop_down.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
+import 'package:jurnee/views/base/custom_time_picker.dart';
 import 'package:jurnee/views/screens/messages/offer_preview.dart';
 
 class CreateOffer extends StatefulWidget {
@@ -150,9 +151,9 @@ class _CreateOfferState extends State<CreateOffer> {
                   Expanded(
                     child: CustomTextField(
                       onTap: () async {
-                        start = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.now(),
+                        start = await showCustomTimePicker(
+                          context,
+                          initialTime: start ?? TimeOfDay.now(),
                         );
                         setState(() {});
                       },
@@ -169,9 +170,9 @@ class _CreateOfferState extends State<CreateOffer> {
                   Expanded(
                     child: CustomTextField(
                       onTap: () async {
-                        end = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.now(),
+                        end = await showCustomTimePicker(
+                          context,
+                          initialTime: end ?? TimeOfDay.now(),
                         );
                         setState(() {});
                       },

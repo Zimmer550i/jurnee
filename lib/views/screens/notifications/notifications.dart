@@ -40,27 +40,46 @@ class _NotificationsState extends State<Notifications> {
         onRefresh: () => controller.fetchNotifications(),
         onLoadMore: () => controller.fetchNotifications(loadMore: true),
         horizontalPadding: 0,
-        child: Obx(
-          () => Column(
-            children: [
-              const SizedBox(height: 20),
-              for (var i in controller.notifications) notificationWidget(i),
-              if (controller.isLoading.value) CustomLoading(),
-              if (!controller.isMoreLoading.value &&
-                  !controller.isFirstLoad.value &&
-                  controller.notifications.isEmpty)
-                Center(
-                  child: Text(
-                    "You have to notifications",
-                    style: AppTexts.tsmr.copyWith(
-                      color: AppColors.gray.shade300,
-                    ),
-                  ),
+        // shrinkWrap: true,
+        child: Obx(() {
+          if (controller.isFirstLoad.value) {
+            return const Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: CustomLoading(),
+            );
+          }
+
+          if (controller.notifications.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Center(
+                child: Text(
+                  "You have no notifications",
+                  style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade300),
                 ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
+              ),
+            );
+          }
+
+          final totalItems =
+              controller.notifications.length +
+              (controller.isMoreLoading.value ? 1 : 0);
+
+          return ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            itemCount: totalItems,
+            itemBuilder: (context, index) {
+              if (index < controller.notifications.length) {
+                return notificationWidget(controller.notifications[index]);
+              }
+
+              return const CustomLoading();
+            },
+            separatorBuilder: (context, index) => const SizedBox.shrink(),
+          );
+        }),
       ),
     );
   }

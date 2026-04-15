@@ -22,8 +22,6 @@ class NotificationController extends GetxController {
   Future<String> fetchNotifications({bool loadMore = false}) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 
-    isLoading(true);
-
     if (!loadMore) {
       isFirstLoad(true);
       currentPage(1);
@@ -67,7 +65,6 @@ class NotificationController extends GetxController {
     } finally {
       isFirstLoad(false);
       isMoreLoading(false);
-      isLoading(false);
     }
   }
 

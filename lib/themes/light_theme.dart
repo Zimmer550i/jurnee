@@ -9,9 +9,10 @@ ThemeData light() => ThemeData(
     brightness: Brightness.light,
   ),
   datePickerTheme: DatePickerThemeData(
-    headerBackgroundColor: AppColors.green[525],
+    headerBackgroundColor: AppColors.scaffoldBG,
     headerForegroundColor: Colors.black,
-    todayForegroundColor: WidgetStatePropertyAll(AppColors.green.shade700),
+    backgroundColor: AppColors.scaffoldBG,
+    todayForegroundColor: WidgetStatePropertyAll(AppColors.black),
     todayBackgroundColor: WidgetStatePropertyAll(AppColors.green.shade100),
     dayForegroundColor: WidgetStateProperty.resolveWith((states) {
       if (states.contains(WidgetState.selected)) return Colors.white;

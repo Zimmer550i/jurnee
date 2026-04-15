@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 
-class CustomListHandler extends StatelessWidget {
+class CustomListHandler extends StatefulWidget {
   final Future<void> Function()? onRefresh;
   final Future<void> Function()? onLoadMore;
   final double scrollThreshold;
@@ -26,45 +26,73 @@ class CustomListHandler extends StatelessWidget {
   });
 
   @override
+  State<CustomListHandler> createState() => _CustomListHandlerState();
+}
+
+class _CustomListHandlerState extends State<CustomListHandler> {
+  bool _isLoadMoreInProgress = false;
+  bool _canTriggerLoadMore = true;
+
+  Future<void> _handleLoadMore(ScrollNotification scrollInfo) async {
+    final onLoadMore = widget.onLoadMore;
+    if (onLoadMore == null) return;
+
+    final shouldLoadMore = widget.reverse
+        ? scrollInfo.metrics.pixels <= widget.scrollThreshold
+        : scrollInfo.metrics.pixels >=
+              scrollInfo.metrics.maxScrollExtent - widget.scrollThreshold;
+
+    if (!shouldLoadMore) {
+      _canTriggerLoadMore = true;
+      return;
+    }
+
+    if (!_canTriggerLoadMore || _isLoadMoreInProgress) return;
+
+    _canTriggerLoadMore = false;
+    _isLoadMoreInProgress = true;
+    try {
+      await onLoadMore();
+    } finally {
+      _isLoadMoreInProgress = false;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
-        if (reverse) {
-          if (scrollInfo.metrics.pixels <= scrollThreshold) {
-            if (onLoadMore != null) onLoadMore!();
-          }
-        } else {
-          if (scrollInfo.metrics.pixels >=
-              scrollInfo.metrics.maxScrollExtent - scrollThreshold) {
-            if (onLoadMore != null) onLoadMore!();
-          }
-        }
+        _handleLoadMore(scrollInfo);
 
         return false;
       },
-      child: isLoading
+      child: widget.isLoading
           ? Center(child: CustomLoading())
-          : reverse
+          : widget.reverse
           ? SingleChildScrollView(
               clipBehavior: Clip.none,
-              reverse: reverse,
-              physics: shrinkWrap
+              reverse: widget.reverse,
+              physics: widget.shrinkWrap
                   ? NeverScrollableScrollPhysics()
                   : const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: SafeArea(child: child),
+              padding: EdgeInsets.symmetric(
+                horizontal: widget.horizontalPadding,
+              ),
+              child: SafeArea(child: widget.child),
             )
           : RefreshIndicator(
-              onRefresh: onRefresh ?? () async {},
+              onRefresh: widget.onRefresh ?? () async {},
               color: AppColors.green,
               backgroundColor: AppColors.green[25],
               child: SingleChildScrollView(
-                reverse: reverse,
-                physics: shrinkWrap
+                reverse: widget.reverse,
+                physics: widget.shrinkWrap
                     ? NeverScrollableScrollPhysics()
                     : const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: SafeArea(top: topPadding, child: child),
+                padding: EdgeInsets.symmetric(
+                  horizontal: widget.horizontalPadding,
+                ),
+                child: SafeArea(top: widget.topPadding, child: widget.child),
               ),
             ),
     );

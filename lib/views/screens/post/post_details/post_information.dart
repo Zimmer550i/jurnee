@@ -58,15 +58,32 @@ class PostInformation extends StatelessWidget {
                           color: AppColors.gray.shade700,
                         ),
                       ),
-                      Text(
-                        postData.subcategory ??
-                            Formatter.toPascelCase(postData.category),
-                        style: AppTexts.txsr.copyWith(
-                          color: postData.subcategory == 'Missing Person'
-                              ? AppColors.red
-                              : AppColors.gray.shade700,
+                      if (postData.subcategory != 'Missing Person')
+                        Text(
+                          postData.subcategory ??
+                              Formatter.toPascelCase(postData.category),
+                          style: AppTexts.txsr.copyWith(
+                            color: AppColors.gray.shade700,
+                          ),
                         ),
-                      ),
+                      if (postData.subcategory == 'Missing Person')
+                        Row(
+                          children: [
+                            Text(
+                              postData.subcategory ??
+                                  Formatter.toPascelCase(postData.category),
+                              style: AppTexts.txsr.copyWith(
+                                color: AppColors.red,
+                              ),
+                            ),
+                            Text(
+                              " • ${Formatter.durationFormatter(DateTime.now().difference(postData.createdAt))}",
+                              style: AppTexts.txsr.copyWith(
+                                color: AppColors.green.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 ),
@@ -152,13 +169,14 @@ class PostInformation extends StatelessWidget {
     final startTime = first.startTime!;
     final endTime = first.endTime!;
 
-    final dayIndexes = schedule
-        .where((s) => s.startTime == startTime && s.endTime == endTime)
-        .map((s) => _dayOrder(s.day))
-        .where((idx) => idx >= 0 && idx <= 6)
-        .toSet()
-        .toList()
-      ..sort();
+    final dayIndexes =
+        schedule
+            .where((s) => s.startTime == startTime && s.endTime == endTime)
+            .map((s) => _dayOrder(s.day))
+            .where((idx) => idx >= 0 && idx <= 6)
+            .toSet()
+            .toList()
+          ..sort();
     if (dayIndexes.isEmpty) return fallback;
 
     final dayRanges = <String>[];
@@ -170,7 +188,9 @@ class PostInformation extends StatelessWidget {
         end = dayIndexes[i + 1];
         i++;
       }
-      dayRanges.add(start == end ? _dayName(start) : "${_dayName(start)}-${_dayName(end)}");
+      dayRanges.add(
+        start == end ? _dayName(start) : "${_dayName(start)}-${_dayName(end)}",
+      );
       i++;
     }
 
