@@ -15,6 +15,7 @@ import 'package:jurnee/views/base/post_card.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/auth/login.dart';
 import 'package:jurnee/views/screens/profile/app_info.dart';
+import 'package:jurnee/views/screens/profile/change_password.dart';
 import 'package:jurnee/views/screens/profile/edit_profile.dart';
 import 'package:jurnee/views/screens/profile/bookings.dart';
 import 'package:jurnee/views/screens/profile/support.dart';
@@ -495,10 +496,10 @@ class _ProfileState extends State<Profile> {
                 Get.back();
                 Get.to(() => EditProfile());
               }),
-              // drawerButton("Orders", "order_history", () {
-              //   Get.back();
-              //   Get.to(() => EditProfile());
-              // }),
+              drawerButton("Change Password", "lock", () {
+                Get.back();
+                Get.to(() => ChangePassword());
+              }),
               drawerButton("My Orders", "calendar", () {
                 Get.back();
                 Get.to(() => Bookings());

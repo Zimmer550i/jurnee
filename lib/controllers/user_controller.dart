@@ -162,6 +162,32 @@ class UserController extends GetxController {
     }
   }
 
+  Future<String> changePassword(
+    String currentPassword,
+    String newPassword,
+    String confirmPassword,
+  ) async {
+    isLoading(true);
+    try {
+      final res = await api.post("/auth/change-password", {
+        "currentPassword": currentPassword,
+        "newPassword": newPassword,
+        "confirmPassword": confirmPassword,
+      }, authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return "success";
+      } else {
+        return body["message"] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<String> updateUserData(Map<String, dynamic> data) async {
     isLoading(true);
     try {

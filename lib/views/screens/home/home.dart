@@ -340,7 +340,8 @@ class _HomeState extends State<Home> {
                 } else if (val == 2) {
                   // Get.find<NotificationController>().fetchNotifications();
                 } else if (val == 3) {
-                  Get.find<UserController>().getUserPosts(Profile.index, null).then((
+                  final user = Get.find<UserController>();
+                  user.getUserPosts(Profile.index, user.userData?.id).then((
                     message,
                   ) {
                     if (message != "success") {

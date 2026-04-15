@@ -149,14 +149,14 @@ class RedeemCodeSheet extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Container(
-                padding: const EdgeInsets.all(5),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.black, width: 5),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: QrImageView(
                   data: _coupon,
-                  version: QrVersions.min,
+                  version: QrVersions.auto,
                   size: 95,
                   backgroundColor: AppColors.white,
                   padding: EdgeInsets.zero,
