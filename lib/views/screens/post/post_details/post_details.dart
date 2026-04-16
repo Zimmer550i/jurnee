@@ -55,9 +55,15 @@ part 'report_post_button.dart';
 Map<String, GlobalKey> commentKeys = {};
 
 class PostDetails extends StatefulWidget {
-  final PostModel post;
+  final PostModel? post;
   final bool showPostActions;
-  const PostDetails(this.post, {super.key, this.showPostActions = false});
+  final String? postId;
+  const PostDetails(
+    this.post, {
+    super.key,
+    this.showPostActions = false,
+    this.postId,
+  });
 
   @override
   State<PostDetails> createState() => _PostDetailsState();
@@ -67,46 +73,64 @@ class _PostDetailsState extends State<PostDetails> {
   final post = Get.find<PostController>();
   final listController = ScrollController();
   final GlobalKey commentSectionKey = GlobalKey();
+  PostModel? postData;
 
   @override
   void initState() {
     super.initState();
+    resolvePostData();
+  }
+
+  void resolvePostData() async {
+    if (widget.post != null) {
+      postData = widget.post!;
+      post.addViewCount(postData!.id);
+    } else {
+      await post.addViewCount(widget.postId!);
+      try {
+        postData = post.posts.firstWhere(
+          (element) => element.id == widget.postId,
+        );
+      } catch (e) {
+        customSnackBar("Post not found");
+      }
+      setState(() {});
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.post.category != "service") {
-        post.fetchComments(widget.post.id).then((message) {
+      if (postData!.category != "service") {
+        post.fetchComments(postData!.id).then((message) {
           if (message != "success") {
             customSnackBar(message);
           }
         });
       } else {
-        post.fetchReviews(widget.post.id).then((message) {
+        post.fetchReviews(postData!.id).then((message) {
           if (message != "success") {
             customSnackBar(message);
           }
         });
       }
-      post.addViewCount(widget.post.id);
-      post.getMedia(widget.post.id, type: "owner");
-      post.getMedia(widget.post.id, type: "community");
+      post.getMedia(postData!.id, type: "owner");
+      post.getMedia(postData!.id, type: "community");
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    var isOwner =
-        widget.post.author.id == Get.find<UserController>().userData!.id;
+    if (postData == null) return CustomLoading();
+
     return Scaffold(
       backgroundColor: AppColors.gray[50],
       appBar: CustomAppBar(
         title:
-            "${widget.post.category.substring(0, 1).toUpperCase()}${widget.post.category.substring(1)} Details",
+            "${postData!.category.substring(0, 1).toUpperCase()}${postData!.category.substring(1)} Details",
         trailing: "assets/icons/share.svg",
         trailingAction: () {
-          final deepLink = "https://jurnee.app/post/${widget.post.id}";
+          final deepLink = "https://jurnee.app/post/${postData!.id}";
 
           SharePlus.instance.share(
             ShareParams(
-              text: "Check out ${widget.post.title} on Jurnee:\n$deepLink",
+              text: "Check out ${postData!.title} on Jurnee:\n$deepLink",
               subject: "Jurnee Post",
             ),
           );
@@ -117,16 +141,14 @@ class _PostDetailsState extends State<PostDetails> {
           if (scrollInfo.metrics.pixels >=
                   scrollInfo.metrics.maxScrollExtent - 200 &&
               !post.isFirstLoad.value) {
-            if (widget.post.category != "service") {
-              post.fetchComments(widget.post.id, loadMore: true).then((
-                message,
-              ) {
+            if (postData!.category != "service") {
+              post.fetchComments(postData!.id, loadMore: true).then((message) {
                 if (message != "success") {
                   customSnackBar(message);
                 }
               });
             } else {
-              post.fetchReviews(widget.post.id, loadMore: true).then((message) {
+              post.fetchReviews(postData!.id, loadMore: true).then((message) {
                 if (message != "success") {
                   customSnackBar(message);
                 }
@@ -143,14 +165,14 @@ class _PostDetailsState extends State<PostDetails> {
             bottom: false,
             child: Column(
               children: [
-                PostCover(widget: widget, post: post, context: context),
+                PostCover(post: postData!, context: context),
 
                 Column(
                   spacing: 8,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     PostInformation(
-                      postData: widget.post,
+                      postData: postData!,
                       onSeeAllTap: () {
                         final sectionContext = commentSectionKey.currentContext;
                         if (sectionContext == null) return;
@@ -162,34 +184,34 @@ class _PostDetailsState extends State<PostDetails> {
                         );
                       },
                     ),
-                    if (isOwner && widget.showPostActions) PostEarnings(),
+                    if (widget.showPostActions) PostEarnings(),
                     PostDescription(
-                      postData: widget.post,
+                      postData: postData!,
                       showPostActions: widget.showPostActions,
                       commentSectionKey: commentSectionKey,
                     ),
-                    PostMetaData(postController: post, postData: widget.post),
-                    if (widget.post.category == "event")
-                      AttendingUsers(post: widget.post),
-                    PostMedia(postData: widget.post, postController: post),
+                    PostMetaData(postController: post, postData: postData!),
+                    if (postData!.category == "event")
+                      AttendingUsers(post: postData!),
+                    PostMedia(postData: postData!, postController: post),
 
-                    if (isOwner && widget.showPostActions)
+                    if (widget.showPostActions)
                       OwnerActionButtons(
-                        post: widget.post,
+                        post: postData!,
                         onDeleteTap: () => showPostDeleteSheet(
                           context,
                           postController: post,
-                          postData: widget.post,
+                          postData: postData!,
                         ),
                       ),
 
-                    if (widget.post.category != "service")
+                    if (postData!.category != "service")
                       PostComments(
                         sectionKey: commentSectionKey,
                         postController: post,
-                        postData: widget.post,
+                        postData: postData!,
                       ),
-                    if (widget.post.category == "service")
+                    if (postData!.category == "service")
                       PostReviews(
                         sectionKey: commentSectionKey,
                         postController: post,

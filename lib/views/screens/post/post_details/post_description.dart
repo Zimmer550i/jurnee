@@ -61,6 +61,14 @@ class _PostDescriptionState extends State<PostDescription> {
             ),
           ),
           if (widget.postData.price != null) const SizedBox(height: 32),
+          if (widget.postData.serviceArea != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Text(
+              "Servicing: ${widget.postData.serviceArea!}",
+              style: AppTexts.tsmb,
+            ),
+          ),
           if (widget.postData.price != null)
             Row(
               children: [

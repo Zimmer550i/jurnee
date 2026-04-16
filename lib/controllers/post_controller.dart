@@ -524,10 +524,14 @@ class PostController extends GetxController {
         final post = PostModel.fromJson(body['data']);
         int index = posts.indexWhere((val) => val.id == id);
         if (index == -1) {
-          index = Get.find<UserController>().posts.indexWhere((val) => val.id == id);
+          index = Get.find<UserController>().posts.indexWhere(
+            (val) => val.id == id,
+          );
         }
         if (index != -1) {
           posts[index] = post;
+        }else{
+          posts.add(post);
         }
         posts.refresh();
         // await prefs.setInt(prefsKey, todayKey);
