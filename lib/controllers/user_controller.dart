@@ -14,7 +14,7 @@ class UserController extends GetxController {
   RxList<PostModel> get posts => Get.find<PostController>().posts;
   RxBool isLoading = RxBool(false);
   RxBool isFollowLoading = RxBool(false);
- 
+
   final api = ApiService();
   late SharedPreferences prefs;
 
@@ -146,7 +146,9 @@ class UserController extends GetxController {
         totalPages(meta.totalPage);
 
         final List<dynamic> dataList = body['data'];
-        final newItems = dataList.map((e) => PostModel.fromJson(e)).toList();
+        final newItems = dataList
+            .map((e) => PostModel.fromJson(index == 2 ? e['postId'] : e))
+            .toList();
 
         posts.addAll(newItems);
 

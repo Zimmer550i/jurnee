@@ -47,6 +47,7 @@ class _CommentWidgetState extends State<CommentWidget> {
   File? commentVideo;
   Offset? _lineStart;
   Offset? _lineEnd;
+  late GlobalKey thisComment;
 
   @override
   void initState() {
@@ -66,15 +67,12 @@ class _CommentWidgetState extends State<CommentWidget> {
   }
 
   void _updateConnectionLine() {
-    // if (widget.comment.content == "Bla") {
-    //   print("found culprint");
-    // }
     if (!mounted || widget.comment.parentComment == null) return;
 
     final parentKey = commentKeys[widget.comment.parentComment];
-    final currentKey = commentKeys[widget.comment.id];
+    final currentKey = commentKeys[widget.comment.id] ?? thisComment;
     final parentContext = parentKey?.currentContext;
-    final currentContext = currentKey?.currentContext;
+    final currentContext = currentKey.currentContext;
     if (parentContext == null || currentContext == null) return;
 
     final rootBox = context.findRenderObject() as RenderBox?;
@@ -106,220 +104,243 @@ class _CommentWidgetState extends State<CommentWidget> {
       );
     }
 
+    thisComment = commentKeys[widget.comment.id] ?? GlobalKey();
+
     return Stack(
       children: [
-        Row(
+        Column(
           spacing: 12,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: () {
-                Get.to(() => Profile(userId: widget.comment.user.id));
-              },
-              child: AbsorbPointer(
-                child: ProfilePicture(
-                  key: commentKeys[widget.comment.id],
-                  size: 32,
-                  image: widget.comment.user.image,
+            Row(
+              spacing: 12,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Get.to(() => Profile(userId: widget.comment.user.id));
+                  },
+                  child: AbsorbPointer(
+                    child: ProfilePicture(
+                      key: thisComment ,
+                      size: 32,
+                      image: widget.comment.user.image,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                spacing: 12,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+                Expanded(
+                  child: Column(
                     spacing: 12,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.comment.user.name,
-                        style: AppTexts.tmdb.copyWith(
-                          color: AppColors.gray.shade700,
-                        ),
-                      ),
-                      Text(
-                        Formatter.durationFormatter(
-                          DateTime.now().difference(widget.comment.createdAt),
-                        ),
-                        style: AppTexts.txss.copyWith(
-                          color: AppColors.green.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (widget.comment.content.isNotEmpty)
-                    Text(
-                      widget.comment.content,
-                      style: AppTexts.tmdr.copyWith(
-                        color: AppColors.gray.shade700,
-                      ),
-                    ),
-                  if (widget.comment.image?.isNotEmpty ?? false)
-                    GestureDetector(
-                      onTap: () => Get.to(
-                        () => MediaPlayer(
-                          postData: widget.postData,
-                          mediaList: [widget.comment.image],
-                        ),
-                      ),
-                      child: CustomNetworkedImage(
-                        url: widget.comment.image,
-                        height: 200,
-                      ),
-                    ),
-                  if (widget.comment.video?.isNotEmpty ?? false)
-                    ClipRRect(
-                      borderRadius: BorderRadiusGeometry.circular(12),
-                      child: SizedBox(
-                        height: 200,
-                        child: GestureDetector(
-                          onTap: () =>
-                              Get.to(() => VideoWidget(widget.comment.video)),
-                          child: MediaThumbnail(path: widget.comment.video),
-                        ),
-                      ),
-                    ),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          post.likeToggle(
-                            widget.comment.id,
-                            widget.isReply ? "reply" : "comment",
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            CustomSvg(
-                              asset:
-                                  "assets/icons/${widget.comment.liked == true ? "loved" : "love"}.svg",
-                              size: 16,
+                      Row(
+                        spacing: 12,
+                        children: [
+                          Text(
+                            widget.comment.user.name,
+                            style: AppTexts.tmdb.copyWith(
+                              color: AppColors.gray.shade700,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.comment.like.toString(),
-                              style: AppTexts.tsms.copyWith(
-                                color: AppColors.gray.shade600,
+                          ),
+                          Text(
+                            Formatter.durationFormatter(
+                              DateTime.now().difference(
+                                widget.comment.createdAt,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 24),
-                      // if (!widget.isReply)
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isReplying = !isReplying;
-                          });
-                        },
-                        child: Row(
-                          children: [
-                            CustomSvg(
-                              asset: "assets/icons/message.svg",
-                              size: 16,
-                              color: AppColors.black,
+                            style: AppTexts.txss.copyWith(
+                              color: AppColors.green.shade700,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              "Reply",
-                              style: AppTexts.tsms.copyWith(
-                                color: AppColors.gray.shade600,
+                          ),
+                        ],
+                      ),
+                      if (widget.comment.content.isNotEmpty)
+                        Text(
+                          widget.comment.content,
+                          style: AppTexts.tmdr.copyWith(
+                            color: AppColors.gray.shade700,
+                          ),
+                        ),
+                      if (widget.comment.image?.isNotEmpty ?? false)
+                        GestureDetector(
+                          onTap: () => Get.to(
+                            () => MediaPlayer(
+                              postData: widget.postData,
+                              mediaList: [widget.comment.image],
+                            ),
+                          ),
+                          child: CustomNetworkedImage(
+                            url: widget.comment.image,
+                            height: 200,
+                          ),
+                        ),
+                      if (widget.comment.video?.isNotEmpty ?? false)
+                        ClipRRect(
+                          borderRadius: BorderRadiusGeometry.circular(12),
+                          child: SizedBox(
+                            height: 200,
+                            child: GestureDetector(
+                              onTap: () => Get.to(
+                                () => VideoWidget(widget.comment.video),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (isReplying)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomTextField(
-                            height: 36,
-                            hintText: "Add a reply",
-                            controller: commentController,
-                            trailingWidget: GestureDetector(
-                              onTap: () async {
-                                final file = await ImagePicker().pickMedia();
-                                if (file != null) {
-                                  setState(() {
-                                    final pickedFile = File(file.path);
-                                    if (file.mimeType?.startsWith('video/') ??
-                                        false) {
-                                      commentVideo = pickedFile;
-                                      commentImage = null;
-                                    } else {
-                                      commentImage = pickedFile;
-                                      commentVideo = null;
-                                    }
-                                  });
-                                }
-                              },
-                              child:
-                                  commentImage == null && commentVideo == null
-                                  ? CustomSvg(
-                                      asset: "assets/icons/add_image.svg",
-                                    )
-                                  : ClipRRect(
-                                      borderRadius:
-                                          BorderRadiusGeometry.circular(4),
-                                      child: SizedBox(
-                                        height: 36,
-                                        child: MediaThumbnail(
-                                          path:
-                                              commentImage?.path ??
-                                              commentVideo?.path,
-                                        ),
-                                      ),
-                                    ),
+                              child: MediaThumbnail(path: widget.comment.video),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        post.commentLoading.value == widget.comment.id
-                            ? CustomLoading()
-                            : CustomButton(
-                                onTap: () {
-                                  post
-                                      .createReply(
-                                        widget.comment.postId,
-                                        widget.comment.id,
-                                        commentController.text,
-                                        commentImage,
-                                        commentVideo,
-                                      )
-                                      .then((message) {
-                                        if (message != "success") {
-                                          customSnackBar(message);
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              post.likeToggle(
+                                widget.comment.id,
+                                widget.isReply ? "reply" : "comment",
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                CustomSvg(
+                                  asset:
+                                      "assets/icons/${widget.comment.liked == true ? "loved" : "love"}.svg",
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  widget.comment.like.toString(),
+                                  style: AppTexts.tsms.copyWith(
+                                    color: AppColors.gray.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 24),
+                          // if (!widget.isReply)
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isReplying = !isReplying;
+                              });
+                            },
+                            child: Row(
+                              children: [
+                                CustomSvg(
+                                  asset: "assets/icons/message.svg",
+                                  size: 16,
+                                  color: AppColors.black,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "Reply",
+                                  style: AppTexts.tsms.copyWith(
+                                    color: AppColors.gray.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (isReplying)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomTextField(
+                                height: 36,
+                                hintText: "Add a reply",
+                                controller: commentController,
+                                trailingWidget: GestureDetector(
+                                  onTap: () async {
+                                    final file = await ImagePicker()
+                                        .pickMedia();
+                                    if (file != null) {
+                                      setState(() {
+                                        final pickedFile = File(file.path);
+                                        if (file.mimeType?.startsWith(
+                                              'video/',
+                                            ) ??
+                                            false) {
+                                          commentVideo = pickedFile;
+                                          commentImage = null;
                                         } else {
-                                          setState(() {
-                                            commentController.clear();
-                                            commentImage = null;
-                                            commentVideo = null;
-                                          });
+                                          commentImage = pickedFile;
+                                          commentVideo = null;
                                         }
                                       });
-                                },
-                                text: "Reply",
-                                width: null,
-                                padding: 12,
-                                height: 36,
-                                fontSize: 14,
+                                    }
+                                  },
+                                  child:
+                                      commentImage == null &&
+                                          commentVideo == null
+                                      ? CustomSvg(
+                                          asset: "assets/icons/add_image.svg",
+                                        )
+                                      : ClipRRect(
+                                          borderRadius:
+                                              BorderRadiusGeometry.circular(4),
+                                          child: SizedBox(
+                                            height: 36,
+                                            child: MediaThumbnail(
+                                              path:
+                                                  commentImage?.path ??
+                                                  commentVideo?.path,
+                                            ),
+                                          ),
+                                        ),
+                                ),
                               ),
-                      ],
-                    ),
-                  for (var i in widget.comment.children)
-                    CommentWidget(
-                      comment: i,
-                      isReply: true,
-                      postData: widget.postData,
-                    ),
-                ],
-              ),
+                            ),
+                            const SizedBox(width: 12),
+                            post.commentLoading.value == widget.comment.id
+                                ? CustomLoading()
+                                : CustomButton(
+                                    onTap: () {
+                                      post
+                                          .createReply(
+                                            widget.comment.postId,
+                                            widget.comment.id,
+                                            commentController.text,
+                                            commentImage,
+                                            commentVideo,
+                                          )
+                                          .then((message) {
+                                            if (message != "success") {
+                                              customSnackBar(message);
+                                            } else {
+                                              setState(() {
+                                                commentController.clear();
+                                                commentImage = null;
+                                                commentVideo = null;
+                                              });
+                                            }
+                                          });
+                                    },
+                                    text: "Reply",
+                                    width: null,
+                                    padding: 12,
+                                    height: 36,
+                                    fontSize: 14,
+                                  ),
+                          ],
+                        ),
+                      if (widget.comment.parentComment == null)
+                        for (var i in widget.comment.children)
+                          CommentWidget(
+                            comment: i,
+                            isReply: true,
+                            postData: widget.postData,
+                          ),
+                    ],
+                  ),
+                ),
+              ],
             ),
+          
+            if (widget.comment.parentComment != null)
+              for (var i in widget.comment.children)
+                CommentWidget(
+                  comment: i,
+                  isReply: true,
+                  postData: widget.postData,
+                ),
           ],
         ),
         if (widget.comment.parentComment != null &&

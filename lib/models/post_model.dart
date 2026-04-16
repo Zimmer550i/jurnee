@@ -40,6 +40,7 @@ class PostModel {
   final String? status;
   final bool? boost;
   final List<Author> attenders;
+  bool isAttender;
   bool isSaved;
   int totalSaved;
   final List<Schedule> schedule;
@@ -86,6 +87,7 @@ class PostModel {
     this.status,
     this.boost,
     required this.attenders,
+    this.isAttender = false,
     required this.isSaved,
     required this.totalSaved,
     this.schedule = const [],
@@ -132,6 +134,7 @@ class PostModel {
     String? status,
     bool? boost,
     List<Author>? attenders,
+    bool? isAttender,
     bool? isSaved,
     int? totalSaved,
     List<Schedule>? schedule,
@@ -176,6 +179,7 @@ class PostModel {
     status: status ?? this.status,
     boost: boost ?? this.boost,
     attenders: attenders ?? this.attenders,
+    isAttender: isAttender ?? this.isAttender,
     isSaved: isSaved ?? this.isSaved,
     totalSaved: totalSaved ?? this.totalSaved,
     schedule: schedule ?? this.schedule,
@@ -244,6 +248,7 @@ class PostModel {
     attenders: List<Author>.from(
       json["attenders"].map((x) => Author.fromJson(x)),
     ),
+    isAttender: json["isAttender"] ?? false,
     isSaved: json["isSaved"],
     totalSaved: json["totalSaved"],
     schedule: json["schedule"] == null
@@ -296,6 +301,7 @@ class PostModel {
     "status": status,
     "boost": boost,
     "attenders": List<dynamic>.from(attenders.map((x) => x.toJson())),
+    "isAttender": isAttender,
     "isSaved": isSaved,
     "totalSaved": totalSaved,
     "schedule": List<dynamic>.from(schedule.map((x) => x.toJson())),

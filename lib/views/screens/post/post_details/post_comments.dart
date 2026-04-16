@@ -159,7 +159,9 @@ class _PostCommentsState extends State<PostComments> {
   }
 
   void _assignCommentKeys(CommentModel comment) {
-    commentKeys[comment.id] = GlobalKey();
+    if (comment.parentComment == null) {
+      commentKeys[comment.id] = GlobalKey();
+    }
     for (var child in comment.children) {
       _assignCommentKeys(child);
     }

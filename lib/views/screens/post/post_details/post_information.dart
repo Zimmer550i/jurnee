@@ -58,7 +58,7 @@ class PostInformation extends StatelessWidget {
                           color: AppColors.gray.shade700,
                         ),
                       ),
-                      if (postData.subcategory != 'Missing Person')
+                      if (postData.category != 'alert')
                         Text(
                           postData.subcategory ??
                               Formatter.toPascelCase(postData.category),
@@ -66,14 +66,16 @@ class PostInformation extends StatelessWidget {
                             color: AppColors.gray.shade700,
                           ),
                         ),
-                      if (postData.subcategory == 'Missing Person')
+                      if (postData.category == 'alert')
                         Row(
                           children: [
                             Text(
                               postData.subcategory ??
                                   Formatter.toPascelCase(postData.category),
                               style: AppTexts.txsr.copyWith(
-                                color: AppColors.red,
+                                color: postData.subcategory == 'Missing Person'
+                                    ? AppColors.red
+                                    : AppColors.gray.shade700,
                               ),
                             ),
                             Text(

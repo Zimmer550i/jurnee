@@ -504,6 +504,30 @@ class PostController extends GetxController {
     }
   }
 
+  Future<String> joinEvent(String id) async {
+    isLoading(true);
+    try {
+      final res = await api.post("/post/event/join/$id", {}, authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        for (int index = 0; index < posts.length; index++) {
+          if (posts[index].id == id) {
+            posts[index].isAttender = true;
+            posts.refresh();
+          }
+        }
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    }finally{
+      isLoading(false);
+    }
+  }
+
   Future<String> addViewCount(String id) async {
     try {
       // final prefs = await SharedPreferences.getInstance();
@@ -530,7 +554,7 @@ class PostController extends GetxController {
         }
         if (index != -1) {
           posts[index] = post;
-        }else{
+        } else {
           posts.add(post);
         }
         posts.refresh();
