@@ -1,12 +1,14 @@
 import 'offer_model.dart';
 
-enum MessageType { message, offer }
+enum MessageType { message, offer, media }
 
 class MessageModel {
   final String? id;
   final String? chat;
   final SenderModel? sender;
   final String? message;
+  final String? image;
+  final String? video;
   final OfferModel? offer;
   final MessageType? type;
   final bool? read;
@@ -18,6 +20,8 @@ class MessageModel {
     this.chat,
     this.sender,
     this.message,
+    this.image,
+    this.video,
     this.offer,
     this.type = MessageType.message,
     this.read,
@@ -26,6 +30,7 @@ class MessageModel {
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
+    final rawType = json['type'] as String?;
     return MessageModel(
       id: json['_id'] as String?,
       chat: json['chat'] as String?,
@@ -33,11 +38,15 @@ class MessageModel {
           ? SenderModel.fromJson(json['sender'])
           : null,
       message: json['message'] as String?,
+      image: json['image'] as String?,
+      video: json['video'] as String?,
       offer: json['offer'] != null
           ? OfferModel.fromJson(json['offer'] as Map<String, dynamic>)
           : null,
-      type: (json['type'] as String?) == 'offer'
+      type: rawType == 'offer'
           ? MessageType.offer
+          : rawType == 'media'
+          ? MessageType.media
           : MessageType.message,
       read: json['read'] as bool?,
       createdAt: json['createdAt'] != null
@@ -55,8 +64,14 @@ class MessageModel {
       "chat": chat,
       "sender": sender?.toJson(),
       "message": message,
+      "image": image,
+      "video": video,
       "offer": offer?.toJson(),
-      "type": type == MessageType.offer ? 'offer' : 'message',
+      "type": type == MessageType.offer
+          ? 'offer'
+          : type == MessageType.media
+          ? 'media'
+          : 'message',
       "read": read,
       "createdAt": createdAt?.toIso8601String(),
       "updatedAt": updatedAt?.toIso8601String(),

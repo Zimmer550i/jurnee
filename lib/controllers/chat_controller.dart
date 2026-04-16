@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/offer_model.dart';
@@ -103,8 +104,14 @@ class ChatController extends GetxController {
     required String chatId,
     required String senderId,
     required String message,
+    File? image,
+    File? video,
     bool isOffer = false,
   }) {
+    if (message.trim().isEmpty && image == null && video == null) {
+      return;
+    }
+
     // Check if socket is null or disconnected before attempting to send
     if (socket == null || !socket!.connected) {
       debugPrint(
@@ -116,15 +123,111 @@ class ChatController extends GetxController {
 
     messages.insert(
       0,
-      MessageModel(id: "demo", chat: chatId, message: message),
+      MessageModel(
+        id: "demo",
+        chat: chatId,
+        message: message,
+        image: image?.path,
+        video: video?.path,
+      ),
     );
     messages.refresh();
     var payload = {"chat": chatId, "sender": senderId, "message": message};
+    if (image != null) {
+      payload["image"] = image.path;
+    }
+    if (video != null) {
+      payload["video"] = video.path;
+    }
     if (isOffer) {
       payload.addAll({"offer": message, "type": "offer"});
     }
 
     socket!.emit("send-message", payload);
+  }
+
+  Future<String> sendMedia({
+    required String chatId,
+    required String senderId,
+    File? image,
+    File? video,
+  }) async {
+    final mediaFile = image ?? video;
+    if (mediaFile == null) {
+      return "No media selected";
+    }
+
+    if (image != null && video != null) {
+      return "Please send one media file at a time";
+    }
+
+    if (socket == null || !socket!.connected) {
+      debugPrint(
+        "⚠️ Cannot send media: Socket is not connected or initialized.",
+      );
+      return "Socket is not connected";
+    }
+
+    messages.insert(
+      0,
+      MessageModel(
+        id: "demo",
+        chat: chatId,
+        image: image?.path,
+        video: video?.path,
+      ),
+    );
+    messages.refresh();
+
+    try {
+      final uploadBody = image != null ? {"image": image} : {"video": video!};
+      final uploadRes = await api.post(
+        "/chat/upload",
+        uploadBody,
+        isMultiPart: true,
+        authReq: true,
+      );
+      final uploadJson = jsonDecode(uploadRes.body);
+
+      if (uploadRes.statusCode != 200 && uploadRes.statusCode != 201) {
+        messages.removeWhere((msg) => msg.id == "demo");
+        messages.refresh();
+        return uploadJson["message"] ?? "Failed to upload media";
+      }
+
+      final mediaUrl = _extractMediaUrl(uploadJson);
+      if (mediaUrl == null || mediaUrl.isEmpty) {
+        messages.removeWhere((msg) => msg.id == "demo");
+        messages.refresh();
+        return "Media upload succeeded but media url is missing";
+      }
+
+      final payload = {
+        "chat": chatId,
+        "sender": senderId,
+        "type": "media",
+        if (image != null) "image": mediaUrl,
+        if (video != null) "video": mediaUrl,
+      };
+
+      socket!.emit("send-message", payload);
+      return "success";
+    } catch (e) {
+      messages.removeWhere((msg) => msg.id == "demo");
+      messages.refresh();
+      return e.toString();
+    }
+  }
+
+  String? _extractMediaUrl(Map<String, dynamic> uploadJson) {
+    if (uploadJson["media_url"] is String) {
+      return uploadJson["media_url"] as String;
+    }
+    if (uploadJson["data"] is Map &&
+        uploadJson["data"]["media_url"] is String) {
+      return uploadJson["data"]["media_url"] as String;
+    }
+    return null;
   }
 
   Future<String> createOrGetChat(String id, {String? postTitle}) async {
