@@ -117,7 +117,13 @@ class _PostDetailsState extends State<PostDetails> {
 
   @override
   Widget build(BuildContext context) {
-    if (postData == null) return CustomLoading();
+    if (postData == null) {
+      return Scaffold(
+        backgroundColor: AppColors.gray[50],
+        appBar: CustomAppBar(title: ""),
+        body: Center(child: CustomLoading()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.gray[50],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
-import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -26,7 +25,6 @@ class CreateOffer extends StatefulWidget {
 
 class _CreateOfferState extends State<CreateOffer> {
   final user = Get.find<UserController>();
-  final post = Get.find<PostController>();
   final TextEditingController _serviceDetailsController =
       TextEditingController();
   final TextEditingController _discountController = TextEditingController();
@@ -41,9 +39,13 @@ class _CreateOfferState extends State<CreateOffer> {
   @override
   void initState() {
     super.initState();
-    user.getUserPosts(3, user.userData?.id).then((message) {
-      if (message != "success") {
-        customSnackBar(message);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (user.myServices.isEmpty) {
+        user.getMyServices().then((message) {
+          if (message != "success") {
+            customSnackBar(message);
+          }
+        });
       }
     });
   }
@@ -109,15 +111,15 @@ class _CreateOfferState extends State<CreateOffer> {
               Obx(
                 () => CustomDropDown(
                   title: "Select Service",
-                  isLoading: user.isFirstLoad.value,
+                  isLoading: user.isLoading.value,
                   onChanged: (val) {
                     setState(() {
-                      serviceId = user.posts
+                      serviceId = user.myServices
                           .firstWhere((temp) => temp.title == val)
                           .id;
                     });
                   },
-                  options: [for (var i in user.posts) i.title],
+                  options: [for (var i in user.myServices) i.title],
                 ),
               ),
               CustomTextField(

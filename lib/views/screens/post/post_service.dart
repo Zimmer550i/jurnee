@@ -117,11 +117,12 @@ class _PostServiceState extends State<PostService> {
         "hasTag": hashtagCtrl.text.trim().split(" "),
 
         "schedule": _availabilityKey.currentState?.getSchedule(),
+        if (serviceAreaCtrl.text.isNotEmpty)
+          "serviceArea": serviceAreaCtrl.text,
       },
       if (widget.post == null || _baseKey.currentState!.cover != null)
         "image": _baseKey.currentState?.cover,
       "media": _baseKey.currentState?.images,
-      if (serviceAreaCtrl.text.isNotEmpty) "serviceArea": serviceAreaCtrl.text,
     };
 
     switch (subCategory) {

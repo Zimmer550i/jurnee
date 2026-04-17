@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:jurnee/models/schedule_model.dart';
 
 PostModel postModelFromJson(String str) => PostModel.fromJson(json.decode(str));
@@ -51,7 +52,6 @@ class PostModel {
   final dynamic averageRating;
   final int? reviewsCount;
   final String? couponCode;
-
 
   PostModel({
     required this.id,
@@ -192,78 +192,85 @@ class PostModel {
     couponCode: couponCode ?? this.couponCode,
   );
 
-  factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
-    id: json["_id"],
-    image: json["image"],
-    media: json["media"] == null
-        ? null
-        : List<String>.from(json["media"].map((x) => x)),
-    author: Author.fromJson(json["author"]),
-    title: json["title"],
-    description: json["description"],
-    startDate: json["startDate"] == null
-        ? null
-        : DateTime.parse(json["startDate"]),
-    startTime: json["startTime"] == null
-        ? null
-        // : DateTime.now().copyWith(
-        //     hour: int.parse(json['startTime'].split(":").first),
-        //     minute: int.parse(json['startTime'].split(":").last),
-        //   ),
-        : DateTime.tryParse(json['startTime']),
-    address: json["address"],
-    location: Location.fromJson(json["location"]),
-    hasTag: json["hasTag"] == null
-        ? null
-        : List<String>.from(json["hasTag"].map((x) => x)),
-    views: json["views"],
-    likes: json["likes"],
-    isLiked: json["isLiked"] ?? false,
-    endDate: json["endDate"] != null
-        ? DateTime.tryParse(json["endDate"])
-        : null,
-    price: json["price"]?.toDouble(),
-    category: json["category"],
-    subcategory: json["subcategory"],
-    serviceType: json["serviceType"],
-    serviceArea: json["serviceArea"],
-    missingName: json["missingName"],
-    missingAge: json["missingAge"],
-    clothingDescription: json["clothingDescription"],
-    lastSeenLocation: json["lastSeenLocation"] == null
-        ? null
-        : Location.fromJson(json["lastSeenLocation"]),
-    lastSeenDate: json["lastSeenDate"] == null
-        ? null
-        : DateTime.tryParse(json["lastSeenDate"]),
-    contactInfo: json["contactInfo"],
-    expireLimit: json["expireLimit"],
-    capacity: json["capacity"],
-    amenities: json["amenities"] == null
-        ? null
-        : List<String>.from(json["amenities"].map((x) => x)),
-    licenses: json["licenses"],
-    status: json["status"],
-    boost: json["boost"],
-    attenders: List<Author>.from(
-      json["attenders"].map((x) => Author.fromJson(x)),
-    ),
-    isAttender: json["isAttender"] ?? false,
-    isSaved: json["isSaved"],
-    totalSaved: json["totalSaved"],
-    schedule: json["schedule"] == null
-        ? []
-        : List<Schedule>.from(
-            json["schedule"].map((x) => Schedule.fromJson(x)),
-          ),
-    createdAt: DateTime.parse(json["createdAt"]),
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    distance: json["distance"]?.toDouble(),
-    boostPriority: json["boostPriority"],
-    averageRating: json["averageRating"],
-    reviewsCount: json["reviewsCount"],
-    couponCode: json["couponCode"],
-  );
+  factory PostModel.fromJson(Map<String, dynamic> json) {
+    try {
+      return PostModel(
+        id: json["_id"],
+        image: json["image"],
+        media: json["media"] == null
+            ? null
+            : List<String>.from(json["media"].map((x) => x)),
+        author: Author.fromJson(json["author"]),
+        title: json["title"],
+        description: json["description"],
+        startDate: json["startDate"] == null
+            ? null
+            : DateTime.parse(json["startDate"]),
+        startTime: json["startTime"] == null
+            ? null
+            // : DateTime.now().copyWith(
+            //     hour: int.parse(json['startTime'].split(":").first),
+            //     minute: int.parse(json['startTime'].split(":").last),
+            //   ),
+            : DateTime.tryParse(json['startTime']),
+        address: json["address"],
+        location: Location.fromJson(json["location"]),
+        hasTag: json["hasTag"] == null
+            ? null
+            : List<String>.from(json["hasTag"].map((x) => x)),
+        views: json["views"],
+        likes: json["likes"],
+        isLiked: json["isLiked"] ?? false,
+        endDate: json["endDate"] != null
+            ? DateTime.tryParse(json["endDate"])
+            : null,
+        price: json["price"]?.toDouble(),
+        category: json["category"],
+        subcategory: json["subcategory"],
+        serviceType: json["serviceType"],
+        serviceArea: json["serviceArea"],
+        missingName: json["missingName"],
+        missingAge: json["missingAge"],
+        clothingDescription: json["clothingDescription"],
+        lastSeenLocation: json["lastSeenLocation"] == null
+            ? null
+            : Location.fromJson(json["lastSeenLocation"]),
+        lastSeenDate: json["lastSeenDate"] == null
+            ? null
+            : DateTime.tryParse(json["lastSeenDate"]),
+        contactInfo: json["contactInfo"],
+        expireLimit: json["expireLimit"],
+        capacity: json["capacity"],
+        amenities: json["amenities"] == null
+            ? null
+            : List<String>.from(json["amenities"].map((x) => x)),
+        licenses: json["licenses"],
+        status: json["status"],
+        boost: json["boost"],
+        attenders: List<Author>.from(
+          json["attenders"].map((x) => Author.fromJson(x)),
+        ),
+        isAttender: json["isAttender"] ?? false,
+        isSaved: json["isSaved"],
+        totalSaved: json["totalSaved"],
+        schedule: json["schedule"] == null
+            ? []
+            : List<Schedule>.from(
+                json["schedule"].map((x) => Schedule.fromJson(x)),
+              ),
+        createdAt: DateTime.parse(json["createdAt"]),
+        updatedAt: DateTime.parse(json["updatedAt"]),
+        distance: json["distance"]?.toDouble(),
+        boostPriority: json["boostPriority"],
+        averageRating: json["averageRating"],
+        reviewsCount: json["reviewsCount"],
+        couponCode: json["couponCode"],
+      );
+    } catch (e) {
+      debugPrint("⚠️ ⚠️ ⚠️\nError: $e\nJson: $json\n⚠️ ⚠️ ⚠️");
+      rethrow;
+    }
+  }
 
   Map<String, dynamic> toJson() => {
     "_id": id,

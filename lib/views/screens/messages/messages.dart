@@ -11,6 +11,7 @@ import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/messages/chat.dart';
+import 'package:jurnee/views/screens/profile/profile.dart';
 
 class Messages extends StatefulWidget {
   const Messages({super.key});
@@ -111,7 +112,12 @@ class _MessagesState extends State<Messages> {
         ),
         child: Row(
           children: [
-            ProfilePicture(image: recipent.image, size: 48),
+            GestureDetector(
+              onTap: () => Get.to(() => Profile(userId: recipent.id)),
+              child: AbsorbPointer(
+                child: ProfilePicture(image: recipent.image, size: 48),
+              ),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

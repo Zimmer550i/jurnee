@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/models/pagination_meta.dart';
 import 'package:jurnee/models/post_model.dart';
+import 'package:jurnee/models/service_model.dart';
 import 'package:jurnee/models/user.dart';
 import 'package:jurnee/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +25,7 @@ class UserController extends GetxController {
   RxBool isFirstLoad = true.obs;
   RxBool isMoreLoading = false.obs;
   RxList<Author> usersList = RxList.empty();
+  RxList<MyServiceModel> myServices = RxList.empty();
 
   User? get userData => user.value;
   String? get userImage {
@@ -128,7 +130,6 @@ class UserController extends GetxController {
           "/post/user-post/$id",
           "/post/user-join-event/$id",
           "/save/my-saved-post",
-          "/post/my-service",
         ][index],
         queryParams: {
           "page": currentPage.value.toString(),
@@ -161,6 +162,36 @@ class UserController extends GetxController {
     } finally {
       isFirstLoad(false);
       isMoreLoading(false);
+    }
+  }
+
+  Future<String> getMyServices() async {
+    isLoading(true);
+    try {
+      final res = await api.get("/post/my-service", authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        myServices.clear();
+
+        final List<dynamic> dataList = body['data'];
+        final newItems = dataList
+            .map(
+              (e) =>
+                  MyServiceModel.fromJson(Map<String, dynamic>.from(e as Map)),
+            )
+            .toList();
+
+        myServices.addAll(newItems);
+
+        return "success";
+      } else {
+        return body["message"] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
     }
   }
 

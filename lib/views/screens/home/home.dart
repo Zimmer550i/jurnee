@@ -338,6 +338,7 @@ class _HomeState extends State<Home> {
                       customSnackBar(message);
                     }
                   });
+                  Get.find<UserController>().getMyServices();
                 } else if (val == 2) {
                   Get.find<NotificationController>().fetchNotifications();
                 } else if (val == 3) {

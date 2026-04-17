@@ -12,6 +12,7 @@ import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/utils/formatter.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
+import 'package:jurnee/views/screens/post/post_details/post_details.dart';
 
 class OfferPreview extends StatefulWidget {
   final OfferModel? offer;
@@ -51,11 +52,21 @@ class _OfferPreviewState extends State<OfferPreview> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(offer.service.title, style: AppTexts.dxsb),
-                  Text(
-                    offer.service.subcategory,
-                    style: AppTexts.txsr.copyWith(
-                      color: AppColors.gray.shade700,
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(() => PostDetails(null, postId: offer.service.id));
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(offer.service.title, style: AppTexts.dxsb),
+                        Text(
+                          offer.service.subcategory,
+                          style: AppTexts.txsr.copyWith(
+                            color: AppColors.gray.shade700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 20),

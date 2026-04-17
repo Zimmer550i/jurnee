@@ -149,17 +149,18 @@ class _ChatState extends State<Chat> {
               ),
             ),
             Spacer(),
-            GestureDetector(
-              onTap: () {
-                Get.to(
-                  () => CreateOffer(
-                    chatID: widget.inboxId,
-                    userId: widget.chatMember.id,
-                  ),
-                );
-              },
-              child: CustomSvg(asset: "assets/icons/offer.svg", size: 24),
-            ),
+            if (Get.find<UserController>().myServices.isNotEmpty)
+              GestureDetector(
+                onTap: () {
+                  Get.to(
+                    () => CreateOffer(
+                      chatID: widget.inboxId,
+                      userId: widget.chatMember.id,
+                    ),
+                  );
+                },
+                child: CustomSvg(asset: "assets/icons/offer.svg", size: 24),
+              ),
             const SizedBox(width: 20),
           ],
         ),
