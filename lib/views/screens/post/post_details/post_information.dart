@@ -11,7 +11,16 @@ class PostInformation extends StatelessWidget {
     String? title,
     Widget? trailing,
   }) {
-    final textStyle = AppTexts.tsmm.copyWith(color: AppColors.gray.shade700);
+    final textStyle = AppTexts.tsmr.copyWith(color: AppColors.gray.shade700);
+    final richText = Text.rich(
+      TextSpan(
+        children: [
+          if (title != null)
+            TextSpan(text: '$title: ', style: AppTexts.tsms),
+          TextSpan(text: text, style: textStyle),
+        ],
+      ),
+    );
     return Row(
       spacing: 4,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,9 +34,8 @@ class PostInformation extends StatelessWidget {
               size: 16,
             ),
           ),
-        if (title != null) Text("$title: ", style: AppTexts.tsms),
-        if (trailing == null) Expanded(child: Text(text, style: textStyle)),
-        if (trailing != null) Text(text, style: textStyle),
+        if (trailing == null) Expanded(child: richText),
+        if (trailing != null) richText,
         if (trailing != null) trailing,
       ],
     );
@@ -99,6 +107,15 @@ class PostInformation extends StatelessWidget {
               title: "Last Seen",
               text: DateFormat('MMM dd, yyyy.').format(postData.lastSeenDate!),
             ),
+          if (postData.subcategory == "Missing Person")
+            GestureDetector(
+              onTap: () => Get.to(() => PostLocation(post: postData)),
+              child: _infoRow(
+                assetName: 'location',
+                title: "Missing from",
+                text: postData.address,
+              ),
+            ),
           Obx(
             () => _infoRow(
               assetName: 'message',
@@ -115,14 +132,15 @@ class PostInformation extends StatelessWidget {
               ),
             ),
           ),
-          GestureDetector(
-            onTap: () => Get.to(() => PostLocation(post: postData)),
-            child: _infoRow(
-              assetName: 'location',
-              text:
-                  '${Get.find<PostController>().getDistance(postData.location.coordinates[0], postData.location.coordinates[1])} • ${postData.address}',
+          if (postData.subcategory != "Missing Person")
+            GestureDetector(
+              onTap: () => Get.to(() => PostLocation(post: postData)),
+              child: _infoRow(
+                assetName: 'location',
+                text:
+                    '${Get.find<PostController>().getDistance(postData.location.coordinates[0], postData.location.coordinates[1])} • ${postData.address}',
+              ),
             ),
-          ),
           // if (postData.lastSeenLocation != null)
           //   _infoRow(
           //     assetName: 'location',

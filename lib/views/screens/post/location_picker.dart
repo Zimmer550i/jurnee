@@ -38,16 +38,16 @@ class LocationPicker extends StatelessWidget {
             children: mapCtrl.predictions.map((prediction) {
               return GestureDetector(
                 onTap: () {
-                  mapCtrl.selectPrediction(
-                    prediction,
-                    controller,
-                  );
+                  mapCtrl.selectPrediction(prediction, controller);
                   FocusScope.of(context).unfocus();
                 },
                 child: Container(
                   width: double.infinity,
                   margin: const EdgeInsets.only(bottom: 8), // specific spacing
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),

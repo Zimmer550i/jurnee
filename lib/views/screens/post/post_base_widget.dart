@@ -10,7 +10,8 @@ import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/screens/post/location_picker.dart';
 
 class PostBaseWidget extends StatefulWidget {
-  const PostBaseWidget({super.key});
+  final bool hasLocation;
+  const PostBaseWidget({super.key, this.hasLocation = true});
 
   @override
   State<PostBaseWidget> createState() => PostBaseWidgetState();
@@ -151,8 +152,12 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
           hintText: "Enter description",
           lines: 5,
         ),
-        const SizedBox(height: 16),
-        LocationPicker(key: locationKey, controller: locationCtrl),
+        // const SizedBox(height: 16),
+        if (widget.hasLocation)
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: LocationPicker(key: locationKey, controller: locationCtrl),
+          ),
         const SizedBox(height: 16),
       ],
     );

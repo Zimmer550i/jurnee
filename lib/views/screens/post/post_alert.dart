@@ -70,6 +70,7 @@ class _PostAlertState extends State<PostAlert> {
       ageCtrl.text = widget.post!.missingAge?.toString() ?? "";
       clothCtrl.text = widget.post!.clothingDescription ?? "";
       date = widget.post!.lastSeenDate;
+      locationCtrl.text = widget.post!.address;
     }
   }
 
@@ -97,7 +98,9 @@ class _PostAlertState extends State<PostAlert> {
         "description": _baseKey.currentState?.descriptionCtrl.text.trim(),
         "category": "alert",
         "subcategory": category,
-        "address": _baseKey.currentState?.locationCtrl.text.trim(),
+        "address": category == "Missing Person"
+            ? locationCtrl.text.trim()
+            : _baseKey.currentState?.locationCtrl.text.trim(),
         "location": {
           "type": "Point",
           "coordinates": [pos['lng'], pos['lat']],
@@ -156,7 +159,9 @@ class _PostAlertState extends State<PostAlert> {
   bool isValid() {
     final title = _baseKey.currentState?.titleCtrl.text.trim();
     final description = _baseKey.currentState?.descriptionCtrl.text.trim();
-    final address = _baseKey.currentState?.locationCtrl.text.trim();
+    final address = category == "Missing Person"
+        ? locationCtrl.text.trim()
+        : _baseKey.currentState?.locationCtrl.text.trim();
 
     if (title == null || title.isEmpty) {
       customSnackBar("Title is required");
@@ -197,7 +202,10 @@ class _PostAlertState extends State<PostAlert> {
         child: SafeArea(
           child: Column(
             children: [
-              PostBaseWidget(key: _baseKey),
+              PostBaseWidget(
+                key: _baseKey,
+                hasLocation: category != "Missing Person",
+              ),
               CustomDropDown(
                 title: "Category",
                 hintText: "Choose alert category",
