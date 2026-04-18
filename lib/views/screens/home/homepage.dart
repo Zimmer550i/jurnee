@@ -7,7 +7,6 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_list_handler.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
-import 'package:jurnee/views/base/banner_ad_widget.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/native_ad_widget.dart';
 import 'package:jurnee/views/base/post_card.dart';
@@ -156,8 +155,10 @@ class HomepageState extends State<Homepage> {
                                   child: PostCard(post.posts.elementAt(i)),
                                 ),
 
-                                if (i != 1 && i % 4 == 0) NativeAdWidget(),
-                                if (i != 1 && i % 4 == 0) BannerAdWidget(),
+                                if (i != 1 && i % 4 == 0)
+                                  NativeAdListItem(
+                                    key: ValueKey('native_ad_$i'),
+                                  ),
                               ],
                               if (post.isMoreLoading.value) CustomLoading(),
                               if (!post.isMoreLoading.value)

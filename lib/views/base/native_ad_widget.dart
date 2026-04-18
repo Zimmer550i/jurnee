@@ -1,121 +1,70 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:jurnee/utils/app_colors.dart';
+import 'package:jurnee/controllers/ad_controller.dart';
+import 'package:jurnee/services/native_ad_load_coordinator.dart';
 
-class NativeAdWidget extends StatefulWidget {
-  const NativeAdWidget({super.key});
+/// One in-feed native ad. Each instance owns its own [NativeAd]; loads are staggered by [NativeAdLoadCoordinator].
+class NativeAdListItem extends StatefulWidget {
+  const NativeAdListItem({super.key});
 
   @override
-  State<NativeAdWidget> createState() => _NativeAdWidgetState();
+  State<NativeAdListItem> createState() => _NativeAdListItemState();
 }
 
-class _NativeAdWidgetState extends State<NativeAdWidget> {
-  final String androidAdUnit = "ca-app-pub-6145393247747170/4449341154";
-  final String iosAdUnit = "ca-app-pub-6145393247747170/8638887669";
-
+class _NativeAdListItemState extends State<NativeAdListItem> {
   NativeAd? _nativeAd;
-  bool _nativeAdLoaded = false;
-  String? _adError;
-  String get adUnitId => Platform.isAndroid ? androidAdUnit : iosAdUnit;
+  bool _loaded = false;
 
   @override
   void initState() {
     super.initState();
-    loadAd();
+    _load();
   }
 
-  loadAd() {
-    debugPrint('NativeAd: initiated | adUnitId=$adUnitId');
-    _nativeAd = NativeAd(
-      adUnitId: adUnitId,
-      request: const AdRequest(),
-      nativeTemplateStyle: NativeTemplateStyle(
-        templateType: TemplateType.medium,
-        mainBackgroundColor: AppColors.scaffoldBG,
-        cornerRadius: 6.0,
-        callToActionTextStyle: NativeTemplateTextStyle(
-          textColor: AppColors.gray.shade900,
-          backgroundColor: AppColors.green.shade600,
-          style: NativeTemplateFontStyle.monospace,
-          size: 16.0,
+  Future<void> _load() async {
+    final ads = Get.find<AdController>();
+    await NativeAdLoadCoordinator.instance.scheduleLoad(() {
+      if (!mounted) return;
+      _nativeAd = NativeAd(
+        adUnitId: ads.adUnitId,
+        request: ads.adRequest,
+        nativeTemplateStyle: ads.nativeTemplateStyle,
+        listener: NativeAdListener(
+          onAdLoaded: (ad) {
+            if (mounted) {
+              setState(() => _loaded = true);
+            }
+          },
+          onAdFailedToLoad: (ad, error) {
+            ad.dispose();
+            if (mounted) {
+              setState(() {
+                _nativeAd = null;
+                _loaded = false;
+              });
+            }
+          },
         ),
-        primaryTextStyle: NativeTemplateTextStyle(
-          textColor: AppColors.gray.shade900,
-          style: NativeTemplateFontStyle.bold,
-          size: 16.0,
-        ),
-        secondaryTextStyle: NativeTemplateTextStyle(
-          textColor: AppColors.gray.shade700,
-          style: NativeTemplateFontStyle.normal,
-          size: 14.0,
-        ),
-        tertiaryTextStyle: NativeTemplateTextStyle(
-          textColor: AppColors.gray.shade700,
-          style: NativeTemplateFontStyle.italic,
-          size: 14.0,
-        ),
-      ),
-      listener: NativeAdListener(
-        onAdLoaded: (ad) {
-          debugPrint('NativeAd: loaded successfully');
-          setState(() {
-            _nativeAdLoaded = true;
-            _adError = null;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          debugPrint('NativeAd: failed to load | error=${error.message}');
-          setState(() {
-            _adError = error.message;
-          });
-          ad.dispose();
-        },
-      ),
-    );
-
-    _nativeAd!.load();
+      );
+      _nativeAd!.load();
+    });
   }
 
   @override
   void dispose() {
-    debugPrint('NativeAd: disposed');
     _nativeAd?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 400),
-      switchInCurve: Curves.easeInOut,
-      switchOutCurve: Curves.easeInOut,
-      transitionBuilder: (Widget child, Animation<double> animation) {
-        return SizeTransition(
-          sizeFactor: animation,
-          axisAlignment: -1.0,
-          child: FadeTransition(opacity: animation, child: child),
-        );
-      },
-      child: _nativeAdLoaded
-          ? AspectRatio(
-              key: const ValueKey('ad_loaded'),
-              aspectRatio: 1,
-              child: AdWidget(ad: _nativeAd!),
-            )
-          : _adError != null
-          ? Center(
-              child: Column(
-                children: [
-                  Text(
-                    _adError.toString(),
-                    style: TextStyle(color: AppColors.red),
-                  ),
-                  const SizedBox(height: 12),
-                ],
-              ),
-            )
-          : const SizedBox(key: ValueKey('ad_empty')),
+    if (!_loaded || _nativeAd == null) {
+      return const SizedBox.shrink();
+    }
+    return AspectRatio(
+      aspectRatio: 1,
+      child: AdWidget(ad: _nativeAd!),
     );
   }
 }

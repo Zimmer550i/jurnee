@@ -1,39 +1,44 @@
 import 'dart:io';
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:jurnee/utils/app_colors.dart';
 
+/// Central place for native ad unit IDs, [AdRequest], and [NativeTemplateStyle] used by feed slots.
 class AdController extends GetxController {
-  final RxBool isLoaded = false.obs;
-  final RxBool isLoading = false.obs;
-  final RxString errorMessage = ''.obs;
-  NativeAd? _nativeAd;
-  final adUnitId = Platform.isAndroid
-      ? 'ca-app-pub-6145393247747170/4449341154'
-      : 'ca-app-pub-6145393247747170/8638887669';
+  /// Google sample native IDs (debug/profile, or when [forceTestAdUnits] is true).
+  static const String _androidTestNative = 'ca-app-pub-3940256099942544/2247696110';
+  static const String _iosTestNative = 'ca-app-pub-3940256099942544/3986624511';
 
-  AdController() {
-    loadAd();
+  /// Production native IDs from AdMob.
+  static const String _androidProdNative = 'ca-app-pub-6145393247747170/4449341154';
+  static const String _iosProdNative = 'ca-app-pub-6145393247747170/8638887669';
+
+  /// Set true to always use sample ad units (e.g. store review). Release builds use production IDs unless this is set.
+  bool forceTestAdUnits = true;
+
+  bool get _shouldUseTestUnits => forceTestAdUnits || !kReleaseMode;
+
+  /// Resolves the correct native ad unit for the current platform and build.
+  String get nativeAdUnitId {
+    if (_shouldUseTestUnits) {
+      return Platform.isAndroid ? _androidTestNative : _iosTestNative;
+    }
+    return Platform.isAndroid ? _androidProdNative : _iosProdNative;
   }
 
-  /// Load Native Ad
-  void loadAd() {
-    if (isLoading.value) return;
+  /// Same as [nativeAdUnitId]; kept for short call sites.
+  String get adUnitId => nativeAdUnitId;
 
-    isLoading.value = true;
-    errorMessage.value = '';
+  AdRequest get adRequest => const AdRequest();
 
-    _nativeAd = NativeAd(
-      adUnitId: adUnitId,
-      request: const AdRequest(),
-      nativeTemplateStyle: NativeTemplateStyle(
+  NativeTemplateStyle get nativeTemplateStyle => NativeTemplateStyle(
         templateType: TemplateType.medium,
         mainBackgroundColor: AppColors.scaffoldBG,
-        cornerRadius: 10.0,
+        cornerRadius: 12.0,
         callToActionTextStyle: NativeTemplateTextStyle(
-          textColor: AppColors.gray.shade900,
+          textColor: AppColors.white,
           backgroundColor: AppColors.green.shade600,
           style: NativeTemplateFontStyle.monospace,
           size: 16.0,
@@ -41,61 +46,17 @@ class AdController extends GetxController {
         primaryTextStyle: NativeTemplateTextStyle(
           textColor: AppColors.gray.shade900,
           style: NativeTemplateFontStyle.bold,
-          size: 16.0,
+          size: 18.0,
         ),
         secondaryTextStyle: NativeTemplateTextStyle(
-          textColor: Colors.green,
-          backgroundColor: Colors.black,
-          style: NativeTemplateFontStyle.bold,
-          size: 16.0,
+          textColor: AppColors.gray.shade700,
+          style: NativeTemplateFontStyle.italic,
+          size: 14.0,
         ),
         tertiaryTextStyle: NativeTemplateTextStyle(
-          textColor: Colors.brown,
-          backgroundColor: Colors.amber,
+          textColor: AppColors.gray.shade700,
           style: NativeTemplateFontStyle.normal,
           size: 16.0,
         ),
-      ),
-      listener: NativeAdListener(
-        onAdLoaded: (ad) {
-          isLoaded.value = true;
-          isLoading.value = false;
-        },
-        onAdFailedToLoad: (ad, error) {
-          errorMessage.value = error.message;
-          isLoaded.value = false;
-          isLoading.value = false;
-          ad.dispose();
-        },
-      ),
-    );
-
-    _nativeAd!.load();
-  }
-
-  List<int> generateAdIndexes(int totalPosts) {
-    final random = Random();
-    final List<int> indexes = [];
-    int currentIndex = random.nextInt(3) + 2;
-
-    while (currentIndex < totalPosts) {
-      indexes.add(currentIndex);
-      currentIndex += random.nextInt(3) + 2;
-    }
-
-    return indexes;
-  }
-
-  /// Optional: reload ad
-  void reloadAd() {
-    _nativeAd?.dispose();
-    isLoaded.value = false;
-    loadAd();
-  }
-
-  @override
-  void onClose() {
-    _nativeAd?.dispose();
-    super.onClose();
-  }
+      );
 }

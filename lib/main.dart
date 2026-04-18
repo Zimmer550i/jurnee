@@ -15,10 +15,18 @@ import 'controllers/theme_controller.dart';
 import 'helpers/di.dart' as di;
 import 'helpers/route.dart';
 
+bool _mobileAdsInitialized = false;
+
+Future<void> _ensureMobileAdsInitialized() async {
+  if (_mobileAdsInitialized) return;
+  await MobileAds.instance.initialize();
+  _mobileAdsInitialized = true;
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await MobileAds.instance.initialize();
+  await _ensureMobileAdsInitialized();
   // await MobileAds.instance.updateRequestConfiguration(
   //   RequestConfiguration(testDeviceIds: ['5d5be013ce0959eae5547111446cf6f6']),
   // );
