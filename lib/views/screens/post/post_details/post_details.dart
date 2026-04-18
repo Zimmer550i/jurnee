@@ -9,6 +9,7 @@ import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/comment_model.dart';
+import 'package:jurnee/models/moment_model.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -110,8 +111,7 @@ class _PostDetailsState extends State<PostDetails> {
           }
         });
       }
-      post.getMedia(postData!.id, type: "owner");
-      post.getMedia(postData!.id, type: "community");
+      post.getMedia(postData!.id);
     });
   }
 

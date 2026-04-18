@@ -37,12 +37,7 @@ class _PostCoverState extends State<PostCover> {
                     Get.to(
                       () => MediaPlayer(
                         postData: widget.post,
-                        preferedStart: i,
-                        mediaList: [
-                          widget.post.image,
-                          ...widget.post.media ?? [],
-                          ...Get.find<PostController>().mediaListCommunity,
-                        ],
+                        initialUrl: i!,
                       ),
                       transition: Transition.noTransition,
                     );

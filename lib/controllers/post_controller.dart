@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/comment_model.dart';
 import 'package:jurnee/models/pagination_meta.dart';
+import 'package:jurnee/models/moment_model.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/models/reivew_model.dart';
 import 'package:jurnee/services/api_service.dart';
@@ -19,8 +20,7 @@ class PostController extends GetxController {
   RxList<PostModel> posts = RxList.empty();
   RxList<CommentModel> comments = RxList.empty();
   RxList<ReviewModel> reviews = RxList.empty();
-  RxList<String> mediaListOwner = RxList.empty();
-  RxList<String> mediaListCommunity = RxList.empty();
+  RxList<MomentModel> mediaList = RxList.empty();
   Rxn<Position> userLocation = Rxn();
   RxBool isLoading = RxBool(false);
   RxBool mediaLoading = RxBool(false);
@@ -620,25 +620,19 @@ class PostController extends GetxController {
     }
   }
 
-  Future<String> getMedia(String id, {String type = "owner"}) async {
+  Future<String> getMedia(String id) async {
     mediaLoading(true);
     try {
-      final res = await api.get("/post/moment/$id/$type", authReq: true);
+      final res = await api.get("/post/moment/$id/all", authReq: true);
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         final data = body['data'];
-
-        if (type == "owner") {
-          mediaListOwner.clear();
-          for (var i in data['media']) {
-            mediaListOwner.add(i);
-          }
-        } else {
-          mediaListCommunity.clear();
-          for (var i in data['media']) {
-            mediaListCommunity.add(i);
-          }
+        mediaList.clear();
+        for (var i in data['mediaSource'] as List<dynamic>? ?? []) {
+          mediaList.add(
+            MomentModel.fromJson(Map<String, dynamic>.from(i as Map)),
+          );
         }
 
         return "success";

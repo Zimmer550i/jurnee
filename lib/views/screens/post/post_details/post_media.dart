@@ -44,18 +44,18 @@ class _PostMediaState extends State<PostMedia> {
             duration: Duration(milliseconds: 200),
             alignment: Alignment.topLeft,
             child: Obx(() {
-              final mediaCollection = [
-                [
-                  widget.postData.image,
-                  ...widget.postController.mediaListOwner,
-                  ...widget.postController.mediaListCommunity,
-                ],
-                [
-                  widget.postData.image,
-                  ...widget.postController.mediaListOwner,
-                ],
-                [...widget.postController.mediaListCommunity],
-              ][momentsIndex];
+              final moments = widget.postController.mediaList;
+              final momentSlice = switch (momentsIndex) {
+                0 => moments.toList(),
+                1 => moments
+                    .where((m) => m.source == MomentSource.owner)
+                    .toList(),
+                2 => moments
+                    .where((m) => m.source == MomentSource.community)
+                    .toList(),
+                _ => moments.toList(),
+              };
+              final mediaCollection = momentSlice.map((m) => m.url).toList();
 
               if (mediaCollection.isEmpty) {
                 return noData('No Media Yet');
@@ -80,8 +80,7 @@ class _PostMediaState extends State<PostMedia> {
                           Get.to(
                             () => MediaPlayer(
                               postData: widget.postData,
-                              preferedStart: mediaCollection[i],
-                              mediaList: [...mediaCollection],
+                              initialUrl: mediaCollection[i],
                             ),
                           );
                         },

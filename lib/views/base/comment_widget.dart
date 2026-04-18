@@ -165,7 +165,8 @@ class _CommentWidgetState extends State<CommentWidget> {
                           onTap: () => Get.to(
                             () => MediaPlayer(
                               postData: widget.postData,
-                              mediaList: [widget.comment.image],
+                              initialUrl: widget.comment.image!,
+                              staticUrls: [widget.comment.image!],
                             ),
                           ),
                           child: CustomNetworkedImage(

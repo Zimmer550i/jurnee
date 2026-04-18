@@ -110,7 +110,6 @@ class _PostCommentsState extends State<PostComments> {
                                   } else {
                                     widget.postController.getMedia(
                                       widget.postData.id,
-                                      type: 'community',
                                     );
                                     setState(() {
                                       commentController.clear();
