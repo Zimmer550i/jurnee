@@ -139,6 +139,7 @@ class _PostAlertState extends State<PostAlert> {
     }
 
     if (message == "success") {
+      Get.find<PostController>().clearFilters();
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
         Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));

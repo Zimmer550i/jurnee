@@ -90,6 +90,18 @@ class PostController extends GetxController {
     return cleaned;
   }
 
+  void clearFilters() {
+    customLocation.value = null;
+    fromDate.value = null;
+    toDate.value = null;
+    distance.value = null;
+    minPrice.value = null;
+    maxPrice.value = null;
+    search.value = null;
+    highlyRated.value = false;
+    categoryList.clear();
+  }
+
   Future<String> fetchPosts({bool loadMore = false, String? category}) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 

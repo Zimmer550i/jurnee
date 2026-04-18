@@ -364,15 +364,7 @@ class _SearchWidgetState extends State<SearchWidget> {
               Expanded(
                 child: CustomButton(
                   onTap: () {
-                    post.customLocation.value = null;
-                    post.fromDate.value = null;
-                    post.toDate.value = null;
-                    post.distance.value = null;
-                    post.maxPrice.value = null;
-                    post.minPrice.value = null;
-                    post.search.value = null;
-                    post.highlyRated.value = false;
-                    post.categoryList.clear();
+                    post.clearFilters();
                     homeKey.currentState?.setState(() {
                       homeKey.currentState?.searchEnabled = false;
                     });

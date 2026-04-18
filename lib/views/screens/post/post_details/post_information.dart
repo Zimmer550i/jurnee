@@ -123,6 +123,12 @@ class PostInformation extends StatelessWidget {
                   '${Get.find<PostController>().getDistance(postData.location.coordinates[0], postData.location.coordinates[1])} • ${postData.address}',
             ),
           ),
+          // if (postData.lastSeenLocation != null)
+          //   _infoRow(
+          //     assetName: 'location',
+          //     text:
+          //         'Missing from: • ${postData.address}',
+          //   ),
           if (postData.startDate != null || postData.schedule.isNotEmpty)
             _infoRow(assetName: 'calendar', text: _dateOrScheduleText()),
           if (postData.serviceType != null)

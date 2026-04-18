@@ -307,6 +307,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                                               customSnackBar(message);
                                             } else {
                                               setState(() {
+                                                isReplying = false;
                                                 commentController.clear();
                                                 commentImage = null;
                                                 commentVideo = null;

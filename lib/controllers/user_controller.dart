@@ -7,6 +7,7 @@ import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/models/service_model.dart';
 import 'package:jurnee/models/user.dart';
 import 'package:jurnee/services/api_service.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserController extends GetxController {
@@ -147,11 +148,33 @@ class UserController extends GetxController {
         totalPages(meta.totalPage);
 
         final List<dynamic> dataList = body['data'];
-        final newItems = dataList
-            .map((e) => PostModel.fromJson(index == 2 ? e['postId'] : e))
-            .toList();
+
+        final newItems = <PostModel>[];
+        int errorCount = 0;
+        for (var i in dataList) {
+          if (index == 2) {
+            if (i['postId'] == null) continue;
+            try {
+              newItems.add(PostModel.fromJson(i['postId']));
+            } catch (e) {
+              errorCount++;
+              continue;
+            }
+          } else {
+            try {
+              newItems.add(PostModel.fromJson(i));
+            } catch (e) {
+              errorCount++;
+              continue;
+            }
+          }
+        }
 
         posts.addAll(newItems);
+
+        if (errorCount > 0) {
+          customSnackBar("Couldn't load $errorCount posts.");
+        }
 
         return "success";
       } else {

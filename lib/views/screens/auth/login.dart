@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
@@ -7,11 +8,13 @@ import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_button.dart';
+import 'package:jurnee/views/base/custom_checkbox.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/screens/auth/forgot_password.dart';
 import 'package:jurnee/views/screens/auth/register.dart';
 import 'package:jurnee/views/screens/home/home.dart';
+import 'package:jurnee/views/screens/profile/app_info.dart';
 import 'package:jurnee/views/screens/profile/edit_profile.dart';
 
 class Login extends StatefulWidget {
@@ -25,7 +28,7 @@ class _LoginState extends State<Login> {
   final emailCtrl = TextEditingController(text: "alphabytes@gmail.com");
   final passCtrl = TextEditingController(text: "12345678");
 
-  bool agreedTerms = true;
+  bool agreedTerms = false;
 
   @override
   void initState() {
@@ -131,67 +134,67 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Row(
-                //   children: [
-                //     CustomCheckBox(
-                //       value: agreedTerms,
-                //       size: 24,
-                //       activeColor: AppColors.green.shade600,
-                //       inactiveColor: Color(0xffe6e6e6),
-                //       onChanged: (val) {
-                //         setState(() {
-                //           agreedTerms = val;
-                //         });
-                //       },
-                //     ),
-                //     const SizedBox(width: 12),
-                //     Expanded(
-                //       child: RichText(
-                //         text: TextSpan(
-                //           text: "I've read and agree with the ",
-                //           style: AppTexts.txsr.copyWith(
-                //             color: Color(0xff808080),
-                //           ),
-                //           children: [
-                //             TextSpan(
-                //               text: "Terms and Conditions",
-                //               style: AppTexts.txsb.copyWith(
-                //                 color: AppColors.green.shade600,
-                //               ),
-                //               recognizer: TapGestureRecognizer()
-                //                 ..onTap = () {
-                //                   Get.to(
-                //                     () => AppInfo(title: "Terms of Services"),
-                //                   );
-                //                 },
-                //             ),
-                //             TextSpan(text: " and the "),
-                //             TextSpan(
-                //               text: "Privacy Policy",
-                //               style: AppTexts.txsb.copyWith(
-                //                 color: AppColors.green.shade600,
-                //               ),
-                //               recognizer: TapGestureRecognizer()
-                //                 ..onTap = () {
-                //                   Get.to(
-                //                     () => AppInfo(title: "Privacy Policy"),
-                //                   );
-                //                 },
-                //             ),
-                //             TextSpan(text: "."),
-                //           ],
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
+                Row(
+                  children: [
+                    CustomCheckBox(
+                      value: agreedTerms,
+                      size: 24,
+                      activeColor: AppColors.green.shade600,
+                      inactiveColor: Color(0xffe6e6e6),
+                      onChanged: (val) {
+                        setState(() {
+                          agreedTerms = val;
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          text: "I've read and agree with the ",
+                          style: AppTexts.txsr.copyWith(
+                            color: Color(0xff808080),
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "Terms and Conditions",
+                              style: AppTexts.txsb.copyWith(
+                                color: AppColors.green.shade600,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Get.to(
+                                    () => AppInfo(title: "Terms of Services"),
+                                  );
+                                },
+                            ),
+                            TextSpan(text: " and the "),
+                            TextSpan(
+                              text: "Privacy Policy",
+                              style: AppTexts.txsb.copyWith(
+                                color: AppColors.green.shade600,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Get.to(
+                                    () => AppInfo(title: "Privacy Policy"),
+                                  );
+                                },
+                            ),
+                            TextSpan(text: "."),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 24),
                 Obx(() {
                   return CustomButton(
                     onTap: onSubmit,
                     isLoading: Get.find<AuthController>().isLoading.value,
                     text: "Login",
-                    isDisabled: !agreedTerms,
+                    // isDisabled: !agreedTerms,
                   );
                 }),
                 const SizedBox(height: 16),

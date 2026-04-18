@@ -12,12 +12,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MapsController extends GetxController {
   var predictions = <PlacePrediction>[].obs;
   Rxn<PlacePrediction> selected = Rxn();
-  var query = ''.obs; 
+  var query = ''.obs;
   var isLoading = false.obs;
 
   String? _sessionToken;
   final String _apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
-  final int cacheDays = 3; 
+  final int cacheDays = 3;
 
   // Count
   int hit = 0;
