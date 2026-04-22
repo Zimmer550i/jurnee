@@ -310,6 +310,7 @@ class PostController extends GetxController {
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         comments.insert(0, CommentModel.fromJson(body['data']));
+        commentReviewCount.value++;
 
         return "success";
       } else {

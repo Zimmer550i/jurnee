@@ -1,4 +1,5 @@
 import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/models/moment_model.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -14,6 +15,7 @@ import 'package:share_plus/share_plus.dart';
 class CustomFlickPortraitControls extends StatelessWidget {
   final bool hasBackButton;
   final PostModel? postData;
+  final MomentModel? moment;
   const CustomFlickPortraitControls({
     super.key,
     this.iconSize = 20,
@@ -21,6 +23,7 @@ class CustomFlickPortraitControls extends StatelessWidget {
     this.progressBarSettings,
     this.hasBackButton = true,
     required this.postData,
+    this.moment,
   });
 
   /// Icon size.
@@ -171,47 +174,58 @@ class CustomFlickPortraitControls extends StatelessWidget {
                             Row(
                               children: [
                                 ProfilePicture(
-                                  image: postData!.author.image,
+                                  image: moment?.userImage.isNotEmpty == true
+                                      ? moment!.userImage
+                                      : postData!.author.image,
                                   size: 36,
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  postData!.author.name,
+                                  moment?.userName.isNotEmpty == true
+                                      ? moment!.userName
+                                      : postData!.author.name,
                                   style: AppTexts.tmdm.copyWith(
                                     color: AppColors.gray[25],
                                   ),
                                 ),
                                 Spacer(),
-                                CustomSvg(
-                                  size: 16,
-                                  asset: "assets/icons/view.svg",
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  postData!.views.toString(),
-                                  style: AppTexts.tsms.copyWith(
+                                if (moment == null) ...[
+                                  CustomSvg(
+                                    size: 16,
+                                    asset: "assets/icons/view.svg",
                                     color: Colors.white,
                                   ),
-                                ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    postData!.views.toString(),
+                                    style: AppTexts.tsms.copyWith(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                                 const SizedBox(width: 12),
                                 GestureDetector(
-                                  onTap: () {
-                                    Get.find<PostController>()
-                                        .likeToggle(postData!.id, "post")
-                                        .then((message) {});
-                                  },
+                                  onTap: moment == null
+                                      ? () {
+                                          Get.find<PostController>()
+                                              .likeToggle(postData!.id, "post")
+                                              .then((message) {});
+                                        }
+                                      : null,
                                   child: Row(
                                     children: [
                                       CustomSvg(
                                         size: 16,
-                                        asset:
-                                            "assets/icons/${postData!.isSaved ? "loved" : "love"}.svg",
+                                        asset: moment == null
+                                            ? "assets/icons/${postData!.isSaved ? "loved" : "love"}.svg"
+                                            : "assets/icons/love.svg",
                                         color: Colors.white,
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        postData!.likes.toString(),
+                                        moment == null
+                                            ? postData!.likes.toString()
+                                            : moment!.like.toString(),
                                         style: AppTexts.tsms.copyWith(
                                           color: Colors.white,
                                         ),

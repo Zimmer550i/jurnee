@@ -1,11 +1,7 @@
 part of 'post_details.dart';
 
 class PostCover extends StatefulWidget {
-  const PostCover({
-    super.key,
-    required this.post,
-    required this.context,
-  });
+  const PostCover({super.key, required this.post, required this.context});
   final PostModel post;
   final BuildContext context;
 
@@ -29,16 +25,12 @@ class _PostCoverState extends State<PostCover> {
             children: [
               for (var i in [
                 widget.post.image,
-                if (widget.post.media != null)
-                  ...widget.post.media!,
+                if (widget.post.media != null) ...widget.post.media!,
               ])
                 GestureDetector(
                   onTap: () {
                     Get.to(
-                      () => MediaPlayer(
-                        postData: widget.post,
-                        initialUrl: i!,
-                      ),
+                      () => MediaPlayer(postData: widget.post, initialUrl: i!),
                       transition: Transition.noTransition,
                     );
                   },

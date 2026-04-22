@@ -1,4 +1,5 @@
 import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/models/moment_model.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -13,10 +14,17 @@ import 'package:share_plus/share_plus.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoWidget extends StatefulWidget {
-  final String? url;
+  final String initialUrl;
   final VideoPlayerController? controller;
   final PostModel? postData;
-  const VideoWidget(this.url, {super.key, this.controller, this.postData});
+  final MomentModel? moment;
+  const VideoWidget({
+    super.key,
+    required this.initialUrl,
+    this.controller,
+    this.postData,
+    this.moment,
+  });
 
   @override
   State<VideoWidget> createState() => _VideoWidgetState();
@@ -25,13 +33,14 @@ class VideoWidget extends StatefulWidget {
 class _VideoWidgetState extends State<VideoWidget> {
   late FlickManager flickManager;
   late VideoPlayerController _controller;
+  MomentModel? get _currentMoment => widget.moment;
 
   @override
   void initState() {
     super.initState();
     _controller =
         widget.controller ??
-              VideoPlayerController.networkUrl(Uri.parse(widget.url!))
+              VideoPlayerController.networkUrl(Uri.parse(widget.initialUrl))
           ..setLooping(true)
           ..setVolume(1);
     flickManager = FlickManager(videoPlayerController: _controller);
@@ -42,7 +51,7 @@ class _VideoWidgetState extends State<VideoWidget> {
       }
     });
 
-    debugPrint(widget.url.toString());
+    debugPrint(widget.initialUrl);
   }
 
   @override
@@ -59,7 +68,10 @@ class _VideoWidgetState extends State<VideoWidget> {
         videoFit: BoxFit.cover,
         playerLoadingFallback: playerOverlay(isLoading: true),
         playerErrorFallback: playerOverlay(isError: true),
-        controls: CustomFlickPortraitControls(postData: widget.postData),
+        controls: CustomFlickPortraitControls(
+          postData: widget.postData,
+          moment: widget.moment,
+        ),
       ),
     );
   }
@@ -143,13 +155,6 @@ class _VideoWidgetState extends State<VideoWidget> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      // Text(
-                      //   "Post from event",
-                      //   style: AppTexts.tmdr.copyWith(
-                      //     color: AppColors.gray[25],
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 12),
                       if (widget.postData != null)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,47 +212,64 @@ class _VideoWidgetState extends State<VideoWidget> {
                             Row(
                               children: [
                                 ProfilePicture(
-                                  image: widget.postData!.author.image,
+                                  image:
+                                      _currentMoment?.userImage.isNotEmpty ==
+                                          true
+                                      ? _currentMoment!.userImage
+                                      : widget.postData!.author.image,
                                   size: 36,
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  widget.postData!.author.name,
+                                  _currentMoment?.userName.isNotEmpty == true
+                                      ? _currentMoment!.userName
+                                      : widget.postData!.author.name,
                                   style: AppTexts.tmdm.copyWith(
                                     color: AppColors.gray[25],
                                   ),
                                 ),
                                 Spacer(),
-                                CustomSvg(
-                                  size: 16,
-                                  asset: "assets/icons/view.svg",
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  widget.postData!.views.toString(),
-                                  style: AppTexts.tsms.copyWith(
+                                if (_currentMoment == null) ...[
+                                  CustomSvg(
+                                    size: 16,
+                                    asset: "assets/icons/view.svg",
                                     color: Colors.white,
                                   ),
-                                ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    widget.postData!.views.toString(),
+                                    style: AppTexts.tsms.copyWith(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                                 const SizedBox(width: 12),
                                 GestureDetector(
-                                  onTap: () {
-                                    Get.find<PostController>()
-                                        .likeToggle(widget.postData!.id, "post")
-                                        .then((message) {});
-                                  },
+                                  onTap: _currentMoment == null
+                                      ? () {
+                                          Get.find<PostController>()
+                                              .likeToggle(
+                                                widget.postData!.id,
+                                                "post",
+                                              )
+                                              .then((message) {});
+                                        }
+                                      : null,
                                   child: Row(
                                     children: [
                                       CustomSvg(
                                         size: 16,
                                         asset:
-                                            "assets/icons/${widget.postData!.isSaved ? "loved" : "love"}.svg",
+                                            _currentMoment == null
+                                            ? "assets/icons/${widget.postData!.isSaved ? "loved" : "love"}.svg"
+                                            : "assets/icons/love.svg",
                                         color: Colors.white,
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        widget.postData!.likes.toString(),
+                                        _currentMoment == null
+                                            ? widget.postData!.likes.toString()
+                                            : _currentMoment!.like.toString(),
                                         style: AppTexts.tsms.copyWith(
                                           color: Colors.white,
                                         ),

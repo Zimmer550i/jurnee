@@ -56,7 +56,11 @@ class _PostMediaState extends State<PostMedia> {
             const SizedBox(height: 16),
             Row(
               spacing: 8,
-              children: [_tab('All', 0), _tab('Owners', 1), _tab('Community', 2)],
+              children: [
+                _tab('All', 0),
+                _tab('Owners', 1),
+                _tab('Community', 2),
+              ],
             ),
             const SizedBox(height: 16),
             AnimatedSize(
@@ -108,10 +112,7 @@ class _PostMediaState extends State<PostMedia> {
                       in showAllTags
                           ? postData.hasTag!
                           : postData.hasTag!
-                                .getRange(
-                                  0,
-                                  min(3, postData.hasTag!.length),
-                                )
+                                .getRange(0, min(3, postData.hasTag!.length))
                                 .toList())
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -130,7 +131,10 @@ class _PostMediaState extends State<PostMedia> {
                     GestureDetector(
                       onTap: () => setState(() => showAllTags = true),
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.gray.shade100,
                           borderRadius: BorderRadius.circular(4),
@@ -147,7 +151,10 @@ class _PostMediaState extends State<PostMedia> {
                     GestureDetector(
                       onTap: () => setState(() => showAllTags = false),
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.gray.shade100,
                           borderRadius: BorderRadius.circular(4),

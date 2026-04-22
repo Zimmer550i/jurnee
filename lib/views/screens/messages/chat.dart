@@ -526,7 +526,7 @@ class _ChatMediaPreview extends StatelessWidget {
           onTap ??
           () {
             if (normalizedVideoPath != null) {
-              Get.to(() => VideoWidget(normalizedVideoPath));
+              Get.to(() => VideoWidget(initialUrl: normalizedVideoPath));
             }
           },
       child: ClipRRect(

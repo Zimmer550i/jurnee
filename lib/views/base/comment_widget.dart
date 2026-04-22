@@ -17,7 +17,6 @@ import 'package:jurnee/views/base/custom_text_field.dart';
 import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
-import 'package:jurnee/views/base/video_widget.dart';
 import 'package:jurnee/views/screens/post/post_details/post_details.dart';
 import 'package:jurnee/views/screens/profile/profile.dart';
 
@@ -121,7 +120,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                   },
                   child: AbsorbPointer(
                     child: ProfilePicture(
-                      key: thisComment ,
+                      key: thisComment,
                       size: 32,
                       image: widget.comment.user.image,
                     ),
@@ -181,7 +180,10 @@ class _CommentWidgetState extends State<CommentWidget> {
                             height: 200,
                             child: GestureDetector(
                               onTap: () => Get.to(
-                                () => VideoWidget(widget.comment.video),
+                                () => MediaPlayer(
+                                  postData: widget.postData,
+                                  initialUrl: widget.comment.video!,
+                                ),
                               ),
                               child: MediaThumbnail(path: widget.comment.video),
                             ),
@@ -335,7 +337,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                 ),
               ],
             ),
-          
+
             if (widget.comment.parentComment != null)
               for (var i in widget.comment.children)
                 CommentWidget(

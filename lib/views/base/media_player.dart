@@ -15,8 +15,10 @@ import 'package:share_plus/share_plus.dart';
 
 class MediaPlayer extends StatefulWidget {
   final PostModel postData;
+
   /// Matched against the playlist to pick the first page (full [PostController.mediaList] for posts).
   final String initialUrl;
+
   /// Standalone URLs (e.g. comment image). Ignores post moments; no [MomentModel] metadata.
   final List<String>? staticUrls;
 
@@ -105,9 +107,9 @@ class _MediaPlayerState extends State<MediaPlayer> {
           child: PageView.builder(
             scrollDirection: Axis.vertical,
             controller: _pageController,
-            itemCount: urls.length,
+            // itemCount: urls.length,
             itemBuilder: (context, index) {
-              final url = urls[index];
+              final url = urls[index % urls.length];
               final moment = _momentForUrl(url, moments);
               return _MediaSlide(
                 url: url,
@@ -140,20 +142,14 @@ class _MediaSlide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (_isVideo(url)) {
+      return VideoWidget(initialUrl: url, postData: postData, moment: moment);
+    }
     return Stack(
       children: [
-        if (_isVideo(url))
-          Positioned.fill(
-            child: VideoWidget(url, postData: postData),
-          ),
-        if (!_isVideo(url))
-          Positioned.fill(
-            child: CustomNetworkedImage(
-              url: url,
-              radius: 0,
-              fit: BoxFit.contain,
-            ),
-          ),
+        Positioned.fill(
+          child: CustomNetworkedImage(url: url, radius: 0, fit: BoxFit.contain),
+        ),
         Positioned(
           top: 12,
           left: 20,
@@ -168,10 +164,7 @@ class _MediaSlide extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Center(
-                  child: CustomSvg(
-                    asset: "assets/icons/back.svg",
-                    size: 32,
-                  ),
+                  child: CustomSvg(asset: "assets/icons/back.svg", size: 32),
                 ),
               ),
             ),
@@ -211,9 +204,7 @@ class _MediaSlide extends StatelessWidget {
                           postData.category.substring(1),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: AppTexts.txsr.copyWith(
-                        color: AppColors.gray[50],
-                      ),
+                      style: AppTexts.txsr.copyWith(color: AppColors.gray[50]),
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -262,10 +253,7 @@ class _MediaSlide extends StatelessWidget {
 }
 
 class _MomentActionsRow extends StatelessWidget {
-  const _MomentActionsRow({
-    required this.moment,
-    required this.postData,
-  });
+  const _MomentActionsRow({required this.moment, required this.postData});
 
   final MomentModel moment;
   final PostModel postData;
@@ -328,10 +316,7 @@ class _PostActionsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        ProfilePicture(
-          image: postData.author.image,
-          size: 36,
-        ),
+        ProfilePicture(image: postData.author.image, size: 36),
         const SizedBox(width: 8),
         Text(
           postData.author.name,
@@ -351,9 +336,9 @@ class _PostActionsRow extends StatelessWidget {
         const SizedBox(width: 12),
         GestureDetector(
           onTap: () {
-            Get.find<PostController>().likeToggle(postData.id, "post").then(
-                  (_) {},
-                );
+            Get.find<PostController>()
+                .likeToggle(postData.id, "post")
+                .then((_) {});
           },
           child: Row(
             children: [
