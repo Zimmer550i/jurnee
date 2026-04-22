@@ -156,8 +156,11 @@ class HomepageState extends State<Homepage> {
                                 ),
 
                                 if (i != 1 && i % 4 == 0)
-                                  NativeAdListItem(
-                                    key: ValueKey('native_ad_$i'),
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 20),
+                                    child: NativeAdListItem(
+                                      key: ValueKey('native_ad_$i'),
+                                    ),
                                   ),
                               ],
                               if (post.isMoreLoading.value) CustomLoading(),

@@ -35,7 +35,7 @@ class AdController extends GetxController {
 
   NativeTemplateStyle get nativeTemplateStyle => NativeTemplateStyle(
         templateType: TemplateType.medium,
-        mainBackgroundColor: AppColors.scaffoldBG,
+        mainBackgroundColor: AppColors.white,
         cornerRadius: 12.0,
         callToActionTextStyle: NativeTemplateTextStyle(
           textColor: AppColors.white,

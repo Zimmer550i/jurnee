@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:jurnee/controllers/ad_controller.dart';
 import 'package:jurnee/services/native_ad_load_coordinator.dart';
+import 'package:jurnee/utils/app_colors.dart';
 
 /// One in-feed native ad. Each instance owns its own [NativeAd]; loads are staggered by [NativeAdLoadCoordinator].
 class NativeAdListItem extends StatefulWidget {
@@ -63,8 +64,41 @@ class _NativeAdListItemState extends State<NativeAdListItem> {
       return const SizedBox.shrink();
     }
     return AspectRatio(
-      aspectRatio: 1,
-      child: AdWidget(ad: _nativeAd!),
+      aspectRatio: 1.2,
+      child: Container(
+        width: double.infinity,
+        constraints: const BoxConstraints(maxWidth: 460, maxHeight: 460),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              offset: const Offset(0, 3),
+              blurRadius: 9.8,
+              color: Colors.black.withValues(alpha: 0.1),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return OverflowBox(
+                alignment: Alignment.center,
+                minWidth: 0,
+                minHeight: 0,
+                maxWidth: double.infinity,
+                maxHeight: double.infinity,
+                child: SizedBox(
+                  width: constraints.maxWidth + 4,
+                  height: constraints.maxHeight + 4,
+                  child: AdWidget(ad: _nativeAd!),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
 }
