@@ -279,7 +279,7 @@ class _PostAlertState extends State<PostAlert> {
               const SizedBox(height: 16),
               CustomTextField(
                 controller: contactCtrl,
-                title: "Contact Info",
+                title: "Contact Info (Optional)",
                 hintText: "Share contact information",
               ),
               const SizedBox(height: 16),

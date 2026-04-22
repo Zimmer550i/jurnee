@@ -23,6 +23,7 @@ class PostController extends GetxController {
   RxList<MomentModel> mediaList = RxList.empty();
   Rxn<Position> userLocation = Rxn();
   RxBool isLoading = RxBool(false);
+  RxBool isAttendLoading = RxBool(false);
   RxBool mediaLoading = RxBool(false);
 
   RxInt currentPage = 1.obs;
@@ -517,7 +518,7 @@ class PostController extends GetxController {
   }
 
   Future<String> joinEvent(String id) async {
-    isLoading(true);
+    isAttendLoading(true);
     try {
       final res = await api.post("/post/event/join/$id", {}, authReq: true);
       final body = jsonDecode(res.body);
@@ -526,6 +527,10 @@ class PostController extends GetxController {
         for (int index = 0; index < posts.length; index++) {
           if (posts[index].id == id) {
             posts[index].isAttender = true;
+            final user = Get.find<UserController>().userData;
+            posts[index].attenders.add(
+              Author(id: user!.id, name: user.name, image: user.image),
+            );
             posts.refresh();
           }
         }
@@ -535,8 +540,8 @@ class PostController extends GetxController {
       }
     } catch (e) {
       return e.toString();
-    }finally{
-      isLoading(false);
+    } finally {
+      isAttendLoading(false);
     }
   }
 

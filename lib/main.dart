@@ -27,9 +27,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await _ensureMobileAdsInitialized();
-  // await MobileAds.instance.updateRequestConfiguration(
-  //   RequestConfiguration(testDeviceIds: ['5d5be013ce0959eae5547111446cf6f6']),
-  // );
   await dotenv.load(fileName: ".env");
   Map<String, Map<String, String>> languages = await di.init();
   SystemChrome.setSystemUIOverlayStyle(

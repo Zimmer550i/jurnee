@@ -83,6 +83,20 @@ class NotificationController extends GetxController {
     }
   }
 
+  readAllNotification() async {
+    try {
+      final res = await api.get("/notification/read", authReq: true);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        notifications.assignAll(
+          notifications.map((notification) => notification.copyWith(read: true)),
+        );
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
   deleteNotification(String id) async {
     try {
       final res = await api.delete("/notification", authReq: true);

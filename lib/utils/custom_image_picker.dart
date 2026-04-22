@@ -5,15 +5,30 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jurnee/utils/app_colors.dart';
+import 'package:jurnee/utils/media_type.dart';
 // import 'package:jurnee/utils/app_colors.dart';
 
-Future<File?> customImagePicker({isCircular = true, isSquared = true}) async {
+Future<File?> customImagePicker({
+  isCircular = true,
+  isSquared = true,
+  bool allowVideo = false,
+}) async {
   final picker = ImagePicker();
   final cropper = ImageCropper();
 
-  final XFile? pickedImage = await picker.pickImage(
-    source: ImageSource.gallery,
-  );
+  final XFile? pickedImage;
+  if (allowVideo) {
+    final XFile? picked = await picker.pickMedia(imageQuality: 90);
+    if (picked == null) return null;
+    if (isVideoMedia(path: picked.path, mimeType: picked.mimeType)) {
+      return File(picked.path);
+    }
+    pickedImage = picked;
+  } else {
+    pickedImage = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+  }
 
   if (pickedImage != null) {
     final CroppedFile? croppedImage = await cropper.cropImage(

@@ -75,6 +75,7 @@ class _PostDetailsState extends State<PostDetails> {
   final listController = ScrollController();
   final GlobalKey commentSectionKey = GlobalKey();
   PostModel? postData;
+  late int index;
 
   @override
   void initState() {
@@ -86,33 +87,19 @@ class _PostDetailsState extends State<PostDetails> {
     if (widget.post != null) {
       postData = widget.post!;
       post.addViewCount(postData!.id);
+      index = post.posts.indexWhere((val) => val.id == postData?.id);
     } else {
       await post.addViewCount(widget.postId!);
       try {
         postData = post.posts.firstWhere(
           (element) => element.id == widget.postId,
         );
+        index = post.posts.indexWhere((val) => val.id == postData?.id);
       } catch (e) {
         customSnackBar("Post not found");
       }
       setState(() {});
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (postData!.category != "service") {
-        post.fetchComments(postData!.id).then((message) {
-          if (message != "success") {
-            customSnackBar(message);
-          }
-        });
-      } else {
-        post.fetchReviews(postData!.id).then((message) {
-          if (message != "success") {
-            customSnackBar(message);
-          }
-        });
-      }
-      post.getMedia(postData!.id);
-    });
   }
 
   @override
@@ -198,8 +185,8 @@ class _PostDetailsState extends State<PostDetails> {
                     ),
                     PostMetaData(postController: post, postData: postData!),
                     if (postData!.category == "event")
-                      AttendingUsers(post: postData!),
-                    PostMedia(postData: postData!, postController: post),
+                      AttendingUsers(index: index),
+                    PostMedia(index: index),
 
                     if (widget.showPostActions)
                       OwnerActionButtons(
@@ -214,13 +201,12 @@ class _PostDetailsState extends State<PostDetails> {
                     if (postData!.category != "service")
                       PostComments(
                         sectionKey: commentSectionKey,
-                        postController: post,
-                        postData: postData!,
+                        index: index,
                       ),
                     if (postData!.category == "service")
                       PostReviews(
                         sectionKey: commentSectionKey,
-                        postController: post,
+                        index: index,
                       ),
                   ],
                 ),

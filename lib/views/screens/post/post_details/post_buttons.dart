@@ -38,7 +38,7 @@ class PostButtons extends StatelessWidget {
           if (message != "success") {
             customSnackBar(message);
           } else {
-            customSnackBar("You have joined the event");
+            customSnackBar("You have joined the event", isError: false);
           }
         };
       } else if (category == "deal") {
@@ -63,7 +63,13 @@ class PostButtons extends StatelessWidget {
         spacing: 10,
         children: [
           Expanded(
-            child: CustomButton(onTap: buttonAction, text: buttonText),
+            child: Obx(
+              () => CustomButton(
+                onTap: buttonAction,
+                text: buttonText,
+                isLoading: Get.find<PostController>().isAttendLoading.value,
+              ),
+            ),
           ),
           GestureDetector(
             onTap: () {

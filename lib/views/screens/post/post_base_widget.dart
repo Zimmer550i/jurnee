@@ -59,13 +59,12 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
             child: cover != null
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.file(cover!, fit: BoxFit.cover),
+                    child: MediaThumbnail(path: cover!.path),
                   )
                 : coverImgUrl != null
-                ? CustomNetworkedImage(
-                    url: coverImgUrl,
-                    radius: 12,
-                    fit: BoxFit.cover,
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: MediaThumbnail(path: coverImgUrl),
                   )
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -104,10 +103,8 @@ class PostBaseWidgetState extends State<PostBaseWidget> {
                     final File? picked = await customImagePicker(
                       isCircular: false,
                       isSquared: false,
+                      allowVideo: true,
                     );
-                    // final XFile? picked = await ImagePicker().pickMedia(
-                    //   imageQuality: 90,
-                    // );
                     if (picked != null) {
                       images[i] = picked;
                       setState(() {});

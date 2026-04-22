@@ -21,6 +21,9 @@ class _NotificationsState extends State<Notifications> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.readAllNotification();
+    });
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
