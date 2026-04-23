@@ -160,7 +160,7 @@ class _ServiceBookingState extends State<ServiceBooking> {
                                         ) ??
                                         0,
                                   ),
-                                ),
+                                ) ?? "--",
                                 style: AppTexts.tsms.copyWith(
                                   color: AppColors.gray,
                                 ),

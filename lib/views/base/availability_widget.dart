@@ -24,10 +24,8 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
     Schedule(day: "sat"),
     Schedule(day: "sun"),
   ];
-  bool repeat = false;
-  int index = 0;
-  DateTime? from;
-  DateTime? to;
+  TimeOfDay? from;
+  TimeOfDay? to;
 
   @override
   void initState() {
@@ -144,11 +142,14 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
                   Expanded(
                     child: CustomTextField(
                       onTap: () async {
-                        schedule[index].startTime = await getTime();
+                        from = await showCustomTimePicker(
+                          context,
+                          initialTime: TimeOfDay.now(),
+                        );
                         setState(() {});
                       },
                       controller: TextEditingController(
-                        text: formatTime(schedule[index].startTime),
+                        text: Formatter.timeFormatter(time: from) ?? "--",
                       ),
                       title: "From",
                       hintText: "Available from",
@@ -158,11 +159,14 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
                   Expanded(
                     child: CustomTextField(
                       onTap: () async {
-                        schedule[index].endTime = await getTime();
+                        to = await showCustomTimePicker(
+                          context,
+                          initialTime: TimeOfDay.now(),
+                        );
                         setState(() {});
                       },
                       controller: TextEditingController(
-                        text: formatTime(schedule[index].endTime),
+                        text: Formatter.timeFormatter(time: to) ?? "--",
                       ),
                       title: "To",
                       hintText: "Available till",
@@ -176,28 +180,5 @@ class AvailabilityWidgetState extends State<AvailabilityWidget> {
         ),
       ],
     );
-  }
-
-  Future<String?> getTime() async {
-    final time = await showCustomTimePicker(
-      context,
-      initialTime: TimeOfDay.now(),
-    );
-
-    if (time != null) {
-      return "${time.hour}:${time.minute}";
-    }
-    return null;
-  }
-
-  String formatTime(String? time) {
-    if (time == null) return "";
-
-    TimeOfDay temp = TimeOfDay(
-      hour: int.parse(time.split(":").first),
-      minute: int.parse(time.split(":").last),
-    );
-
-    return Formatter.timeFormatter(time: temp);
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Formatter {
-  static String timeFormatter({
+  static String? timeFormatter({
     TimeOfDay? time,
     DateTime? dateTime,
     bool showDate = false,
@@ -13,7 +13,7 @@ class Formatter {
     }
 
     if (time == null) {
-      return "null";
+      return null;
     }
 
     if (showDate && dateTime != null) {

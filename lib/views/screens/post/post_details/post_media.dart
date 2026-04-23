@@ -114,19 +114,23 @@ class _PostMediaState extends State<PostMedia> {
                           : postData.hasTag!
                                 .getRange(0, min(3, postData.hasTag!.length))
                                 .toList())
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.gray.shade100,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        tag.contains('#') ? '$tag ' : '#$tag ',
-                        style: AppTexts.tsmr.copyWith(
-                          color: AppColors.green.shade800,
+                    if (tag != "")
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.gray.shade100,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          tag.contains('#') ? '$tag ' : '#$tag ',
+                          style: AppTexts.tsmr.copyWith(
+                            color: AppColors.green.shade800,
+                          ),
                         ),
                       ),
-                    ),
                   if (postData.hasTag!.length > 3 && !showAllTags)
                     GestureDetector(
                       onTap: () => setState(() => showAllTags = true),
