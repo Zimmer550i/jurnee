@@ -134,7 +134,8 @@ class CustomFlickPortraitControls extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              postData!.title,
+                              postData!.category.substring(0, 1).toUpperCase() +
+                                  postData!.category.substring(1),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppTexts.txsr.copyWith(

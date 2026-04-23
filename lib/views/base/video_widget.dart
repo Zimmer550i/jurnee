@@ -171,7 +171,10 @@ class _VideoWidgetState extends State<VideoWidget> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              widget.postData!.title,
+                              widget.postData!.category
+                                      .substring(0, 1)
+                                      .toUpperCase() +
+                                  widget.postData!.category.substring(1),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppTexts.txsr.copyWith(
@@ -259,8 +262,7 @@ class _VideoWidgetState extends State<VideoWidget> {
                                     children: [
                                       CustomSvg(
                                         size: 16,
-                                        asset:
-                                            _currentMoment == null
+                                        asset: _currentMoment == null
                                             ? "assets/icons/${widget.postData!.isSaved ? "loved" : "love"}.svg"
                                             : "assets/icons/love.svg",
                                         color: Colors.white,
