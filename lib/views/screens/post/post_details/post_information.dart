@@ -2,9 +2,9 @@ part of 'post_details.dart';
 
 class PostInformation extends StatelessWidget {
   final void Function()? onSeeAllTap;
+  final PostModel postData;
   const PostInformation({super.key, required this.postData, this.onSeeAllTap});
 
-  final PostModel postData;
   Widget _infoRow({
     String? assetName,
     required String text,
@@ -15,8 +15,7 @@ class PostInformation extends StatelessWidget {
     final richText = Text.rich(
       TextSpan(
         children: [
-          if (title != null)
-            TextSpan(text: '$title: ', style: AppTexts.tsms),
+          if (title != null) TextSpan(text: '$title: ', style: AppTexts.tsms),
           TextSpan(text: text, style: textStyle),
         ],
       ),
@@ -180,7 +179,10 @@ class PostInformation extends StatelessWidget {
 
   String _dateOrScheduleText() {
     String fallback = postData.startDate != null
-        ? DateFormat('dd MMM, hh:mm a').format(postData.startDate!)
+        ? DateFormat('dd MMM').format(postData.startDate!)
+        : "";
+    fallback += postData.startTime != null
+        ? DateFormat(', hh:mm a').format(postData.startTime!)
         : "";
     if (postData.category != "service" || postData.schedule.isEmpty) {
       return fallback;
