@@ -91,7 +91,11 @@ class _PostEventState extends State<PostEvent> {
       Get.find<PostController>().clearFilters();
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
-        Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
+        if (widget.post == null) {
+          Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
+        } else {
+          Get.back();
+        }
       }
       customSnackBar(
         "Event ${widget.post == null ? "created" : "updated"} successfully",

@@ -87,7 +87,11 @@ class _PostDealState extends State<PostDeal> {
       Get.find<PostController>().clearFilters();
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
-        Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
+        if (widget.post == null) {
+          Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
+        } else {
+          Get.back();
+        }
       }
       customSnackBar(
         "Deal ${widget.post == null ? "created" : "updated"} successfully",

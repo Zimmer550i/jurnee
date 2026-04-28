@@ -145,7 +145,11 @@ class _PostAlertState extends State<PostAlert> {
       Get.find<PostController>().clearFilters();
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
-        Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
+        if (widget.post == null) {
+          Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
+        } else {
+          Get.back();
+        }
       }
       customSnackBar(
         "Alert ${widget.post == null ? "created" : "updated"} successfully",
@@ -304,7 +308,7 @@ class _PostAlertState extends State<PostAlert> {
                 () => CustomButton(
                   onTap: publish,
                   isLoading: Get.find<PostController>().isLoading.value,
-                  text: "Publish",
+                  text: widget.post != null ? "Update" : "Publish",
                 ),
               ),
               const SizedBox(height: 28),

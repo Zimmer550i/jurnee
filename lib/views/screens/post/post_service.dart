@@ -192,7 +192,11 @@ class _PostServiceState extends State<PostService> {
       Get.find<PostController>().clearFilters();
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
-        Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
+        if (widget.post == null) {
+          Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
+        } else {
+          Get.back();
+        }
       }
       customSnackBar("Post created successfully", isError: false);
     } else {
@@ -296,7 +300,7 @@ class _PostServiceState extends State<PostService> {
                 () => CustomButton(
                   onTap: publish,
                   isLoading: Get.find<PostController>().isLoading.value,
-                  text: "Publish",
+                  text: widget.post != null ? "Update" : "Publish",
                 ),
               ),
               const SizedBox(height: 28),
