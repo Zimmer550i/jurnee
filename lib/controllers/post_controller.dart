@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:jurnee/controllers/maps_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/comment_model.dart';
 import 'package:jurnee/models/pagination_meta.dart';
@@ -101,6 +101,7 @@ class PostController extends GetxController {
     search.value = null;
     highlyRated.value = false;
     categoryList.clear();
+    Get.find<MapsController>().selected.value = null;
   }
 
   Future<String> fetchPosts({bool loadMore = false, String? category}) async {
@@ -268,10 +269,10 @@ class PostController extends GetxController {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        posts.insert(0, PostModel.fromJson(body['data']));
-        try {} catch (e) {
-          debugPrint(e.toString());
-        }
+        // posts.insert(0, PostModel.fromJson(body['data']));
+        // try {} catch (e) {
+        //   debugPrint(e.toString());
+        // }
         return "success";
       } else {
         return body['message'] ?? "Something went wrong";

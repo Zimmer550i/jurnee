@@ -59,6 +59,26 @@ class _PostServiceState extends State<PostService> {
             widget.post!.media ?? List.generate(5, (_) => null);
       });
     });
+    WidgetsBinding.instance.addPostFrameCallback((val) {
+      setState(() {
+        var oldSchedule = _availabilityKey.currentState!.schedule;
+        final newSchedule = widget.post!.schedule;
+        for (int i = 0; i < newSchedule.length; i++) {
+          if (oldSchedule[i].day == newSchedule[i].day) {
+            oldSchedule[i] = newSchedule[i];
+            oldSchedule[i].availability = true;
+            _availabilityKey.currentState!.from = TimeOfDay(
+              hour: int.parse(oldSchedule[i].startTime!.split(":").first),
+              minute: int.parse(oldSchedule[i].startTime!.split(":").last),
+            );
+            _availabilityKey.currentState!.to = TimeOfDay(
+              hour: int.parse(oldSchedule[i].endTime!.split(":").first),
+              minute: int.parse(oldSchedule[i].endTime!.split(":").last),
+            );
+          }
+        }
+      });
+    });
 
     // Others
     subCategory = widget.post!.subcategory;
