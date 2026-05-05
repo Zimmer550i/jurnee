@@ -64,7 +64,7 @@ class _MessagesState extends State<Messages> {
                     const SizedBox(height: 12),
                     for (var i in chat.chats) messageWidget(i),
                     if (chat.isMoreLoading.value) CustomLoading(),
-                    if (!chat.isMoreLoading.value)
+                    if (!chat.isMoreLoading.value && chat.chats.isNotEmpty)
                       Text(
                         "End of list",
                         style: AppTexts.tsmr.copyWith(
@@ -72,11 +72,10 @@ class _MessagesState extends State<Messages> {
                         ),
                       ),
                     if (!chat.isMoreLoading.value &&
-                        !chat.isFirstLoad.value &&
                         chat.chats.isEmpty)
                       Center(
                         child: Text(
-                          "You have to messages",
+                          "You have no messages",
                           style: AppTexts.tsmr.copyWith(
                             color: AppColors.gray.shade300,
                           ),
