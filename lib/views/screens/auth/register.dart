@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
+import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
@@ -49,6 +50,7 @@ class _RegisterState extends State<Register> {
     );
 
     if (message == "success") {
+      Get.find<PostController>().clearFilters();
       customSnackBar(
         "An OTP has been send to ${emailCtrl.text}",
         isError: false,
