@@ -14,6 +14,7 @@ import 'controllers/localization_controller.dart';
 import 'controllers/theme_controller.dart';
 import 'helpers/di.dart' as di;
 import 'helpers/route.dart';
+import 'helpers/route_observer.dart';
 
 bool _mobileAdsInitialized = false;
 
@@ -61,6 +62,7 @@ class MyApp extends StatelessWidget {
                 AppConstants.languages[0].languageCode,
                 AppConstants.languages[0].countryCode,
               ),
+              navigatorObservers: [routeObserver],
               transitionDuration: const Duration(milliseconds: 500),
               getPages: AppRoutes.pages,
               // initialRoute: AppRoutes.splash,

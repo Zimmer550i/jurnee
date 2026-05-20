@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
+import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_list_handler.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
+import 'package:jurnee/helpers/route_observer.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
@@ -32,9 +34,10 @@ class Profile extends StatefulWidget {
   State<Profile> createState() => _ProfileState();
 }
 
-class _ProfileState extends State<Profile> {
+class _ProfileState extends State<Profile> with RouteAware {
   final user = Get.find<UserController>();
   final GlobalKey<ScaffoldState> _key = GlobalKey();
+  PageRoute<dynamic>? _route;
 
   int get index => Profile.index;
   set index(int value) => Profile.index = value;
@@ -44,8 +47,53 @@ class _ProfileState extends State<Profile> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getSpecificUserData();
-      user.getUserPosts(index, widget.userId ?? user.userData?.id);
+      _loadUserPosts();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute<dynamic> && route != _route) {
+      if (_route != null) {
+        routeObserver.unsubscribe(this);
+      }
+      _route = route;
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void didPopNext() {
+    _loadUserPostsIfSourceChanged();
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  String? get _profileUserId => widget.userId ?? user.userData?.id;
+
+  Future<void> _loadUserPosts() async {
+    final userId = _profileUserId;
+    if (userId == null) return;
+
+    final message = await user.getUserPosts(index, userId);
+    if (message != "success") {
+      customSnackBar(message);
+    }
+  }
+
+  void _loadUserPostsIfSourceChanged() {
+    final userId = _profileUserId;
+    if (userId == null) return;
+
+    if (Get.find<PostController>().postsSource != userId) {
+      user.getUserPosts(index, userId);
+    }
   }
 
   void getSpecificUserData() async {
