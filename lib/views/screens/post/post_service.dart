@@ -193,11 +193,10 @@ class _PostServiceState extends State<PostService> {
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
         if (widget.post == null) {
+          Get.back();
           final lastPost = Get.find<PostController>().lastPost.value;
           if (lastPost != null) {
             Get.to(() => BoostPost(post: lastPost));
-          } else {
-            Get.back();
           }
         } else {
           Get.back();

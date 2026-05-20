@@ -22,8 +22,14 @@ class PostMetaData extends StatelessWidget {
     return Container(
       color: Colors.white,
       padding: EdgeInsets.all(24),
-      child: Obx(
-        () => Row(
+      child: Obx(() {
+        if (index == -1) {
+          return SizedBox(
+            width: double.infinity,
+            child: Text("Reload this page"),
+          );
+        }
+        return Row(
           children: [
             GestureDetector(
               onTap: () {
@@ -117,8 +123,8 @@ class PostMetaData extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
+        );
+      }),
     );
   }
 }

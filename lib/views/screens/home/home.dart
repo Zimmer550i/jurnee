@@ -34,18 +34,16 @@ class _HomeState extends State<Home> {
   bool showOverlay = false;
   bool showNavBar = true;
 
-  late final List<Widget> pages;
+  final List<Widget> pages = [Homepage(key: homeKey), Messages(), Notifications(), Profile()];
 
   @override
   void initState() {
     super.initState();
-    Get.find<PostController>().fetchLocation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.find<UserController>().userData!.interested.isEmpty) {
         Get.to(() => UserInterests());
       }
     });
-    pages = [Homepage(key: homeKey), Messages(), Notifications(), Profile()];
   }
 
   @override

@@ -42,6 +42,11 @@ class HomepageState extends State<Homepage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Get.find<PostController>().fetchLocation().then((val) {
+        setState(() {});
+      });
+    });
     post.fetchPosts().then((message) {
       if (message != "success") {
         customSnackBar(message);

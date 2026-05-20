@@ -27,9 +27,14 @@ class PostButtons extends StatelessWidget {
       };
 
       if (category == "event") {
-        final post = Get.find<PostController>().posts.firstWhere(
-          (element) => element.id == postData.id,
-        );
+        late PostModel post;
+        try {
+          post = Get.find<PostController>().posts.firstWhere(
+            (element) => element.id == postData.id,
+          );
+        } catch (e) {
+          return Text("Reload this page");
+        }
         buttonText = post.isAttender == true ? "Attending" : "Attend";
         buttonAction = () async {
           final message = await Get.find<PostController>().joinEvent(

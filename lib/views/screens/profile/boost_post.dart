@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/revcat_controller.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
@@ -88,11 +90,34 @@ class BoostPost extends StatelessWidget {
               const SizedBox(height: 32),
               PostCardSmall(post: post, witdth: double.infinity),
               Spacer(),
-              CustomButton(text: "Boost Now- \$5"),
+              GetBuilder<RevcatController>(
+                builder: (controller) {
+                  return CustomButton(
+                    onTap: () async {
+                      final message = await controller.purchaseBoostPackage(
+                        post.id,
+                      );
+                      if (message == "success") {
+                        if (context.mounted) {
+                          Get.back();
+                        }
+                        customSnackBar("Boost successful", isError: false);
+                      } else {
+                        customSnackBar(message);
+                      }
+                    },
+                    isDisabled: post.boost == true,
+                    isLoading: controller.isLoading.value,
+                    text: post.boost == true
+                        ? "Already Boosted"
+                        : "Boost Now- \$5",
+                  );
+                },
+              ),
               const SizedBox(height: 16),
               CustomButton(
                 onTap: () => Get.back(),
-                text: "Skip",
+                text: post.boost == true ? "Back" : "Skip",
                 isSecondary: true,
               ),
               const SizedBox(height: 16),
