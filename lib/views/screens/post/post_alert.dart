@@ -146,7 +146,12 @@ class _PostAlertState extends State<PostAlert> {
       if (mounted) {
         Get.until((route) => Get.currentRoute == "/app");
         if (widget.post == null) {
-          Get.to(() => BoostPost(post: Get.find<PostController>().posts.first));
+          final lastPost = Get.find<PostController>().lastPost.value;
+          if (lastPost != null) {
+            Get.to(() => BoostPost(post: lastPost));
+          } else {
+            Get.back();
+          }
         } else {
           Get.back();
         }

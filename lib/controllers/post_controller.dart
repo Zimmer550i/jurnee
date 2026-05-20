@@ -17,6 +17,7 @@ enum PostType { defaultPosts }
 
 class PostController extends GetxController {
   final api = ApiService();
+  Rxn<PostModel> lastPost = Rxn();
   RxList<PostModel> posts = RxList.empty();
   RxList<CommentModel> comments = RxList.empty();
   RxList<ReviewModel> reviews = RxList.empty();
@@ -269,10 +270,7 @@ class PostController extends GetxController {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        // posts.insert(0, PostModel.fromJson(body['data']));
-        // try {} catch (e) {
-        //   debugPrint(e.toString());
-        // }
+        lastPost.value = PostModel.fromJson(body['data']);
         return "success";
       } else {
         return body['message'] ?? "Something went wrong";
@@ -662,6 +660,32 @@ class PostController extends GetxController {
       return e.toString();
     } finally {
       mediaLoading(false);
+    }
+  }
+
+  Future<String> boostPost(
+    String postId,
+    String transactionId,
+    double amount,
+  ) async {
+    isLoading(true);
+    try {
+      final res = await api.post("/post/boost", authReq: true, {
+        "serviceId": postId,
+        "transactionId": transactionId,
+        "amount": amount,
+      });
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
     }
   }
 }
