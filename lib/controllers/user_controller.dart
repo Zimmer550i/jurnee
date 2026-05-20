@@ -141,6 +141,7 @@ class UserController extends GetxController {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
+        Get.find<PostController>().postsSource = id ?? userData!.id;
         if (!loadMore) {
           posts.clear();
         }

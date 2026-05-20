@@ -17,6 +17,7 @@ enum PostType { defaultPosts }
 
 class PostController extends GetxController {
   final api = ApiService();
+  String postsSource = "";
   Rxn<PostModel> lastPost = Rxn();
   RxList<PostModel> posts = RxList.empty();
   RxList<CommentModel> comments = RxList.empty();
@@ -141,6 +142,7 @@ class PostController extends GetxController {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200) {
+        postsSource = "homescreen";
         if (!loadMore) {
           posts.clear();
         }
