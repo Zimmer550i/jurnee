@@ -1,20 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:jurnee/controllers/chat_controller.dart';
+import 'package:jurnee/controllers/booking_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/offer_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
+import 'package:jurnee/utils/custom_snackbar.dart';
 import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/utils/formatter.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_networked_image.dart';
 import 'package:jurnee/views/screens/messages/offer_preview.dart';
 
-class OfferWidget extends StatelessWidget {
+class OfferWidget extends StatefulWidget {
   final OfferModel offer;
   const OfferWidget({super.key, required this.offer});
+
+  @override
+  State<OfferWidget> createState() => _OfferWidgetState();
+}
+
+class _OfferWidgetState extends State<OfferWidget> with WidgetsBindingObserver {
+  final user = Get.find<UserController>();
+  final booking = Get.find<BookingController>();
+  late OfferModel offer;
+
+  bool _paymentStarted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    offer = widget.offer;
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _paymentStarted) {
+      _paymentStarted = false;
+      booking.getSingleBooking(offer.id).then((message) {
+        if (!mounted || message != "success" || booking.current.value == null) {
+          customSnackBar(message);
+          return;
+        }
+
+        setState(() {
+          offer = booking.current.value!;
+        });
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,31 +174,47 @@ class OfferWidget extends StatelessWidget {
                       ),
                       // if (Get.find<UserController>().userData!.id ==
                       //     offer.customer)
-                      Row(
-                        spacing: 12,
-                        children: [
-                          Expanded(
-                            child: CustomButton(
-                              onTap: () =>
-                                  Get.to(() => OfferPreview(offer: offer)),
-                              text: "View Offer",
-                              isSecondary: true,
-                              height: 44,
-                            ),
-                          ),
-                          Expanded(
-                            child: Obx(
-                              () => CustomButton(
-                                onTap: () {},
-                                isLoading:
-                                    Get.find<ChatController>().isLoading.value,
-                                text: "Accept",
+                      if (offer.status != "accepted")
+                        Row(
+                          spacing: 12,
+                          children: [
+                            Expanded(
+                              child: CustomButton(
+                                onTap: () =>
+                                    Get.to(() => OfferPreview(offer: offer)),
+                                text: "View Offer",
+                                isSecondary: true,
                                 height: 44,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                            if (offer.provider.id !=
+                                Get.find<UserController>().userData!.id)
+                              Expanded(
+                                child: Obx(
+                                  () => CustomButton(
+                                    onTap: () {
+                                      _paymentStarted = true;
+
+                                      booking
+                                          .makePayment(
+                                            offer.id,
+                                            total.toDouble(),
+                                          )
+                                          .then((message) {
+                                            if (message != "success") {
+                                              _paymentStarted = false;
+                                              customSnackBar(message);
+                                            }
+                                          });
+                                    },
+                                    isLoading: booking.isLoading.value,
+                                    text: "Accept",
+                                    height: 44,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
                     ],
                   ),
                 ),

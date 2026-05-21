@@ -30,11 +30,17 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  PageController pageController = PageController(initialPage: 0);
   int index = 0;
   bool showOverlay = false;
   bool showNavBar = true;
 
-  final List<Widget> pages = [Homepage(key: homeKey), Messages(), Notifications(), Profile()];
+  final List<Widget> pages = [
+    Homepage(key: homeKey),
+    Messages(),
+    Notifications(),
+    Profile(),
+  ];
 
   @override
   void initState() {
@@ -51,7 +57,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: Stack(
         children: [
-          IndexedStack(index: index, children: pages),
+          PageView(controller: pageController, children: pages),
           if (showOverlay)
             GestureDetector(
               onTap: () {
@@ -313,9 +319,15 @@ class _HomeState extends State<Home> {
               index: index,
               showOverlay: showOverlay,
               onChanged: (val) {
+                pageController.animateToPage(
+                  val,
+                  duration: Duration(milliseconds: 100 * (index - val).abs()),
+                  curve: Curves.decelerate,
+                );
                 setState(() {
                   index = val;
                 });
+
                 if (val == 0) {
                   Get.find<PostController>().fetchPosts().then((message) {
                     if (message != "success") {

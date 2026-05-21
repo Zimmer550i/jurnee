@@ -18,6 +18,26 @@ class BookingController extends GetxController {
   RxBool isFirstLoad = true.obs;
   RxBool isMoreLoading = false.obs;
 
+  Future<String> getSingleBooking(String id) async {
+    isLoading(true);
+
+    try {
+      final res = await api.get("/offer/$id", authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200) {
+        current.value = OfferModel.fromJson(body['data']);
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<String> fetchBookings(String type, {bool loadMore = false}) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 
@@ -68,56 +88,11 @@ class BookingController extends GetxController {
     }
   }
 
-  Future<String> confirmBooking({
-    required String serviceId,
-    required String scheduleId,
-    required String slotId,
-    required DateTime serviceDate,
-    required String slotStart,
-    required String slotEnd,
-    required double amount,
-  }) async {
+  Future<String> makePayment(String offerId, double amount) async {
     isLoading(true);
     try {
-      final data = {
-        "service": serviceId,
-        "scheduleId": scheduleId,
-        "slotId": slotId,
-        "serviceDate": serviceDate.toIso8601String(),
-        "slotStart": slotStart,
-        "slotEnd": slotEnd,
-        "amount": amount,
-      };
-
-      final res = await api.post("/offer", data, authReq: true);
-      final body = jsonDecode(res.body);
-
-      if (res.statusCode == 200 || res.statusCode == 201) {
-        final data = body['data'];
-
-        current.value = OfferModel.fromJson(data);
-
-        return "success";
-      } else {
-        return body['message'] ?? "Something went wrong";
-      }
-    } catch (e) {
-      return e.toString();
-    } finally {
-      isLoading(false);
-    }
-  }
-
-  Future<String> makePayment(
-    String serviceId,
-    String bookingId,
-    double amount,
-  ) async {
-    isLoading(true);
-    try {
-      final res = await api.post("//payments/stripe-intent", {
-        "serviceId": serviceId,
-        "bookingId": bookingId,
+      final res = await api.post("/payments/stripe-intent", {
+        "offerId": offerId,
         "amount": amount,
       }, authReq: true);
       final body = jsonDecode(res.body);

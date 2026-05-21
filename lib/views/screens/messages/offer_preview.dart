@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jurnee/controllers/booking_controller.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/offer_model.dart';
@@ -22,18 +23,45 @@ class OfferPreview extends StatefulWidget {
   State<OfferPreview> createState() => _OfferPreviewState();
 }
 
-class _OfferPreviewState extends State<OfferPreview> {
+class _OfferPreviewState extends State<OfferPreview>
+    with WidgetsBindingObserver {
   final chat = Get.find<ChatController>();
+  final booking = Get.find<BookingController>();
   late OfferModel offer;
   bool showFullDescription = false;
+  bool _paymentStarted = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (widget.offer != null) {
       offer = widget.offer!;
     } else {
       offer = Get.find<ChatController>().lastOffer.value!;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _paymentStarted) {
+      _paymentStarted = false;
+      booking.getSingleBooking(offer.id).then((message) {
+        if (!mounted || message != "success" || booking.current.value == null) {
+          customSnackBar(message);
+          return;
+        }
+
+        setState(() {
+          offer = booking.current.value!;
+        });
+      });
     }
   }
 
@@ -259,7 +287,8 @@ class _OfferPreviewState extends State<OfferPreview> {
                           widget.offer == null)
                         ownerActions(),
                       if (Get.find<UserController>().userData!.id ==
-                          offer.customer)
+                              offer.customer &&
+                          offer.status.toLowerCase() != "accepted")
                         customerActions(),
 
                       // const SizedBox(height: 16),
@@ -330,9 +359,19 @@ class _OfferPreviewState extends State<OfferPreview> {
           child: Obx(
             () => CustomButton(
               onTap: () async {
-                // final message = await chat.off
+                _paymentStarted = true;
+
+                final message = await booking.makePayment(
+                  offer.id,
+                  (calculateServiceCharge - offer.discount).toDouble(),
+                );
+
+                if (message != "success") {
+                  _paymentStarted = false;
+                  customSnackBar(message);
+                }
               },
-              isLoading: chat.isLoading.value,
+              isLoading: booking.isLoading.value,
               text: "Accept",
             ),
           ),
