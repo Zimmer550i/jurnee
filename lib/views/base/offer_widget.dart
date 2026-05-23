@@ -174,7 +174,7 @@ class _OfferWidgetState extends State<OfferWidget> with WidgetsBindingObserver {
                       ),
                       // if (Get.find<UserController>().userData!.id ==
                       //     offer.customer)
-                      if (offer.status != "accepted")
+                      if (offer.status != "draft")
                         Row(
                           spacing: 12,
                           children: [

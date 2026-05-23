@@ -14,6 +14,7 @@ import 'package:jurnee/utils/formatter.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/screens/post/post_details/post_details.dart';
+import 'package:jurnee/views/screens/profile/mark_as_complete.dart';
 
 class OfferPreview extends StatefulWidget {
   final OfferModel? offer;
@@ -285,10 +286,10 @@ class _OfferPreviewState extends State<OfferPreview>
                       if (Get.find<UserController>().userData!.id ==
                               offer.provider.id &&
                           widget.offer == null)
-                        ownerActions(),
+                        newOfferActions(),
                       if (Get.find<UserController>().userData!.id ==
                               offer.customer &&
-                          offer.status.toLowerCase() != "accepted")
+                          offer.status.toLowerCase() != "draft")
                         customerActions(),
 
                       // const SizedBox(height: 16),
@@ -303,17 +304,10 @@ class _OfferPreviewState extends State<OfferPreview>
     );
   }
 
-  Widget ownerActions() {
+  Widget newOfferActions() {
     return Row(
       spacing: 8,
       children: [
-        // Expanded(
-        //   child: CustomButton(
-        //     onTap: () => Get.back(),
-        //     text: "",
-        //     isSecondary: true,
-        //   ),
-        // ),
         Expanded(
           child: Obx(
             () => CustomButton(
@@ -337,47 +331,95 @@ class _OfferPreviewState extends State<OfferPreview>
   }
 
   Widget customerActions() {
-    return Row(
-      spacing: 8,
-      children: [
-        Expanded(
-          child: CustomButton(
-            onTap: () async {
-              final message = await chat.rejectOffer(offer);
-
-              if (message == "success") {
-                customSnackBar("Offer has been rejected", isError: false);
-              } else {
-                customSnackBar(message);
-              }
-            },
-            text: "Reject",
-            isSecondary: true,
-          ),
-        ),
-        Expanded(
-          child: Obx(
-            () => CustomButton(
+    if (offer.status.toLowerCase() == "draft") {
+      return Row(
+        spacing: 8,
+        children: [
+          Expanded(
+            child: CustomButton(
               onTap: () async {
-                _paymentStarted = true;
+                final message = await chat.rejectOffer(offer);
 
-                final message = await booking.makePayment(
-                  offer.id,
-                  (calculateServiceCharge - offer.discount).toDouble(),
-                );
-
-                if (message != "success") {
-                  _paymentStarted = false;
+                if (message == "success") {
+                  customSnackBar("Offer has been rejected", isError: false);
+                } else {
                   customSnackBar(message);
                 }
               },
-              isLoading: booking.isLoading.value,
-              text: "Accept",
+              text: "Reject",
+              isSecondary: true,
             ),
           ),
-        ),
-      ],
-    );
+          Expanded(
+            child: Obx(
+              () => CustomButton(
+                onTap: () async {
+                  _paymentStarted = true;
+
+                  final message = await booking.makePayment(
+                    offer.id,
+                    (calculateServiceCharge - offer.discount).toDouble(),
+                  );
+
+                  if (message != "success") {
+                    _paymentStarted = false;
+                    customSnackBar(message);
+                  }
+                },
+                isLoading: booking.isLoading.value,
+                text: "Accept",
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (offer.status.toLowerCase() == "accepted") {
+      return Row(
+        spacing: 8,
+        children: [
+          Expanded(
+            child: Obx(
+              () => CustomButton(
+                onTap: () async {
+                  final message = await booking.completeOffer(
+                    offer.id,
+                    (calculateServiceCharge - offer.discount).toDouble(),
+                  );
+
+                  if (message != "success") {
+                    offer.status = "completed";
+                    Get.to(() => MarkAsComplete(booking: offer));
+                  } else {
+                    customSnackBar(message);
+                  }
+                },
+                isLoading: booking.isLoading.value,
+                text: "Mark As Completed",
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (offer.status.toLowerCase() == "completed") {
+      return Row(
+        spacing: 8,
+        children: [
+          Expanded(
+            child: Obx(
+              () => CustomButton(
+                onTap: () {
+                  // Get.to(() => Rev(booking: offer));
+                },
+                isLoading: booking.isLoading.value,
+                text: "Give Rating",
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Container();
+    }
   }
 
   num get calculateServiceCharge {

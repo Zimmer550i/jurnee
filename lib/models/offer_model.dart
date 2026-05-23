@@ -10,7 +10,7 @@ class OfferModel {
   final String to;
   final List<OfferItem> items;
   final double discount;
-  final String status;
+  String status;
   final DateTime createdAt;
   final DateTime updatedAt;
 

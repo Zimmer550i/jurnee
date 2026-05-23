@@ -8,7 +8,6 @@ import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/messages/offer_preview.dart';
-import 'package:jurnee/views/screens/profile/mark_as_complete.dart';
 
 class BookingWidget extends StatelessWidget {
   final OfferModel offer;
@@ -69,7 +68,7 @@ class BookingWidget extends StatelessWidget {
                 ),
                 Spacer(),
                 CustomButton(
-                  onTap: () => Get.to(()=> OfferPreview(offer: offer,)),
+                  onTap: () => Get.to(() => OfferPreview(offer: offer)),
                   text: "See Post",
                   width: null,
                   padding: 12,
@@ -131,14 +130,21 @@ class BookingWidget extends StatelessWidget {
               ],
             ),
           ),
+          CustomButton(
+            onTap: () {
+              Get.to(() => OfferPreview(offer: offer));
+            },
+            text: "View Offer",
+            isSecondary: true,
+          ),
 
-          if (offer.status.toLowerCase() == "accepted")
-            CustomButton(
-              onTap: () => Get.to(() => MarkAsComplete(booking: offer)),
-              text: "Mark as Complete",
-            ),
-          if (offer.status.toLowerCase() == "completed")
-            CustomButton(text: "Make Payment", isSecondary: true),
+          // if (offer.status.toLowerCase() == "accepted")
+          //   CustomButton(
+          //     onTap: () => Get.to(() => MarkAsComplete(booking: offer)),
+          //     text: "Mark as Complete",
+          //   ),
+          // if (offer.status.toLowerCase() == "completed")
+          //   CustomButton(text: "Make Payment", isSecondary: true),
         ],
       ),
     );

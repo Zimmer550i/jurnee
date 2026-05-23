@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jurnee/models/offer_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
@@ -15,7 +16,7 @@ class MarkAsComplete extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Mark As Compelte"),
+      appBar: CustomAppBar(title: "Marked As Compelted"),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: SafeArea(
@@ -23,7 +24,7 @@ class MarkAsComplete extends StatelessWidget {
             children: [
               const SizedBox(height: 24),
               Text(
-                "Mark as Complete",
+                "Marked as Completed",
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 22,
@@ -101,10 +102,15 @@ class MarkAsComplete extends StatelessWidget {
                 ),
               ),
               Spacer(),
-              CustomButton(text: "Mark as Complete"),
+              CustomButton(
+                onTap: () {
+                  Get.back();
+                },
+                text: "Go Back",
+              ),
               const SizedBox(height: 16),
               Text(
-                "Payment will be released once the customer confirms.",
+                "Payment has been released.",
                 style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade400),
               ),
               const SizedBox(height: 16),

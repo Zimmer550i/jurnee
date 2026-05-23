@@ -27,6 +27,37 @@ class BookingController extends GetxController {
 
       if (res.statusCode == 200) {
         current.value = OfferModel.fromJson(body['data']);
+
+        int index = offers.indexWhere((val) => val.id == current.value!.id);
+        if (current.value != null) offers[index] = current.value!;
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<String> completeOffer(String offerId, double amount) async {
+    isLoading(true);
+
+    try {
+      final res = await api.post("/offer/complete", {
+        "offerId": offerId,
+        "amount": amount,
+      }, authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200) {
+        current.value = OfferModel.fromJson(body['data']);
+
+        int index = offers.indexWhere((val) => val.id == current.value!.id);
+        if (current.value != null) offers[index] = current.value!;
+
         return "success";
       } else {
         return body['message'] ?? "Something went wrong";
