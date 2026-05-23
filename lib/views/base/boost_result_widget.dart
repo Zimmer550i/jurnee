@@ -15,10 +15,7 @@ class BoostResultItem {
   final PostModel post;
   final int hoursRemaining;
 
-  const BoostResultItem({
-    required this.post,
-    required this.hoursRemaining,
-  });
+  const BoostResultItem({required this.post, required this.hoursRemaining});
 }
 
 class BoostResultWidget extends StatelessWidget {
@@ -105,21 +102,21 @@ class BoostResultWidget extends StatelessWidget {
                           color: AppColors.gray.shade400,
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          "Boost active for $hoursRemaining hrs",
+                          style: AppTexts.tsmr.copyWith(
+                            color: _boostStatusGold,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                "Boost active for $hoursRemaining hrs",
-                style: AppTexts.tsmr.copyWith(
-                  color: _boostStatusGold,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ),
           ],
         ),

@@ -690,4 +690,28 @@ class PostController extends GetxController {
       isLoading(false);
     }
   }
+
+  Future<String> getBoostedPosts() async {
+    isLoading(true);
+    try {
+      final res = await api.get("/post/boosted", authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200) {
+        posts.clear();
+        final List<dynamic> dataList = body['data'];
+        final newItems = dataList.map((e) => PostModel.fromJson(e)).toList();
+
+        posts.addAll(newItems);
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
+    }
+  }
 }

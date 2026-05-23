@@ -35,11 +35,14 @@ class PostModel {
   final DateTime? lastSeenDate;
   final String? contactInfo;
   final int? expireLimit;
+  final dynamic alertExpire;
   final int? capacity;
   final List<String>? amenities;
   final String? licenses;
+  final String? contact;
   final String? status;
   final bool? boost;
+  final DateTime? boostActivatedAt;
   final List<Author> attenders;
   bool isAttender;
   bool isSaved;
@@ -81,11 +84,14 @@ class PostModel {
     this.lastSeenDate,
     this.contactInfo,
     this.expireLimit,
+    this.alertExpire,
     this.capacity,
     this.amenities,
     this.licenses,
+    this.contact,
     this.status,
     this.boost,
+    this.boostActivatedAt,
     required this.attenders,
     this.isAttender = false,
     required this.isSaved,
@@ -128,11 +134,14 @@ class PostModel {
     DateTime? lastSeenDate,
     String? contactInfo,
     int? expireLimit,
+    dynamic alertExpire,
     int? capacity,
     List<String>? amenities,
     String? licenses,
+    String? contact,
     String? status,
     bool? boost,
+    DateTime? boostActivatedAt,
     List<Author>? attenders,
     bool? isAttender,
     bool? isSaved,
@@ -173,11 +182,14 @@ class PostModel {
     lastSeenDate: lastSeenDate ?? this.lastSeenDate,
     contactInfo: contactInfo ?? this.contactInfo,
     expireLimit: expireLimit ?? this.expireLimit,
+    alertExpire: alertExpire ?? this.alertExpire,
     capacity: capacity ?? this.capacity,
     amenities: amenities ?? this.amenities,
     licenses: licenses ?? this.licenses,
+    contact: contact ?? this.contact,
     status: status ?? this.status,
     boost: boost ?? this.boost,
+    boostActivatedAt: boostActivatedAt ?? this.boostActivatedAt,
     attenders: attenders ?? this.attenders,
     isAttender: isAttender ?? this.isAttender,
     isSaved: isSaved ?? this.isSaved,
@@ -240,13 +252,18 @@ class PostModel {
             : DateTime.tryParse(json["lastSeenDate"]),
         contactInfo: json["contactInfo"],
         expireLimit: json["expireLimit"],
+        alertExpire: json["alertExpire"],
         capacity: json["capacity"],
         amenities: json["amenities"] == null
             ? null
             : List<String>.from(json["amenities"].map((x) => x)),
         licenses: json["licenses"],
+        contact: json["contact"],
         status: json["status"],
         boost: json["boost"],
+        boostActivatedAt: json["boostActivatedAt"] == null
+            ? null
+            : DateTime.tryParse(json["boostActivatedAt"]),
         attenders: List<Author>.from(
           json["attenders"].map((x) => Author.fromJson(x)),
         ),
@@ -300,13 +317,16 @@ class PostModel {
     "lastSeenDate": lastSeenDate?.toIso8601String(),
     "contactInfo": contactInfo,
     "expireLimit": expireLimit,
+    "alertExpire": alertExpire,
     "capacity": capacity,
     "amenities": amenities == null
         ? null
         : List<dynamic>.from(amenities!.map((x) => x)),
     "licenses": licenses,
+    "contact": contact,
     "status": status,
     "boost": boost,
+    "boostActivatedAt": boostActivatedAt?.toIso8601String(),
     "attenders": List<dynamic>.from(attenders.map((x) => x.toJson())),
     "isAttender": isAttender,
     "isSaved": isSaved,
