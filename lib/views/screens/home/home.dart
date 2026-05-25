@@ -57,7 +57,11 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: Stack(
         children: [
-          PageView(controller: pageController, children: pages),
+          PageView(
+            physics: NeverScrollableScrollPhysics(),
+            controller: pageController,
+            children: pages,
+          ),
           if (showOverlay)
             GestureDetector(
               onTap: () {
