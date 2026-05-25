@@ -17,13 +17,12 @@
       </intent>
     </queries>
 
-    <!-- For Geo Locator -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <!-- For Geolocator: foreground location only, used to get the user's current latitude/longitude while the app is open. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     
     <application
-        android:label="jurnee"
+        android:label="Jurnee"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <meta-data 
