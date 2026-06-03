@@ -25,8 +25,8 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final emailCtrl = TextEditingController(text: "wasiul0491@gmail.com");
-  final passCtrl = TextEditingController(text: "wasiul12");
+  final emailCtrl = TextEditingController(text: "");
+  final passCtrl = TextEditingController(text: "");
 
   bool agreedTerms = false;
 

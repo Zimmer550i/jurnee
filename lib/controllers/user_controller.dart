@@ -264,6 +264,23 @@ class UserController extends GetxController {
     }
   }
 
+  Future<String> deleteUser() async {
+    isLoading(true);
+    try {
+      final res = await api.delete("/user/delete-profile", authReq: true);
+
+      if (res.statusCode == 200) {
+        return "success";
+      } else {
+        return "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<String> getFollowers(String id, {bool loadMore = false}) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 

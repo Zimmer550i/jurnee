@@ -580,6 +580,10 @@ class _ProfileState extends State<Profile> with RouteAware {
                 Get.back();
                 Get.to(() => Support());
               }),
+              drawerButton("Delete Account", "delete", () {
+                Get.back();
+                deleteAccountSheet(context);
+              }),
               drawerButton("Logout", "log-out", () {
                 Get.back();
                 logoutSheet(context);
@@ -669,6 +673,87 @@ class _ProfileState extends State<Profile> with RouteAware {
                           Get.find<AuthController>().logout();
                           customSnackBar(
                             "You have been logged out!",
+                            isError: false,
+                          );
+                          Get.offAll(() => Login());
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      child: CustomButton(
+                        text: "Cancel",
+                        onTap: () {
+                          Get.back();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 40),
+                  ],
+                ),
+                const SizedBox(height: 48),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<dynamic> deleteAccountSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: Color(0xffE0E0E0))),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 24),
+                Text(
+                  "Delete Account",
+                  style: AppTexts.tlgb.copyWith(color: AppColors.red),
+                ),
+                const SizedBox(height: 24),
+                Container(
+                  width: double.infinity,
+                  height: 1,
+                  color: AppColors.gray.shade100,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  "Are you sure you want to delete your account?",
+                  style: AppTexts.tlgs.copyWith(color: AppColors.gray.shade400),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    const SizedBox(width: 40),
+                    Expanded(
+                      child: CustomButton(
+                        text: "Yes, Delete",
+                        padding: 0,
+                        isSecondary: true,
+                        onTap: () async {
+                          Get.back();
+                          await Get.find<UserController>().deleteUser().then((
+                            message,
+                          ) {
+                            if (message != "success") {
+                              customSnackBar(message);
+                            }
+                          });
+                          Get.find<AuthController>().logout();
+                          customSnackBar(
+                            "Your account has been deleted!",
                             isError: false,
                           );
                           Get.offAll(() => Login());

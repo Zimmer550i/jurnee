@@ -63,7 +63,7 @@ class ProfilePicture extends StatelessWidget {
                       height: size,
                       fit: BoxFit.cover,
                     )
-                  : image != null
+                  : (image != null && image != "")
                   ? CachedNetworkImage(
                       imageUrl: image!,
                       progressIndicatorBuilder: (context, url, progress) {
@@ -100,9 +100,11 @@ class ProfilePicture extends StatelessWidget {
                       ),
                       child: Center(
                         child: SvgPicture.asset(
-                          AppIcons.bell,
+                          "assets/icons/user.svg",
+                          height: size/2,
+                          width: size/2,
                           colorFilter: ColorFilter.mode(
-                            AppColors.green[400]!,
+                            AppColors.green[100]!,
                             BlendMode.srcIn,
                           ),
                         ),
