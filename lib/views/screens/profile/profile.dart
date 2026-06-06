@@ -36,6 +36,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> with RouteAware {
   final user = Get.find<UserController>();
+  final overlayController = OverlayPortalController();
   final GlobalKey<ScaffoldState> _key = GlobalKey();
   PageRoute<dynamic>? _route;
 
@@ -125,7 +126,10 @@ class _ProfileState extends State<Profile> with RouteAware {
                 ],
               ),
             )
-          : CustomAppBar(title: "Profile"),
+          : CustomAppBar(
+              title: "Profile",
+              trailingWidget: profileActionButton(),
+            ),
       endDrawer: widget.userId == null ? drawer(context) : null,
       body: CustomListHandler(
         onRefresh: () {
@@ -529,6 +533,71 @@ class _ProfileState extends State<Profile> with RouteAware {
                 ),
         ),
       ),
+    );
+  }
+
+  Widget profileActionButton() {
+    return PopupMenuButton<String>(
+      color: AppColors.white,
+      offset: const Offset(0, 8),
+      padding: EdgeInsets.zero,
+      borderRadius: BorderRadius.circular(16),
+      icon: CustomSvg(asset: "assets/icons/three_dot.svg"),
+      onSelected: (value) {
+        if (value == "report") {
+          if (user.specificUser.value != null) {
+            customSnackBar(
+              "${user.specificUser.value?.name} has been reported to the Admin.",
+              isError: false,
+            );
+          }
+        }
+
+        if (value == "block") {
+          if (user.specificUser.value != null) {
+            user.blockUser(user.specificUser.value!.id).then((value) {
+              if (value == "success") {
+                if (context.mounted) {
+                  Get.back();
+                }
+                customSnackBar(
+                  "${user.specificUser.value?.name} has been blocked.",
+                  isError: false,
+                );
+              }
+            });
+          }
+        }
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: "report",
+          child: _profileMenuButton(
+            title: "Report User",
+            icon: "assets/icons/alert.svg",
+          ),
+        ),
+        PopupMenuItem(
+          value: "block",
+          child: _profileMenuButton(
+            title: "Block User",
+            icon: "assets/icons/delete.svg",
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _profileMenuButton({required String title, required String icon}) {
+    return Row(
+      children: [
+        CustomSvg(asset: icon, size: 20, color: AppColors.green),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: AppTexts.tsmr.copyWith(color: AppColors.gray.shade700),
+        ),
+      ],
     );
   }
 

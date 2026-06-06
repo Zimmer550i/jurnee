@@ -281,6 +281,24 @@ class UserController extends GetxController {
     }
   }
 
+  Future<String> blockUser(String id) async {
+    isLoading(true);
+    try {
+      final res = await api.post("/block/$id", {}, authReq: true);
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return "success";
+      } else {
+        return body["message"] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<String> getFollowers(String id, {bool loadMore = false}) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 

@@ -9,6 +9,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool hasLeading;
   final String? trailing;
+  final Widget? trailingWidget;
   final void Function()? trailingAction;
   const CustomAppBar({
     super.key,
@@ -16,6 +17,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.hasLeading = true,
     this.trailing,
     this.trailingAction,
+    this.trailingWidget,
   });
 
   @override
@@ -51,7 +53,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 style: AppTexts.tmdb.copyWith(color: AppColors.gray.shade700),
               ),
             ),
-            trailing != null
+            trailingWidget != null
+                ? trailingWidget!
+                : trailing != null
                 ? GestureDetector(
                     onTap: () {
                       if (trailingAction != null) {
