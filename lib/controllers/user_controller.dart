@@ -38,7 +38,11 @@ class UserController extends GetxController {
 
   set userData(User? val) {
     user.value = val;
-    isLoggedIn.value = true;
+    if (val == null) {
+      isLoggedIn.value = false;
+    } else {
+      isLoggedIn.value = true;
+    }
   }
 
   @override

@@ -224,6 +224,7 @@ class _LoginState extends State<Login> {
                       ),
                       GestureDetector(
                         onTap: () {
+                          Get.find<UserController>().userData = null;
                           Get.offAll(() => Home(), routeName: "/app");
                         },
                         child: Text(

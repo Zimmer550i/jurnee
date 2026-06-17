@@ -739,12 +739,12 @@ class _ProfileState extends State<Profile> with RouteAware {
                         isSecondary: true,
                         onTap: () async {
                           Get.back();
+                          Get.offAll(() => Login());
                           Get.find<AuthController>().logout();
                           customSnackBar(
                             "You have been logged out!",
                             isError: false,
                           );
-                          Get.offAll(() => Login());
                         },
                       ),
                     ),
