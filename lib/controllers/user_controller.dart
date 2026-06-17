@@ -14,6 +14,7 @@ class UserController extends GetxController {
   Rxn<User> user = Rxn();
   Rxn<User> specificUser = Rxn();
   RxList<PostModel> get posts => Get.find<PostController>().posts;
+  RxBool isLoggedIn = RxBool(false);
   RxBool isLoading = RxBool(false);
   RxBool isFollowLoading = RxBool(false);
 
@@ -37,6 +38,7 @@ class UserController extends GetxController {
 
   set userData(User? val) {
     user.value = val;
+    isLoggedIn.value = true;
   }
 
   @override
@@ -102,11 +104,14 @@ class UserController extends GetxController {
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         user.value = User.fromJson(body['data']);
+        isLoggedIn.value = true;
         return "success";
       } else {
+        isLoggedIn.value = false;
         return body["message"] ?? "Something went wrong";
       }
     } catch (e) {
+      isLoggedIn.value = false;
       return e.toString();
     }
   }

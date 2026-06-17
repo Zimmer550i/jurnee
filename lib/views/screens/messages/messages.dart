@@ -71,8 +71,7 @@ class _MessagesState extends State<Messages> {
                           color: AppColors.gray.shade300,
                         ),
                       ),
-                    if (!chat.isMoreLoading.value &&
-                        chat.chats.isEmpty)
+                    if (!chat.isMoreLoading.value && chat.chats.isEmpty)
                       Center(
                         child: Text(
                           "You have no messages",
@@ -97,11 +96,23 @@ class _MessagesState extends State<Messages> {
     //     child: Text("!!!", style: AppTexts.tsmr.copyWith(color: AppColors.red)),
     //   );
     // }
-    final Member recipent = chat.members.where((mem) => mem.id != userId).first;
+    Member? recipent;
+    try {
+      recipent = chat.members.where((mem) => mem.id != userId).first;
+    } catch (_) {}
+    if (recipent == null) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          "Error loading this chat",
+          style: AppTexts.tsmr.copyWith(color: AppColors.red),
+        ),
+      );
+    }
 
     return GestureDetector(
       onTap: () {
-        Get.to(() => Chat(inboxId: chat.id, chatMember: recipent));
+        Get.to(() => Chat(inboxId: chat.id, chatMember: recipent!));
       },
       child: Container(
         padding: EdgeInsets.all(12),
@@ -112,7 +123,7 @@ class _MessagesState extends State<Messages> {
         child: Row(
           children: [
             GestureDetector(
-              onTap: () => Get.to(() => Profile(userId: recipent.id)),
+              onTap: () => Get.to(() => Profile(userId: recipent!.id)),
               child: AbsorbPointer(
                 child: ProfilePicture(image: recipent.image, size: 48),
               ),

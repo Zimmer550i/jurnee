@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
 import 'package:jurnee/controllers/user_controller.dart';
-import 'package:jurnee/views/screens/auth/login.dart';
 import 'package:jurnee/views/screens/home/home.dart';
 
 class Splash extends StatefulWidget {
@@ -38,16 +37,30 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     final time = Stopwatch();
     time.start();
     isVerified = await Get.find<AuthController>().previouslyLoggedIn();
-    if (isVerified) await Get.find<UserController>().getUserData();
+
+    String message = "Call not made";
+    if (isVerified) {
+      try {
+        message = await Get.find<UserController>().getUserData().timeout(
+          const Duration(seconds: 2),
+        );
+      } catch (_) {
+        message = "timeout_or_failed";
+      }
+    }
 
     if (time.elapsed < animationDuration) {
       await Future.delayed(animationDuration - time.elapsed);
     }
 
-    if (isVerified) {
-      Get.offAll(() => Home(), routeName: "/app");
-    } else {
-      Get.offAll(() => Login());
-    }
+    debugPrint(message);
+
+    Get.offAll(() => Home(), routeName: "/app");
+
+    // if (isVerified && message == "success") {
+    //   Get.offAll(() => Home(), routeName: "/app");
+    // } else {
+    //   Get.offAll(() => Login());
+    // }
   }
 }

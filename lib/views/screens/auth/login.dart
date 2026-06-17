@@ -198,25 +198,43 @@ class _LoginState extends State<Login> {
                   );
                 }),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Not a member?",
-                      style: AppTexts.txsr.copyWith(color: Color(0xff808080)),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.to(() => Register());
-                      },
-                      child: Text(
-                        " Register now ",
-                        style: AppTexts.txsb.copyWith(
-                          color: AppColors.green.shade700,
+                SizedBox(
+                  width: double.infinity,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    children: [
+                      Text(
+                        "Not a member?",
+                        style: AppTexts.txsr.copyWith(color: Color(0xff808080)),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Get.to(() => Register());
+                        },
+                        child: Text(
+                          "  Register now  ",
+                          style: AppTexts.txsb.copyWith(
+                            color: AppColors.green.shade700,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                      Text(
+                        " or ",
+                        style: AppTexts.txsr.copyWith(color: Color(0xff808080)),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Get.offAll(() => Home(), routeName: "/app");
+                        },
+                        child: Text(
+                          "  Continue as a Guest",
+                          style: AppTexts.txsb.copyWith(
+                            color: AppColors.green.shade700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Container(

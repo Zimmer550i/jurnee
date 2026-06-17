@@ -1,5 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:jurnee/views/base/custom_button.dart';
+import 'package:jurnee/views/screens/auth/login.dart';
+import 'package:motor/motor.dart';
 import 'package:get/get.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
 import 'package:jurnee/controllers/notification_controller.dart';
@@ -12,6 +15,7 @@ import 'package:jurnee/utils/custom_svg.dart';
 import 'package:jurnee/views/base/custom_bottom_navbar.dart';
 import 'package:jurnee/views/screens/auth/user_interests.dart';
 import 'package:jurnee/views/screens/home/homepage.dart';
+import 'package:jurnee/views/screens/home/need_login.dart';
 import 'package:jurnee/views/screens/messages/messages.dart';
 import 'package:jurnee/views/screens/notifications/notifications.dart';
 import 'package:jurnee/views/screens/post/post_alert.dart';
@@ -31,11 +35,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   PageController pageController = PageController(initialPage: 0);
+  final user = Get.find<UserController>();
   int index = 0;
   bool showOverlay = false;
   bool showNavBar = true;
 
-  final List<Widget> pages = [
+  List<Widget> pages = [
     Homepage(key: homeKey),
     Messages(),
     Notifications(),
@@ -45,8 +50,11 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    if (!user.isLoggedIn.value) {
+      pages = [Homepage(key: homeKey), NeedLogin(), NeedLogin(), NeedLogin()];
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (Get.find<UserController>().userData!.interested.isEmpty) {
+      if (user.userData?.interested.isEmpty ?? false) {
         Get.to(() => UserInterests());
       }
     });
@@ -69,206 +77,18 @@ class _HomeState extends State<Home> {
                   showOverlay = false;
                 });
               },
-              child: Container(color: AppColors.black.withValues(alpha: 0.37)),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                child: Container(
+                  color: AppColors.black.withValues(alpha: 0.37),
+                ),
+              ),
             ),
           Positioned(
             bottom: 20,
             left: 24,
             right: 24,
-            child: TweenAnimationBuilder(
-              tween: Tween(begin: 0.0, end: showOverlay ? 3.0 : 0.0),
-              duration: Duration(milliseconds: 100),
-              builder: (context, value, child) {
-                return BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: value, sigmaY: value),
-                  child: Transform.scale(
-                    scale: value / 3,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            "Create Post",
-                            style: AppTexts.tlgs.copyWith(
-                              color: AppColors.gray.shade700,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      showOverlay = false;
-                                    });
-                                    Get.to(() => PostEvent());
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.gray[50],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        CustomSvg(
-                                          asset: "assets/icons/event.svg",
-                                        ),
-                                        Text(
-                                          "Event",
-                                          style: AppTexts.tmdb.copyWith(
-                                            color: AppColors.gray.shade600,
-                                          ),
-                                        ),
-                                        Text(
-                                          "Share upcoming activities, concerts, meetups",
-                                          textAlign: TextAlign.center,
-                                          style: AppTexts.txsr.copyWith(
-                                            color: AppColors.gray.shade500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      showOverlay = false;
-                                    });
-                                    Get.to(() => PostDeal());
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.gray[50],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        CustomSvg(
-                                          asset: "assets/icons/deal.svg",
-                                        ),
-                                        Text(
-                                          "Deal",
-                                          style: AppTexts.tmdb.copyWith(
-                                            color: AppColors.gray.shade600,
-                                          ),
-                                        ),
-                                        Text(
-                                          "Promote discounts, specials, flash offers",
-                                          textAlign: TextAlign.center,
-                                          style: AppTexts.txsr.copyWith(
-                                            color: AppColors.gray.shade500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      showOverlay = false;
-                                    });
-                                    Get.to(() => PostService());
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.gray[50],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        CustomSvg(
-                                          asset: "assets/icons/service.svg",
-                                        ),
-                                        Text(
-                                          "Service",
-                                          style: AppTexts.tmdb.copyWith(
-                                            color: AppColors.gray.shade600,
-                                          ),
-                                        ),
-                                        Text(
-                                          "Add professional services with availability & pricing",
-                                          textAlign: TextAlign.center,
-                                          style: AppTexts.txsr.copyWith(
-                                            color: AppColors.gray.shade500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      showOverlay = false;
-                                    });
-                                    Get.to(() => PostAlert());
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.gray[50],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        CustomSvg(
-                                          asset: "assets/icons/alert.svg",
-                                        ),
-                                        Text(
-                                          "Alerts",
-                                          style: AppTexts.tmdb.copyWith(
-                                            color: AppColors.gray.shade600,
-                                          ),
-                                        ),
-                                        Text(
-                                          "Quick community updates (road closures, lost pet)",
-                                          textAlign: TextAlign.center,
-                                          style: AppTexts.txsr.copyWith(
-                                            color: AppColors.gray.shade500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+            child: _buildCreatePostOverlay(),
           ),
         ],
       ),
@@ -331,32 +151,7 @@ class _HomeState extends State<Home> {
                 setState(() {
                   index = val;
                 });
-
-                if (val == 0) {
-                  Get.find<PostController>().fetchPosts().then((message) {
-                    if (message != "success") {
-                      customSnackBar(message);
-                    }
-                  });
-                } else if (val == 1) {
-                  Get.find<ChatController>().fetchChats().then((message) {
-                    if (message != "success") {
-                      customSnackBar(message);
-                    }
-                  });
-                  Get.find<UserController>().getMyServices();
-                } else if (val == 2) {
-                  Get.find<NotificationController>().fetchNotifications();
-                } else if (val == 3) {
-                  final user = Get.find<UserController>();
-                  user.getUserPosts(Profile.index, user.userData?.id).then((
-                    message,
-                  ) {
-                    if (message != "success") {
-                      customSnackBar(message);
-                    }
-                  });
-                }
+                _fetchDataForTab(val);
               },
               onShowOverlay: () {
                 setState(() {
@@ -366,5 +161,166 @@ class _HomeState extends State<Home> {
             )
           : null,
     );
+  }
+
+  Widget _buildCreatePostOverlay() {
+    return SingleMotionBuilder(
+      motion: showOverlay
+          ? CupertinoMotion.bouncy(duration: Duration(milliseconds: 200))
+          : CupertinoMotion.snappy(duration: Duration(milliseconds: 200)),
+      value: showOverlay ? 3.0 : 0.0,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, -(value - 3) * 50),
+          child: Transform.scale(
+            scale: value / 3,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: !user.isLoggedIn.value
+                  ? Column(
+                      children: [
+                        Text("Sign In To Continue", style: AppTexts.tlgs),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Unlock all features by signing in to your account.",
+                          style: AppTexts.tsmr.copyWith(
+                            color: AppColors.gray.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        CustomButton(
+                          onTap: () {
+                            Get.offAll(() => Login());
+                          },
+                          text: "Login",
+                        ),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        Text(
+                          "Create Post",
+                          style: AppTexts.tlgs.copyWith(
+                            color: AppColors.gray.shade700,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildPostOption(
+                              asset: "assets/icons/event.svg",
+                              title: "Event",
+                              description:
+                                  "Share upcoming activities, concerts, meetups",
+                              onTap: () => Get.to(() => PostEvent()),
+                            ),
+                            const SizedBox(width: 16),
+                            _buildPostOption(
+                              asset: "assets/icons/deal.svg",
+                              title: "Deal",
+                              description:
+                                  "Promote discounts, specials, flash offers",
+                              onTap: () => Get.to(() => PostDeal()),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildPostOption(
+                              asset: "assets/icons/service.svg",
+                              title: "Service",
+                              description:
+                                  "Add professional services with availability & pricing",
+                              onTap: () => Get.to(() => PostService()),
+                            ),
+                            const SizedBox(width: 16),
+                            _buildPostOption(
+                              asset: "assets/icons/alert.svg",
+                              title: "Alerts",
+                              description:
+                                  "Quick community updates (road closures, lost pet)",
+                              onTap: () => Get.to(() => PostAlert()),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPostOption({
+    required String asset,
+    required String title,
+    required String description,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            showOverlay = false;
+          });
+          onTap();
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.gray[50],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              CustomSvg(asset: asset),
+              Text(
+                title,
+                style: AppTexts.tmdb.copyWith(color: AppColors.gray.shade600),
+              ),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: AppTexts.txsr.copyWith(color: AppColors.gray.shade500),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _fetchDataForTab(int tabIndex) {
+    if (!user.isLoggedIn.value) return;
+
+    switch (tabIndex) {
+      case 0:
+        Get.find<PostController>().fetchPosts().then((message) {
+          if (message != "success") customSnackBar(message);
+        });
+        break;
+      case 1:
+        Get.find<ChatController>().fetchChats().then((message) {
+          if (message != "success") customSnackBar(message);
+        });
+        user.getMyServices();
+        break;
+      case 2:
+        Get.find<NotificationController>().fetchNotifications();
+        break;
+      case 3:
+        user.getUserPosts(Profile.index, user.userData?.id).then((message) {
+          if (message != "success") customSnackBar(message);
+        });
+        break;
+    }
   }
 }

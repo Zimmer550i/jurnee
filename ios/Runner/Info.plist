@@ -51,12 +51,10 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app needs your location to provide better service.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app needs your location even when running in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs your location while using the app.</string>
+	<string>Jurnee uses your location to show nearby posts while you are using the app.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Jurnee uses your location to display your position on the map while you are using the app. Jurnee does not use your location in the background.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app requires access to your photo library to select and upload photos for Event details and Profile information.</string>
 	<key>UIApplicationSceneManifest</key>
