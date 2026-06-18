@@ -12,6 +12,8 @@ class PostMetaData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final parentState =
+        context.findAncestorStateOfType<_PostDetailsState>();
     int index = postController.posts.indexWhere((val) => val.id == postData.id);
     if (index == -1) {
       index = Get.find<UserController>().posts.indexWhere(
@@ -29,13 +31,18 @@ class PostMetaData extends StatelessWidget {
             child: Text("Reload this page"),
           );
         }
+        final currentPost = postController.posts.elementAt(index);
         return Row(
           children: [
             GestureDetector(
               onTap: () {
+                if (parentState != null && !parentState._isLoggedIn) {
+                  parentState._onAuthRequired();
+                  return;
+                }
                 Get.to(
                   () => Profile(
-                    userId: postController.posts.elementAt(index).author.id,
+                    userId: currentPost.author.id,
                   ),
                 );
               },
@@ -53,16 +60,13 @@ class PostMetaData extends StatelessWidget {
                     children: [
                       AbsorbPointer(
                         child: ProfilePicture(
-                          image: postController.posts
-                              .elementAt(index)
-                              .author
-                              .image,
+                          image: currentPost.author.image,
                           size: 32,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        postController.posts.elementAt(index).author.name,
+                        currentPost.author.name,
                         style: AppTexts.tmdb.copyWith(
                           color: AppColors.gray.shade700,
                         ),
@@ -76,23 +80,27 @@ class PostMetaData extends StatelessWidget {
             CustomSvg(asset: 'assets/icons/view.svg'),
             const SizedBox(width: 4),
             Text(
-              postController.posts.elementAt(index).views.toString(),
+              currentPost.views.toString(),
               style: AppTexts.tsmr,
             ),
             const SizedBox(width: 12),
             GestureDetector(
-              onTap: () => postController.saveToggle(
-                postController.posts.elementAt(index).id,
-              ),
+              onTap: () {
+                if (parentState != null && !parentState._isLoggedIn) {
+                  parentState._onAuthRequired();
+                  return;
+                }
+                postController.saveToggle(currentPost.id);
+              },
               child: Row(
                 children: [
                   CustomSvg(
                     asset:
-                        'assets/icons/${postController.posts.elementAt(index).isSaved ? 'saved' : 'save'}.svg',
+                        'assets/icons/${currentPost.isSaved ? 'saved' : 'save'}.svg',
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    postController.posts.elementAt(index).totalSaved.toString(),
+                    currentPost.totalSaved.toString(),
                     style: AppTexts.tsmr,
                   ),
                 ],
@@ -101,9 +109,13 @@ class PostMetaData extends StatelessWidget {
             const SizedBox(width: 12),
             GestureDetector(
               onTap: () {
+                if (parentState != null && !parentState._isLoggedIn) {
+                  parentState._onAuthRequired();
+                  return;
+                }
                 postController
                     .likeToggle(
-                      postController.posts.elementAt(index).id,
+                      currentPost.id,
                       'post',
                     )
                     .then((message) {});
@@ -112,11 +124,11 @@ class PostMetaData extends StatelessWidget {
                 children: [
                   CustomSvg(
                     asset:
-                        'assets/icons/${postController.posts.elementAt(index).isLiked ? 'loved' : 'love'}.svg',
+                        'assets/icons/${currentPost.isLiked ? 'loved' : 'love'}.svg',
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    postController.posts.elementAt(index).likes.toString(),
+                    currentPost.likes.toString(),
                     style: AppTexts.tsmr,
                   ),
                 ],
@@ -128,3 +140,4 @@ class PostMetaData extends StatelessWidget {
     );
   }
 }
+

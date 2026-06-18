@@ -27,6 +27,7 @@ import 'package:jurnee/views/base/media_player.dart';
 import 'package:jurnee/views/base/media_thumbnail.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/base/review_widget.dart';
+import 'package:jurnee/views/screens/auth/login.dart';
 import 'package:jurnee/views/screens/home/post_location.dart';
 import 'package:jurnee/views/screens/home/users_list.dart';
 import 'package:jurnee/views/screens/post/post_alert.dart';
@@ -72,10 +73,84 @@ class PostDetails extends StatefulWidget {
 
 class _PostDetailsState extends State<PostDetails> {
   final post = Get.find<PostController>();
+  final user = Get.find<UserController>();
   final listController = ScrollController();
   final GlobalKey commentSectionKey = GlobalKey();
   PostModel? postData;
   late int index;
+
+  bool get _isLoggedIn => user.isLoggedIn.value;
+
+  /// Called when an unauthenticated user taps an auth-required action.
+  /// The user will add an overlay here later.
+  void _onAuthRequired() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: Color(0xffE0E0E0))),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 24),
+                Text(
+                  "Login",
+                  style: AppTexts.tlgb.copyWith(color: AppColors.red),
+                ),
+                const SizedBox(height: 24),
+                Container(
+                  width: double.infinity,
+                  height: 1,
+                  color: AppColors.gray.shade100,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  "You must login to get full access",
+                  style: AppTexts.tlgs.copyWith(color: AppColors.gray.shade400),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    const SizedBox(width: 40),
+                    Expanded(
+                      child: CustomButton(
+                        text: "Login",
+                        padding: 0,
+                        isSecondary: true,
+                        onTap: () async {
+                          Get.back();
+                          Get.offAll(() => Login());
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      child: CustomButton(
+                        text: "Cancel",
+                        onTap: () {
+                          Get.back();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 40),
+                  ],
+                ),
+                const SizedBox(height: 48),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -86,10 +161,10 @@ class _PostDetailsState extends State<PostDetails> {
   void resolvePostData() async {
     if (widget.post != null) {
       postData = widget.post!;
-      post.addViewCount(postData!.id);
+      if (_isLoggedIn) post.addViewCount(postData!.id);
       index = post.posts.indexWhere((val) => val.id == postData?.id);
     } else {
-      await post.addViewCount(widget.postId!);
+      if (_isLoggedIn) await post.addViewCount(widget.postId!);
       try {
         postData = post.posts.firstWhere(
           (element) => element.id == widget.postId,
@@ -199,15 +274,9 @@ class _PostDetailsState extends State<PostDetails> {
                       ),
 
                     if (postData!.category != "service")
-                      PostComments(
-                        sectionKey: commentSectionKey,
-                        index: index,
-                      ),
+                      PostComments(sectionKey: commentSectionKey, index: index),
                     if (postData!.category == "service")
-                      PostReviews(
-                        sectionKey: commentSectionKey,
-                        index: index,
-                      ),
+                      PostReviews(sectionKey: commentSectionKey, index: index),
                   ],
                 ),
               ],

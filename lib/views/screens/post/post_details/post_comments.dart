@@ -65,81 +65,120 @@ class _PostCommentsState extends State<PostComments> {
                   child: CustomLoading(),
                 ),
               if (!postController.isFirstLoad.value)
-                Row(
-                  children: [
-                    Expanded(
-                      child: CustomTextField(
-                        hintText: 'Add a comment',
-                        controller: commentController,
-                        trailingWidget: GestureDetector(
-                          onTap: () async {
-                            final file = await ImagePicker().pickMedia();
-                            if (file != null) {
-                              setState(() {
-                                final pickedFile = File(file.path);
-                                if (isVideoMedia(
-                                  path: file.path,
-                                  mimeType: file.mimeType,
-                                )) {
-                                  commentVideo = pickedFile;
-                                  commentImage = null;
-                                } else {
-                                  commentImage = pickedFile;
-                                  commentVideo = null;
-                                }
-                              });
-                            }
-                          },
-                          child: commentImage == null && commentVideo == null
-                              ? CustomSvg(asset: 'assets/icons/add_image.svg')
-                              : ClipRRect(
-                                  borderRadius: BorderRadiusGeometry.circular(4),
-                                  child: SizedBox(
-                                    height: 36,
-                                    width: 36,
-                                    child: MediaThumbnail(
-                                      showPlayButton: false,
-                                      path:
-                                          commentImage?.path ??
-                                          commentVideo?.path,
-                                    ),
+                Builder(
+                  builder: (ctx) {
+                    final parentState =
+                        ctx.findAncestorStateOfType<_PostDetailsState>();
+                    final isLoggedIn = parentState?._isLoggedIn ?? false;
+
+                    if (!isLoggedIn) {
+                      return GestureDetector(
+                        onTap: () => parentState?._onAuthRequired(),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.gray.shade200),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Sign in to add a comment',
+                                  style: AppTexts.tsmr.copyWith(
+                                    color: AppColors.gray.shade400,
                                   ),
                                 ),
+                              ),
+                              CustomSvg(
+                                asset: 'assets/icons/add_image.svg',
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    postController.commentLoading.value == postData.id
-                        ? CustomLoading()
-                        : CustomButton(
-                            onTap: () {
-                              postController
-                                  .createComment(
-                                    postData.id,
-                                    commentController.text,
-                                    commentImage,
-                                    commentVideo,
-                                  )
-                                  .then((message) {
-                                    if (message != 'success') {
-                                      customSnackBar(message);
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: CustomTextField(
+                            hintText: 'Add a comment',
+                            controller: commentController,
+                            trailingWidget: GestureDetector(
+                              onTap: () async {
+                                final file = await ImagePicker().pickMedia();
+                                if (file != null) {
+                                  setState(() {
+                                    final pickedFile = File(file.path);
+                                    if (isVideoMedia(
+                                      path: file.path,
+                                      mimeType: file.mimeType,
+                                    )) {
+                                      commentVideo = pickedFile;
+                                      commentImage = null;
                                     } else {
-                                      postController.getMedia(postData.id);
-                                      setState(() {
-                                        commentController.clear();
-                                        commentImage = null;
-                                        commentVideo = null;
-                                      });
+                                      commentImage = pickedFile;
+                                      commentVideo = null;
                                     }
                                   });
-                            },
-                            text: 'Post',
-                            width: null,
-                            padding: 20,
-                            height: 36,
-                            fontSize: 14,
+                                }
+                              },
+                              child: commentImage == null && commentVideo == null
+                                  ? CustomSvg(asset: 'assets/icons/add_image.svg')
+                                  : ClipRRect(
+                                      borderRadius: BorderRadiusGeometry.circular(4),
+                                      child: SizedBox(
+                                        height: 36,
+                                        width: 36,
+                                        child: MediaThumbnail(
+                                          showPlayButton: false,
+                                          path:
+                                              commentImage?.path ??
+                                              commentVideo?.path,
+                                        ),
+                                      ),
+                                    ),
+                            ),
                           ),
-                  ],
+                        ),
+                        const SizedBox(width: 12),
+                        postController.commentLoading.value == postData.id
+                            ? CustomLoading()
+                            : CustomButton(
+                                onTap: () {
+                                  postController
+                                      .createComment(
+                                        postData.id,
+                                        commentController.text,
+                                        commentImage,
+                                        commentVideo,
+                                      )
+                                      .then((message) {
+                                        if (message != 'success') {
+                                          customSnackBar(message);
+                                        } else {
+                                          postController.getMedia(postData.id);
+                                          setState(() {
+                                            commentController.clear();
+                                            commentImage = null;
+                                            commentVideo = null;
+                                          });
+                                        }
+                                      });
+                                },
+                                text: 'Post',
+                                width: null,
+                                padding: 20,
+                                height: 36,
+                                fontSize: 14,
+                              ),
+                      ],
+                    );
+                  },
                 ),
               Divider(height: 32, color: AppColors.gray.shade100),
               if (postController.comments.isEmpty)

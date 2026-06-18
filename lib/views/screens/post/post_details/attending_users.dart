@@ -7,6 +7,9 @@ class AttendingUsers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final parentState =
+        context.findAncestorStateOfType<_PostDetailsState>();
+
     return Obx(() {
       final post = Get.find<PostController>().posts[index];
       return Container(
@@ -14,6 +17,10 @@ class AttendingUsers extends StatelessWidget {
         padding: EdgeInsets.all(24),
         child: InkWell(
           onTap: () {
+            if (parentState != null && !parentState._isLoggedIn) {
+              parentState._onAuthRequired();
+              return;
+            }
             Get.to(() => UsersList(title: 'Attending', data: post.attenders));
           },
           child: Row(

@@ -12,10 +12,17 @@ class PostButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final parentState =
+        context.findAncestorStateOfType<_PostDetailsState>();
+
     return Obx(() {
       final category = postData.category.toLowerCase();
       String buttonText = "Request Quote";
       VoidCallback buttonAction = () {
+        if (parentState != null && !parentState._isLoggedIn) {
+          parentState._onAuthRequired();
+          return;
+        }
         if (postData.author.id != null) {
           Get.find<ChatController>().createOrGetChat(
             postData.author.id!,
@@ -37,6 +44,10 @@ class PostButtons extends StatelessWidget {
         }
         buttonText = post.isAttender == true ? "Attending" : "Attend";
         buttonAction = () async {
+          if (parentState != null && !parentState._isLoggedIn) {
+            parentState._onAuthRequired();
+            return;
+          }
           final message = await Get.find<PostController>().joinEvent(
             postData.id,
           );
@@ -49,11 +60,19 @@ class PostButtons extends StatelessWidget {
       } else if (category == "deal") {
         buttonText = "Get Deal";
         buttonAction = () {
+          if (parentState != null && !parentState._isLoggedIn) {
+            parentState._onAuthRequired();
+            return;
+          }
           showRedeemCodeSheet(context, postData);
         };
       } else if (category == "alert") {
         buttonText = "Add Comment";
         buttonAction = () {
+          if (parentState != null && !parentState._isLoggedIn) {
+            parentState._onAuthRequired();
+            return;
+          }
           final target = commentSectionKey.currentContext;
           if (target != null) {
             Scrollable.ensureVisible(
@@ -78,6 +97,10 @@ class PostButtons extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
+              if (parentState != null && !parentState._isLoggedIn) {
+                parentState._onAuthRequired();
+                return;
+              }
               if (postData.author.id != null) {
                 Get.find<ChatController>().createOrGetChat(postData.author.id!);
               } else {
@@ -106,3 +129,4 @@ class PostButtons extends StatelessWidget {
     });
   }
 }
+

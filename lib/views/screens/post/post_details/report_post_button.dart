@@ -5,10 +5,17 @@ class ReportPostButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final parentState =
+        context.findAncestorStateOfType<_PostDetailsState>();
+
     return PopupMenuButton<String>(
       icon: CustomSvg(asset: 'assets/icons/options.svg'),
       padding: EdgeInsets.zero,
       onSelected: (value) {
+        if (parentState != null && !parentState._isLoggedIn) {
+          parentState._onAuthRequired();
+          return;
+        }
         showModalBottomSheet(
           context: context,
           useSafeArea: true,
@@ -58,3 +65,4 @@ class ReportPostButton extends StatelessWidget {
     );
   }
 }
+
