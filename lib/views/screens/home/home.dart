@@ -114,11 +114,16 @@ class _HomeState extends State<Home> {
                 homeKey.currentState?.setState(() {
                   homeKey.currentState?.searchEnabled = false;
                 });
-                post.fetchPosts().then((message) {
-                  if (message != "success") {
-                    customSnackBar(message);
-                  }
-                });
+                final userCtrl = Get.find<UserController>();
+                if (userCtrl.isLoggedIn.value) {
+                  post.fetchPosts().then((message) {
+                    if (message != "success") customSnackBar(message);
+                  });
+                } else {
+                  post.fetchPostsWithoutAuth().then((message) {
+                    if (message != "success") customSnackBar(message);
+                  });
+                }
               },
               child: Container(
                 height: 60,
@@ -183,13 +188,14 @@ class _HomeState extends State<Home> {
               child: !user.isLoggedIn.value
                   ? Column(
                       children: [
-                        Text("Sign In To Continue", style: AppTexts.tlgs),
+                        Text("Log In to Continue", style: AppTexts.tlgs),
                         const SizedBox(height: 8),
                         Text(
-                          "Unlock all features by signing in to your account.",
+                          "Sign in to your account to unlock all features and enjoy a personalized experience.",
                           style: AppTexts.tsmr.copyWith(
                             color: AppColors.gray.shade600,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
                         CustomButton(

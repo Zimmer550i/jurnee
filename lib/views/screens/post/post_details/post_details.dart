@@ -101,10 +101,7 @@ class _PostDetailsState extends State<PostDetails> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 24),
-                Text(
-                  "Login",
-                  style: AppTexts.tlgb.copyWith(color: AppColors.red),
-                ),
+                Text("Personalized Feature", style: AppTexts.tlgs),
                 const SizedBox(height: 24),
                 Container(
                   width: double.infinity,
@@ -112,37 +109,54 @@ class _PostDetailsState extends State<PostDetails> {
                   color: AppColors.gray.shade100,
                 ),
                 const SizedBox(height: 24),
-                Text(
-                  "You must login to get full access",
-                  style: AppTexts.tlgs.copyWith(color: AppColors.gray.shade400),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    "Sign in to your account to unlock all features and enjoy a personalized experience.",
+                    style: AppTexts.tmdr.copyWith(
+                      color: AppColors.gray.shade500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 const SizedBox(height: 24),
-                Row(
-                  children: [
-                    const SizedBox(width: 40),
-                    Expanded(
-                      child: CustomButton(
-                        text: "Login",
-                        padding: 0,
-                        isSecondary: true,
-                        onTap: () async {
-                          Get.back();
-                          Get.offAll(() => Login());
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 18),
-                    Expanded(
-                      child: CustomButton(
-                        text: "Cancel",
-                        onTap: () {
-                          Get.back();
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 40),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: CustomButton(
+                    text: "Login",
+                    padding: 0,
+                    onTap: () async {
+                      Get.back();
+                      Get.offAll(() => Login());
+                    },
+                  ),
                 ),
+                // Row(
+                //   children: [
+                //     const SizedBox(width: 40),
+                //     Expanded(
+                //       child: CustomButton(
+                //         text: "Login",
+                //         padding: 0,
+                //         isSecondary: true,
+                //         onTap: () async {
+                //           Get.back();
+                //           Get.offAll(() => Login());
+                //         },
+                //       ),
+                //     ),
+                //     const SizedBox(width: 18),
+                //     Expanded(
+                //       child: CustomButton(
+                //         text: "Cancel",
+                //         onTap: () {
+                //           Get.back();
+                //         },
+                //       ),
+                //     ),
+                //     const SizedBox(width: 40),
+                //   ],
+                // ),
                 const SizedBox(height: 48),
               ],
             ),
@@ -161,10 +175,18 @@ class _PostDetailsState extends State<PostDetails> {
   void resolvePostData() async {
     if (widget.post != null) {
       postData = widget.post!;
-      if (_isLoggedIn) post.addViewCount(postData!.id);
+      if (_isLoggedIn) {
+        post.addViewCount(postData!.id);
+      } else {
+        post.getSinglePostWithoutAuth(postData!.id);
+      }
       index = post.posts.indexWhere((val) => val.id == postData?.id);
     } else {
-      if (_isLoggedIn) await post.addViewCount(widget.postId!);
+      if (_isLoggedIn) {
+        await post.addViewCount(widget.postId!);
+      } else {
+        await post.getSinglePostWithoutAuth(widget.postId!);
+      }
       try {
         postData = post.posts.firstWhere(
           (element) => element.id == widget.postId,
@@ -273,9 +295,11 @@ class _PostDetailsState extends State<PostDetails> {
                         ),
                       ),
 
-                    if (postData!.category != "service")
+                    if (!_isLoggedIn) SafeArea(child: SizedBox(height: 0)),
+
+                    if (_isLoggedIn && postData!.category != "service")
                       PostComments(sectionKey: commentSectionKey, index: index),
-                    if (postData!.category == "service")
+                    if (_isLoggedIn && postData!.category == "service")
                       PostReviews(sectionKey: commentSectionKey, index: index),
                   ],
                 ),

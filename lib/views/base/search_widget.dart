@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:jurnee/controllers/location_controller.dart';
 import 'package:jurnee/controllers/maps_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
@@ -258,8 +260,8 @@ class _SearchWidgetState extends State<SearchWidget> {
                             expanded = -1;
                             try {
                               post.customLocation.value = LatLng(
-                                post.userLocation.value!.latitude,
-                                post.userLocation.value!.longitude,
+                                Get.find<LocationController>().userLocation.value!.latitude,
+                                Get.find<LocationController>().userLocation.value!.longitude,
                               );
                             } catch (_) {
                               customSnackBar("Couldn't fetch user location");
@@ -368,11 +370,16 @@ class _SearchWidgetState extends State<SearchWidget> {
                     homeKey.currentState?.setState(() {
                       homeKey.currentState?.searchEnabled = false;
                     });
-                    post.fetchPosts().then((message) {
-                      if (message != "success") {
-                        customSnackBar(message);
-                      }
-                    });
+                    final userCtrl = Get.find<UserController>();
+                    if (userCtrl.isLoggedIn.value) {
+                      post.fetchPosts().then((message) {
+                        if (message != "success") customSnackBar(message);
+                      });
+                    } else {
+                      post.fetchPostsWithoutAuth().then((message) {
+                        if (message != "success") customSnackBar(message);
+                      });
+                    }
                   },
                   text: "Reset",
                   isSecondary: true,
@@ -387,11 +394,16 @@ class _SearchWidgetState extends State<SearchWidget> {
                       homeKey.currentState!.searchEnabled = false;
                       homeKey.currentState!.tab = 0;
                     });
-                    post.fetchPosts().then((message) {
-                      if (message != "success") {
-                        customSnackBar(message);
-                      }
-                    });
+                    final userCtrl = Get.find<UserController>();
+                    if (userCtrl.isLoggedIn.value) {
+                      post.fetchPosts().then((message) {
+                        if (message != "success") customSnackBar(message);
+                      });
+                    } else {
+                      post.fetchPostsWithoutAuth().then((message) {
+                        if (message != "success") customSnackBar(message);
+                      });
+                    }
                   },
                   text: "Apply",
                   height: 44,

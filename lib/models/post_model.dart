@@ -268,7 +268,7 @@ class PostModel {
           json["attenders"].map((x) => Author.fromJson(x)),
         ),
         isAttender: json["isAttender"] ?? false,
-        isSaved: json["isSaved"],
+        isSaved: json["isSaved"] ?? false,
         totalSaved: json["totalSaved"],
         schedule: json["schedule"] == null
             ? []

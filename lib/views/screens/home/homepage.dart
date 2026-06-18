@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
+import 'package:jurnee/controllers/location_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_list_handler.dart';
@@ -12,6 +14,7 @@ import 'package:jurnee/views/base/native_ad_widget.dart';
 import 'package:jurnee/views/base/post_card.dart';
 import 'package:jurnee/views/base/search_widget.dart';
 import 'package:jurnee/views/screens/home/location_map.dart';
+import 'package:jurnee/views/screens/home/need_location.dart';
 import 'package:jurnee/views/screens/post/post_alert.dart';
 import 'package:jurnee/views/screens/post/post_deal.dart';
 import 'package:jurnee/views/screens/post/post_event.dart';
@@ -42,16 +45,36 @@ class HomepageState extends State<Homepage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.find<PostController>().fetchLocation().then((val) {
-        setState(() {});
-      });
-    });
-    post.fetchPosts().then((message) {
-      if (message != "success") {
-        customSnackBar(message);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final locController = Get.find<LocationController>();
+      await locController.checkPermission();
+
+      if (!locController.hasPermission.value) {
+        customSnackBar("You must enable location permission to get posts.");
+        return;
       }
+
+      await post.fetchLocation();
+      setState(() {});
+
+      await _fetchPosts();
     });
+  }
+
+  Future<void> _fetchPosts({bool loadMore = false, String? category}) async {
+    final userController = Get.find<UserController>();
+    String message;
+    if (userController.isLoggedIn.value) {
+      message = await post.fetchPosts(loadMore: loadMore, category: category);
+    } else {
+      message = await post.fetchPostsWithoutAuth(
+        loadMore: loadMore,
+        category: category,
+      );
+    }
+    if (message != "success") {
+      customSnackBar(message);
+    }
   }
 
   @override
@@ -59,132 +82,148 @@ class HomepageState extends State<Homepage> {
     return Scaffold(
       body: Stack(
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              AppBar(
-                // toolbarHeight: 50,
-                automaticallyImplyLeading: false,
-                backgroundColor: AppColors.scaffoldBG,
-                surfaceTintColor: Colors.transparent,
-                titleSpacing: 0,
-                title: Row(
-                  children: [
-                    const SizedBox(width: 24),
-                    CustomSvg(asset: "assets/icons/logo.svg", height: 22),
-                    Spacer(),
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          searchEnabled = true;
-                        });
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: isFiltering()
-                            ? BoxDecoration(
-                                color: AppColors.green.shade600,
-                                borderRadius: BorderRadius.circular(4),
-                                boxShadow: [
-                                  BoxShadow(
-                                    offset: Offset(0, 2),
-                                    blurRadius: 2,
-                                    color: Colors.black.withValues(alpha: 0.4),
-                                  ),
-                                ],
-                              )
-                            : null,
-                        child: CustomSvg(
-                          asset: "assets/icons/search.svg",
-                          color: isFiltering() ? AppColors.green[25] : null,
+          Obx(
+            () => Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                AppBar(
+                  // toolbarHeight: 50,
+                  automaticallyImplyLeading: false,
+                  backgroundColor: AppColors.scaffoldBG,
+                  surfaceTintColor: Colors.transparent,
+                  titleSpacing: 0,
+                  title: Row(
+                    children: [
+                      const SizedBox(width: 24),
+                      CustomSvg(asset: "assets/icons/logo.svg", height: 22),
+                      Spacer(),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            searchEnabled = true;
+                          });
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(4),
+                          decoration: isFiltering()
+                              ? BoxDecoration(
+                                  color: AppColors.green.shade600,
+                                  borderRadius: BorderRadius.circular(4),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      offset: Offset(0, 2),
+                                      blurRadius: 2,
+                                      color: Colors.black.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : null,
+                          child: CustomSvg(
+                            asset: "assets/icons/search.svg",
+                            color: isFiltering() ? AppColors.green[25] : null,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 24),
-                  ],
-                ),
-              ),
-              // const SizedBox(height: 12 ,),
-              if (!isFiltering())
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 8,
-                  ),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    clipBehavior: Clip.none,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      spacing: 8,
-                      children: [
-                        tabs("All", "assets/icons/icon.svg", 0),
-                        tabs("Events", "assets/icons/event.svg", 1),
-                        tabs("Deals", "assets/icons/deal.svg", 2),
-                        tabs("Services", "assets/icons/service.svg", 3),
-                        tabs("Alerts", "assets/icons/alert.svg", 4),
-                      ],
-                    ),
+                      const SizedBox(width: 24),
+                    ],
                   ),
                 ),
+                // const SizedBox(height: 12 ,),
+                if (!isFiltering())
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      clipBehavior: Clip.none,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        spacing: 8,
+                        children: [
+                          tabs("All", "assets/icons/icon.svg", 0),
+                          tabs("Events", "assets/icons/event.svg", 1),
+                          tabs("Deals", "assets/icons/deal.svg", 2),
+                          tabs("Services", "assets/icons/service.svg", 3),
+                          tabs("Alerts", "assets/icons/alert.svg", 4),
+                        ],
+                      ),
+                    ),
+                  ),
 
-              Container(
-                width: double.infinity,
-                height: 1,
-                color: AppColors.gray.shade200,
-              ),
-              showMap
-                  ? Expanded(child: LocationMap())
-                  : Expanded(
-                      child: Obx(
-                        () => CustomListHandler(
-                          isLoading: post.isFirstLoad.value,
-                          horizontalPadding: 16,
-                          onRefresh: () => post
-                              .fetchPosts(category: categoryList[tab])
-                              .then((message) {
-                                if (message != "success") {
-                                  customSnackBar(message);
-                                }
-                              }),
-                          onLoadMore: () => post.fetchPosts(
-                            loadMore: true,
-                            category: categoryList[tab],
-                          ),
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 12),
-                              for (int i = 0; i < post.posts.length; i++) ...[
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: PostCard(post.posts.elementAt(i)),
-                                ),
-
-                                if (i != 1 && i % 4 == 0)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 20),
-                                    child: NativeAdListItem(
-                                      key: ValueKey('native_ad_$i'),
+                Container(
+                  width: double.infinity,
+                  height: 1,
+                  color: AppColors.gray.shade200,
+                ),
+                if (!Get.find<LocationController>().hasPermission.value)
+                  Expanded(
+                    child: Center(
+                      child: NeedLocation(
+                        onTap: () => _fetchPosts(category: categoryList[tab]),
+                      ),
+                    ),
+                  ),
+                if (Get.find<LocationController>().hasPermission.value)
+                  showMap
+                      ? Expanded(child: LocationMap())
+                      : Expanded(
+                          child: Obx(
+                            () => CustomListHandler(
+                              isLoading: post.isFirstLoad.value,
+                              horizontalPadding: 16,
+                              onRefresh: () =>
+                                  _fetchPosts(category: categoryList[tab]),
+                              onLoadMore: () => _fetchPosts(
+                                loadMore: true,
+                                category: categoryList[tab],
+                              ),
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 12),
+                                  for (
+                                    int i = 0;
+                                    i < post.posts.length;
+                                    i++
+                                  ) ...[
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 20,
+                                      ),
+                                      child: PostCard(post.posts.elementAt(i)),
                                     ),
-                                  ),
-                              ],
-                              if (post.isMoreLoading.value) CustomLoading(),
-                              if (!post.isMoreLoading.value)
-                                post.posts.isEmpty
-                                    ? _emptyFeedMessage()
-                                    : Text(
-                                        "End of results",
-                                        style: AppTexts.tsmr.copyWith(
-                                          color: AppColors.gray.shade300,
+
+                                    if (i != 1 && i % 4 == 0)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 20,
+                                        ),
+                                        child: NativeAdListItem(
+                                          key: ValueKey('native_ad_$i'),
                                         ),
                                       ),
-                              const SizedBox(height: 24),
-                            ],
+                                  ],
+                                  if (post.isMoreLoading.value) CustomLoading(),
+                                  if (!post.isMoreLoading.value)
+                                    post.posts.isEmpty
+                                        ? _emptyFeedMessage()
+                                        : Text(
+                                            "End of results",
+                                            style: AppTexts.tsmr.copyWith(
+                                              color: AppColors.gray.shade300,
+                                            ),
+                                          ),
+                                  const SizedBox(height: 24),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-            ],
+              ],
+            ),
           ),
 
           if (searchEnabled)
@@ -216,11 +255,7 @@ class HomepageState extends State<Homepage> {
       onTap: () {
         setState(() {
           tab = index;
-          post.fetchPosts(category: categoryList[tab]).then((message) {
-            if (message != "success") {
-              customSnackBar(message);
-            }
-          });
+          _fetchPosts(category: categoryList[tab]);
         });
       },
       child: AnimatedContainer(

@@ -7,7 +7,7 @@ import 'package:jurnee/controllers/post_controller.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
 import 'package:jurnee/utils/custom_snackbar.dart';
-import 'package:jurnee/utils/get_location.dart';
+import 'package:jurnee/controllers/location_controller.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_checkbox.dart';
 import 'package:jurnee/views/base/custom_text_field.dart';
@@ -40,7 +40,7 @@ class _RegisterState extends State<Register> {
       return;
     }
 
-    final userLocation = await getLocation();
+    final userLocation = await Get.find<LocationController>().getLocation();
     final message = await auth.register(
       emailCtrl.text,
       passCtrl.text,

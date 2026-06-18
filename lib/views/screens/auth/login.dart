@@ -194,7 +194,7 @@ class _LoginState extends State<Login> {
                     onTap: onSubmit,
                     isLoading: Get.find<AuthController>().isLoading.value,
                     text: "Login",
-                    // isDisabled: !agreedTerms,
+                    isDisabled: !agreedTerms,
                   );
                 }),
                 const SizedBox(height: 16),
@@ -225,6 +225,7 @@ class _LoginState extends State<Login> {
                       GestureDetector(
                         onTap: () {
                           Get.find<UserController>().userData = null;
+                          Get.find<UserController>().isLoggedIn.value = false;
                           Get.offAll(() => Home(), routeName: "/app");
                         },
                         child: Text(

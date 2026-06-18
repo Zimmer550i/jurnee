@@ -7,6 +7,7 @@ import 'package:jurnee/controllers/ad_controller.dart';
 import 'package:jurnee/controllers/auth_controller.dart';
 import 'package:jurnee/controllers/booking_controller.dart';
 import 'package:jurnee/controllers/chat_controller.dart';
+import 'package:jurnee/controllers/location_controller.dart';
 import 'package:jurnee/controllers/maps_controller.dart';
 import 'package:jurnee/controllers/notification_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
@@ -31,6 +32,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.put(AuthController());
   Get.put(UserController());
   Get.put(ChatController());
+  Get.put(LocationController());
   Get.put(PostController());
   Get.put(MapsController());
   Get.put(BookingController());

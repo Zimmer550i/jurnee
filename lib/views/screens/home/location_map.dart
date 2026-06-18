@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:jurnee/controllers/location_controller.dart';
 import 'package:jurnee/controllers/post_controller.dart';
+import 'package:jurnee/controllers/user_controller.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/utils/app_colors.dart';
 import 'package:jurnee/utils/app_texts.dart';
@@ -48,9 +49,10 @@ class _LocationMapState extends State<LocationMap> {
     }
 
     try {
+      final loc = Get.find<LocationController>();
       lastFetchedLocation = LatLng(
-        post.userLocation.value!.latitude,
-        post.userLocation.value!.longitude,
+        loc.userLocation.value!.latitude,
+        loc.userLocation.value!.longitude,
       );
     } catch (e) {
       String dustbin = e.toString();
@@ -71,10 +73,10 @@ class _LocationMapState extends State<LocationMap> {
           initialCameraPosition: CameraPosition(
             target: LatLng(
               widget.startPosition?.latitude ??
-                  post.userLocation.value?.latitude ??
+                  Get.find<LocationController>().userLocation.value?.latitude ??
                   36.7783,
               widget.startPosition?.longitude ??
-                  post.userLocation.value?.longitude ??
+                  Get.find<LocationController>().userLocation.value?.longitude ??
                   -119.4179,
             ),
             zoom: 14.5,
@@ -99,13 +101,24 @@ class _LocationMapState extends State<LocationMap> {
                 !post.isFirstLoad.value) {
               lastFetchedLocation = position.target;
               post.customLocation.value = position.target;
-              post.fetchPosts().then((val) {
-                if (val != "success") {
-                  customSnackBar(val);
-                } else {
-                  loadMarkers();
-                }
-              });
+              final userCtrl = Get.find<UserController>();
+              if (userCtrl.isLoggedIn.value) {
+                post.fetchPosts().then((val) {
+                  if (val != "success") {
+                    customSnackBar(val);
+                  } else {
+                    loadMarkers();
+                  }
+                });
+              } else {
+                post.fetchPostsWithoutAuth().then((val) {
+                  if (val != "success") {
+                    customSnackBar(val);
+                  } else {
+                    loadMarkers();
+                  }
+                });
+              }
             }
           },
           markers: markers,

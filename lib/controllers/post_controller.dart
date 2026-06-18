@@ -11,7 +11,7 @@ import 'package:jurnee/models/moment_model.dart';
 import 'package:jurnee/models/post_model.dart';
 import 'package:jurnee/models/reivew_model.dart';
 import 'package:jurnee/services/api_service.dart';
-import 'package:jurnee/utils/get_location.dart';
+import 'package:jurnee/controllers/location_controller.dart';
 
 enum PostType { defaultPosts }
 
@@ -23,7 +23,7 @@ class PostController extends GetxController {
   RxList<CommentModel> comments = RxList.empty();
   RxList<ReviewModel> reviews = RxList.empty();
   RxList<MomentModel> mediaList = RxList.empty();
-  Rxn<Position> userLocation = Rxn();
+
   RxBool isLoading = RxBool(false);
   RxBool isAttendLoading = RxBool(false);
   RxBool mediaLoading = RxBool(false);
@@ -47,16 +47,15 @@ class PostController extends GetxController {
   Rxn<DateTime> toDate = Rxn<DateTime>();
 
   Future<void> fetchLocation() async {
-    await getLocation().then((val) {
-      userLocation.value = val;
-    });
-    if (userLocation.value != null) {
+    final location = Get.find<LocationController>();
+    await location.getLocation();
+    if (location.userLocation.value != null) {
       await Get.find<UserController>().updateUserData({
         "location": {
           "type": "Point",
           "coordinates": [
-            userLocation.value!.longitude,
-            userLocation.value!.latitude,
+            location.userLocation.value!.longitude,
+            location.userLocation.value!.latitude,
           ],
         },
       });
@@ -64,12 +63,12 @@ class PostController extends GetxController {
   }
 
   String getDistance(double targetLong, double targetLat) {
+    final location = Get.find<LocationController>();
     final currentLat =
-        customLocation.value?.latitude ?? userLocation.value?.latitude ?? 0;
+        customLocation.value?.latitude ?? location.userLocation.value?.latitude ?? 0;
     final currentLng =
-        customLocation.value?.longitude ?? userLocation.value?.longitude ?? 0;
+        customLocation.value?.longitude ?? location.userLocation.value?.longitude ?? 0;
 
-    // Calculate distance in meters
     double distanceInMeters = Geolocator.distanceBetween(
       currentLat,
       currentLng,
@@ -77,7 +76,6 @@ class PostController extends GetxController {
       targetLong,
     );
 
-    // Convert meters to miles (1 meter = 0.000621371 miles)
     double distanceInMiles = distanceInMeters * 0.000621371;
 
     return "${distanceInMiles.toStringAsFixed(1)} miles";
@@ -106,6 +104,67 @@ class PostController extends GetxController {
     Get.find<MapsController>().selected.value = null;
   }
 
+  Future<String> fetchPostsWithoutAuth({bool loadMore = false, String? category}) async {
+    if (loadMore && currentPage.value >= totalPages.value) return "success";
+
+    if (!loadMore) {
+      isFirstLoad(true);
+      currentPage(1);
+    } else {
+      isMoreLoading(true);
+      currentPage.value++;
+    }
+
+    try {
+      final res = await api.get(
+        "/post/global",
+        queryParams: _removeNullQueryParams({
+          "page": currentPage.value,
+          "limit": limit,
+          "lat": customLocation.value?.latitude ??
+              Get.find<LocationController>().userLocation.value?.latitude,
+          "lng": customLocation.value?.longitude ??
+              Get.find<LocationController>().userLocation.value?.longitude,
+          "maxDistance": distance.value != null
+              ? (distance.value! * 1609.344 * 1000).toInt() + 100
+              : null,
+          "rating": highlyRated.value ? "4" : null,
+          "minPrice": minPrice.value,
+          "maxPrice": maxPrice.value,
+          "category": category ?? categoryList.join(","),
+          "dateFrom": fromDate.value?.toIso8601String(),
+          "dateTo": toDate.value?.toIso8601String(),
+          "search": search.value,
+        }),
+      );
+
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200) {
+        postsSource = "homescreen";
+        if (!loadMore) {
+          posts.clear();
+        }
+        final meta = PaginationMeta.fromJson(body['meta']);
+        totalPages(meta.totalPage);
+
+        final List<dynamic> dataList = body['data'];
+        final newItems = dataList.map((e) => PostModel.fromJson(e)).toList();
+
+        posts.addAll(newItems);
+
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    } finally {
+      isFirstLoad(false);
+      isMoreLoading(false);
+    }
+  }
+
   Future<String> fetchPosts({bool loadMore = false, String? category}) async {
     if (loadMore && currentPage.value >= totalPages.value) return "success";
 
@@ -123,8 +182,10 @@ class PostController extends GetxController {
         queryParams: _removeNullQueryParams({
           "page": currentPage.value,
           "limit": limit,
-          "lat": customLocation.value?.latitude,
-          "lng": customLocation.value?.longitude,
+          "lat": customLocation.value?.latitude ??
+              Get.find<LocationController>().userLocation.value?.latitude,
+          "lng": customLocation.value?.longitude ??
+              Get.find<LocationController>().userLocation.value?.longitude,
           "maxDistance": distance.value != null
               ? (distance.value! * 1609.344 * 1000).toInt() + 100
               : null,
@@ -587,6 +648,35 @@ class PostController extends GetxController {
     }
   }
 
+  Future<String> getSinglePostWithoutAuth(String id) async {
+    try {
+      final res = await api.get("/post/global/$id");
+
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final post = PostModel.fromJson(body['data']);
+        int index = posts.indexWhere((val) => val.id == id);
+        if (index == -1) {
+          index = Get.find<UserController>().posts.indexWhere(
+            (val) => val.id == id,
+          );
+        }
+        if (index != -1) {
+          posts[index] = post;
+        } else {
+          posts.add(post);
+        }
+        posts.refresh();
+        return "success";
+      } else {
+        return body['message'] ?? "Something went wrong";
+      }
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
   Future<String> updatePost(String id, Map<String, dynamic> data) async {
     isLoading(true);
     try {
@@ -642,7 +732,7 @@ class PostController extends GetxController {
   Future<String> getMedia(String id) async {
     mediaLoading(true);
     try {
-      final res = await api.get("/post/moment/$id/all", authReq: true);
+      final res = await api.get("/post/moment/$id/all");
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
