@@ -16,7 +16,7 @@ class AdController extends GetxController {
   static const String _iosProdNative = 'ca-app-pub-6145393247747170/8638887669';
 
   /// Set true to always use sample ad units (e.g. store review). Release builds use production IDs unless this is set.
-  bool forceTestAdUnits = true;
+  bool forceTestAdUnits = false;
 
   bool get _shouldUseTestUnits => forceTestAdUnits || !kReleaseMode;
 

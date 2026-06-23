@@ -13,6 +13,7 @@ import 'package:jurnee/helpers/route_observer.dart';
 import 'package:jurnee/views/base/custom_app_bar.dart';
 import 'package:jurnee/views/base/custom_button.dart';
 import 'package:jurnee/views/base/custom_loading.dart';
+import 'package:jurnee/views/base/native_ad_widget.dart';
 import 'package:jurnee/views/base/post_card.dart';
 import 'package:jurnee/views/base/profile_picture.dart';
 import 'package:jurnee/views/screens/auth/login.dart';
@@ -507,11 +508,23 @@ class _ProfileState extends State<Profile> with RouteAware {
                       () => Column(
                         children: [
                           if (!user.isFirstLoad.value)
-                            for (var i in user.posts)
+                            for (int i = 0; i < user.posts.length; i++) ...[
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 20),
-                                child: PostCard(i, showPostActions: true),
+                                child: PostCard(
+                                  user.posts.elementAt(i),
+                                  showPostActions: true,
+                                ),
                               ),
+
+                              if (i != 1 && i % 4 == 0)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  child: NativeAdListItem(
+                                    key: ValueKey('native_ad_$i'),
+                                  ),
+                                ),
+                            ],
 
                           if (user.isFirstLoad.value) CustomLoading(),
                           if (!user.isFirstLoad.value &&

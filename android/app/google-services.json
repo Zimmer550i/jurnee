@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "634424633336-pdo8i38imikj82hn0ef6brpg57382eem.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.joinjurnee.jurnee",
+            "certificate_hash": "5d4c482f84c0f0e77c7b0bd42c426e86f4c57117"
+          }
+        },
+        {
           "client_id": "634424633336-q380o0ht0rdpgs9f93gjc5jmdtteteo2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
