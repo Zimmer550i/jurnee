@@ -18,6 +18,14 @@ class User {
   int followers;
   int following;
   final Location location;
+  final String? googleId;
+  final String? appleId;
+  final String? paypalAccount;
+  final int? income;
+  final int? v;
+  final String? stripeAccountId;
+  final bool? isStripeConnected;
+  final String? card;
 
   User({
     required this.id,
@@ -39,6 +47,14 @@ class User {
     this.followers = 0,
     this.following = 0,
     required this.location,
+    this.googleId,
+    this.appleId,
+    this.paypalAccount,
+    this.income,
+    this.v,
+    this.stripeAccountId,
+    this.isStripeConnected,
+    this.card,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -62,6 +78,14 @@ class User {
       followers: json['followers'] ?? 0,
       following: json['following'] ?? 0,
       location: Location.fromJson(json['location'] ?? {}),
+      googleId: json['googleId'],
+      appleId: json['appleId'],
+      paypalAccount: json['paypalAccount'],
+      income: json['income'],
+      v: json['__v'],
+      stripeAccountId: json['stripeAccountId'],
+      isStripeConnected: json['isStripeConnected'],
+      card: json['card'],
     );
   }
 
@@ -86,6 +110,14 @@ class User {
       'followers': followers,
       'following': following,
       'location': location.toJson(),
+      'googleId': googleId,
+      'appleId': appleId,
+      'paypalAccount': paypalAccount,
+      'income': income,
+      '__v': v,
+      'stripeAccountId': stripeAccountId,
+      'isStripeConnected': isStripeConnected,
+      'card': card,
     };
   }
 }

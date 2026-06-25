@@ -23,6 +23,7 @@ class _EditProfileState extends State<EditProfile> {
   final nameCtrl = TextEditingController();
   final locationCtrl = TextEditingController();
   final bioCtrl = TextEditingController();
+  final cardCtrl = TextEditingController();
 
   File? image;
 
@@ -32,6 +33,7 @@ class _EditProfileState extends State<EditProfile> {
     nameCtrl.text = user.userData?.name ?? "";
     locationCtrl.text = user.userData?.address ?? "";
     bioCtrl.text = user.userData?.bio ?? "";
+    cardCtrl.text = user.userData?.card ?? "";
   }
 
   void onSubmit() async {
@@ -39,6 +41,7 @@ class _EditProfileState extends State<EditProfile> {
       "name": nameCtrl.text.trim(),
       "address": locationCtrl.text.trim(),
       "bio": bioCtrl.text.trim(),
+      "card": cardCtrl.text.trim(),
     };
 
     if (image != null) {
@@ -55,6 +58,15 @@ class _EditProfileState extends State<EditProfile> {
     } else {
       customSnackBar(message);
     }
+  }
+
+  @override
+  void dispose() {
+    nameCtrl.dispose();
+    locationCtrl.dispose();
+    bioCtrl.dispose();
+    cardCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -92,6 +104,13 @@ class _EditProfileState extends State<EditProfile> {
                   hintText: "Enter your bio",
                   controller: bioCtrl,
                   lines: 5,
+                ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  title: "Stripe Card no.",
+                  hintText: "Enter Stripe card no.",
+                  controller: cardCtrl,
+                  textInputType: TextInputType.number,
                 ),
                 const SizedBox(height: 24),
                 // Spacer(),
